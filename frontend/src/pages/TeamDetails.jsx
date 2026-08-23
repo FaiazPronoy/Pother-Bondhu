@@ -1,9 +1,7 @@
 // TeamDetails.jsx
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-
-const backendUrl = "http://localhost:4000";
-
+import { backendUrl } from '../config';
 export default function TeamDetails() {
   const { key } = useParams(); // slug | id | _id
   const [team, setTeam] = useState(null);

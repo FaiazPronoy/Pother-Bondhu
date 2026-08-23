@@ -1,8 +1,6 @@
 // src/components/TeamDetailsModal.jsx
 import React from "react";
-
-const backendUrl = "http://localhost:4000";
-
+import { backendUrl } from '../config';
 export default function TeamDetailsModal({ open, onClose, teamKey, title }) {
   const [team, setTeam] = React.useState(null);
   const [loading, setLoading] = React.useState(false);

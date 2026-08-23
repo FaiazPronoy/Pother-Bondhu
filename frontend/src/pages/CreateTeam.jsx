@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
-
-const backendUrl = "http://localhost:4000";
-
+import { backendUrl } from '../config';
 const CreateTeamPage = () => {
   const [teamName, setTeamName] = useState("");
   const [location, setLocation] = useState("");

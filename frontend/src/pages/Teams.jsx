@@ -2,10 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import TeamDetailsModal from "../components/TeamDetailsModal";
-
-const backendUrl = "http://localhost:4000";
-
-
+import { backendUrl } from '../config';
 const Teams = () => {
   const [teams, setTeams] = useState([]);
   const [searchName, setSearchName] = useState('');

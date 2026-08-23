@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Plus, Edit, Trash2, Save, X, PlusCircle, MinusCircle, Info } from 'lucide-react';
 import AdminNavbar from './AdminNavbar';
 import { DarkmodeContext } from '../context/DarkmodeContext';
+import { backendUrl } from '../config';
 
 const ProductPage = () => {
     const [products, setProducts] = useState([]);
@@ -28,8 +29,6 @@ const ProductPage = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [selectedProductDetails, setSelectedProductDetails] = useState(null);
     const { isDarkMode } = useContext(DarkmodeContext);
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
-
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };

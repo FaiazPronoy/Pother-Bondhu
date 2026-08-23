@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
+import { backendUrl } from '../config';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const ProfilePage = () => {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:4000/api/user/profile", {
+        const response = await fetch(`${backendUrl}/api/user/profile`, {
           method: "GET",
           credentials: "include",
           headers: {
@@ -70,7 +71,7 @@ const ProfilePage = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("http://localhost:4000/api/user/profile", {
+      const response = await fetch(`${backendUrl}/api/user/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -120,7 +121,7 @@ const ProfilePage = () => {
       }
 
       const response = await fetch(
-        "http://localhost:4000/api/user/add-points",
+        `${backendUrl}/api/user/add-points`,
         {
           method: "PUT",
           credentials: "include",
@@ -161,7 +162,7 @@ const ProfilePage = () => {
       formData.append("image", selectedImage); // 'image' must match Multer field name
       formData.append("caption", imageCaption);
 
-      const response = await fetch("http://localhost:4000/api/upload/rescue", {
+      const response = await fetch(`${backendUrl}/api/upload/rescue`, {
         method: "POST",
         credentials: "include", // for cookies if using session auth
         body: formData, // No Content-Type header - browser sets it automatically

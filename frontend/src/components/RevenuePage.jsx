@@ -3,6 +3,7 @@ import { X, DollarSign, CalendarDays, CircleDollarSign } from 'lucide-react';
 import AdminNavbar from './AdminNavbar';
 import { DarkmodeContext } from '../context/DarkmodeContext';
 import axios from 'axios';
+import { backendUrl } from '../config';
 
 const Card = ({ title, children, className, onClick }) => {
     const { isDarkMode } = useContext(DarkmodeContext);
@@ -435,8 +436,6 @@ const RevenuePage = () => {
     const [weeklyProfit, setWeeklyProfit] = useState(null);
     const [loadingWeeklyProfit, setLoadingWeeklyProfit] = useState(false);
     const [errorWeeklyProfit, setErrorWeeklyProfit] = useState(null);
-
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
     const handleCardClick = (title) => {
         setShowCalculation(title);
         if (title === 'Total Revenue') {

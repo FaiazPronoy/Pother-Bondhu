@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Info, Users } from 'lucide-react';
 import AdminNavbar from './AdminNavbar';
 import { DarkmodeContext } from '../context/DarkmodeContext';
+import { backendUrl } from '../config';
 
 const VolunteerPage = () => {
     const [volunteers, setVolunteers] = useState([]);
@@ -13,9 +14,6 @@ const VolunteerPage = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [activeTab, setActiveTab] = useState('Volunteers');
     const { isDarkMode } = useContext(DarkmodeContext);
-
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
-
     useEffect(() => {
         const fetchVolunteers = async () => {
             setLoading(true);

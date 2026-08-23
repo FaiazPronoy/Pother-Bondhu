@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { backendUrl } from '../config';
 
-const API_URL = 'http://localhost:4000/api/products'; // Update if you deployed it somewhere
+const API_URL = `${backendUrl}/api/products`; // Update if you deployed it somewhere
 
 // Fetch all products
 export const getAllProducts = async () => {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { backendUrl } from '../config';
 
 export default function VolunteersPage() {
   const [volunteers, setVolunteers] = useState([]);
@@ -12,7 +13,7 @@ export default function VolunteersPage() {
     try {
       setLoading(true);
       const res = await fetch(
-        `http://localhost:4000/api/volunteers${location ? `?location=${encodeURIComponent(location)}` : ''}`,
+        `${backendUrl}/api/volunteers${location ? `?location=${encodeURIComponent(location)}` : ''}`,
         {
           credentials: 'include',
           headers: {

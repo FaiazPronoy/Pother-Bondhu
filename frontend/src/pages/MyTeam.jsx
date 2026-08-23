@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { backendUrl } from '../config';
 
 const MyTeam = () => {
   const [teams, setTeams] = useState([]);
@@ -21,7 +22,7 @@ const MyTeam = () => {
       try {
         // Fetch teams
         const teamsResponse = await fetch(
-          "http://localhost:4000/api/teams/my-teams",
+          `${backendUrl}/api/teams/my-teams`,
           {
             method: "GET",
             headers: {
@@ -63,7 +64,7 @@ const MyTeam = () => {
 
         // Fetch volunteers
         const volunteersResponse = await fetch(
-          "http://localhost:4000/api/volunteers",
+          `${backendUrl}/api/volunteers`,
           {
             method: "GET",
             headers: {
@@ -106,7 +107,7 @@ const MyTeam = () => {
     formData.append("caption", caption);
 
     try {
-      const res = await fetch("http://localhost:4000/api/upload/rescue", {
+      const res = await fetch(`${backendUrl}/api/upload/rescue`, {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -137,7 +138,7 @@ const MyTeam = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:4000/api/invites/send", {
+      const response = await fetch(`${backendUrl}/api/invites/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

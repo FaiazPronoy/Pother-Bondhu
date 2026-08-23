@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
+import { backendUrl } from '../config';
 
 const VolunteerProfile = () => {
   const { id } = useParams();
@@ -22,7 +23,7 @@ const VolunteerProfile = () => {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:4000/api/volunteers/${id}?page=${currentPage}`,
+          `${backendUrl}/api/volunteers/${id}?page=${currentPage}`,
           {
             method: "GET",
             credentials: "include",
@@ -160,7 +161,7 @@ const VolunteerProfile = () => {
 
                           try {
                             const response = await fetch(
-                              `http://localhost:4000/api/volunteers/${id}/donate`,
+                              `${backendUrl}/api/volunteers/${id}/donate`,
                               {
                                 method: "POST",
                                 headers: {
@@ -219,9 +220,9 @@ const VolunteerProfile = () => {
                       key={image._id}
                       className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
                     >
-                      {console.log(`http://localhost:4000/ ${image.imageUrl}`)}
+                      {console.log(`${backendUrl}/ ${image.imageUrl}`)}
                       <img
-                        src={`http://localhost:4000${image.imageUrl}`}
+                        src={`${backendUrl}${image.imageUrl}`}
                         alt="Rescued animal"
                         className="w-full h-48 object-cover"
                       />

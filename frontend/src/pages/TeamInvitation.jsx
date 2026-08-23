@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { backendUrl } from '../config';
 
 const TeamInvitations = () => {
   const [invitations, setInvitations] = useState([]);
@@ -12,7 +13,7 @@ const TeamInvitations = () => {
   useEffect(() => {
     const fetchInvitations = async () => {
       try {
-        const response = await fetch('http://localhost:4000/api/invites/me', {
+        const response = await fetch(`${backendUrl}/api/invites/me`, {
           credentials: 'include'
         });
         const data = await response.json();
@@ -32,7 +33,7 @@ const TeamInvitations = () => {
       setError(null);
       setSuccessMessage(null);
       
-      const response = await fetch(`http://localhost:4000/api/invites/${inviteId}/respond`, {
+      const response = await fetch(`${backendUrl}/api/invites/${inviteId}/respond`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

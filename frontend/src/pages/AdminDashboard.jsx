@@ -5,6 +5,7 @@ import { Boxes, ClipboardList, ArrowRight, ShoppingCart, AlertTriangle, CheckCir
 import AdminNavbar from '../components/AdminNavbar';
 import { DarkmodeContext } from '../context/DarkmodeContext';
 import axios from 'axios';
+import { backendUrl } from '../config';
 
 const Card = ({ title, children, className, onClick }) => {
     const { isDarkMode } = useContext(DarkmodeContext);
@@ -131,7 +132,6 @@ const AdminDashboard = () => {
     const [lowStockProducts, setLowStockProducts] = useState([]);
     const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
     const [mostOrderedProductsData, setMostOrderedProductsData] = useState([]);
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
     const [loading, setLoading] = useState(false);
     const [fetchError, setFetchError] = useState(null);
     const [orders, setOrders] = useState(null);
@@ -190,7 +190,6 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchMostOrdered = async () => {
             try {
-                const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
                 const response = await axios.get(`${backendUrl}/api/products/most-ordered`);
                 setMostOrderedProductsData(response.data);
                 console.log("Most ordered products fetched:", response.data);
@@ -525,7 +524,6 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchProductCount = async () => {
             try {
-                const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
                 if (!backendUrl) {
                     throw new Error("VITE_BACKEND_URL is not defined. Please configure your environment.");
                 }
@@ -550,7 +548,6 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchLowStockProducts = async () => {
             try {
-                const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
                 if (!backendUrl) {
                     throw new Error("VITE_BACKEND_URL is not defined. Please configure your environment.");
                 }
