@@ -24,7 +24,7 @@ describe('PUT /api/user/profile', () => {
     expect(after.points).toBe(10);
   });
 
-  it('still updates the fields a user is allowed to change', async () => {
+  it('updates the fields a user is allowed to change', async () => {
     const donor = await createUser();
     const res = await api('PUT', '/api/user/profile', {
       body: { name: 'New Name', location: 'Dhaka', bio: 'hello' },

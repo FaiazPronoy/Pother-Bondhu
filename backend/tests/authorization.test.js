@@ -60,8 +60,8 @@ describe('product catalogue writes', () => {
   });
 });
 
-describe('the unauthenticated order listing', () => {
-  it('is gone', async () => {
+describe('GET /api/orders/', () => {
+  it('is not a route', async () => {
     const res = await api('GET', '/api/orders/');
     expect(res.status).toBe(404);
   });

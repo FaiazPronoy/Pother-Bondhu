@@ -52,7 +52,8 @@ export const AppContextProvider = (props) => {
       const res = await axios.get(`${backendUrl}/api/products`);
 
       const slimmedProducts = res.data.map(p => ({
-        id: p._id, 
+        id: p.id,
+        _id: p._id,
         name: p.name,
         sellingPrice: p.sellingPrice,
         stockQuantity: p.stockQuantity,

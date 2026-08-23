@@ -13,4 +13,13 @@ uploadRouter.post(
   uploadImage          
 );
 
+// multer rejects bad files by throwing, which would otherwise return Express's
+// HTML error page to a caller expecting JSON
+uploadRouter.use((err, req, res, next) => {
+  if (err) {
+    return res.status(400).json({ success: false, message: err.message });
+  }
+  next();
+});
+
 export default uploadRouter;

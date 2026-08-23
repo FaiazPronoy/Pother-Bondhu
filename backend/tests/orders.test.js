@@ -4,7 +4,7 @@ import { api, createUser, createProduct, getUser, getLatestOrder } from './helpe
 const shipping = { name: 'Buyer', phone: '01700000000', address: '12 Test Road', shipping: 'standard' };
 
 describe('placing an order', () => {
-  it('charges for every item in the cart, not just the last one', async () => {
+  it('charges for every item in the cart', async () => {
     const a = await createProduct({ sellingPrice: 500 });
     const b = await createProduct({ sellingPrice: 300 });
     const c = await createProduct({ sellingPrice: 200 });
@@ -115,7 +115,7 @@ describe('placing an order', () => {
     expect(after.points).toBe(100);
   });
 
-  it('stores the cost and product id on each line so profit can be worked out', async () => {
+  it('stores the cost and product id on each line', async () => {
     const p = await createProduct({ sellingPrice: 300, purchaseCost: 120 });
     const buyer = await createUser({ points: 1000 });
 

@@ -9,8 +9,7 @@ export const saveUserCart = async (req, res) => {
     return res.status(400).json({ message: 'items must be an array' });
   }
 
-  // the client sends whole product objects, but only the id and quantity are
-  // worth storing - name and price are read back from the product itself
+  // only id and quantity get stored, the rest comes from the product
   const slimItems = items
     .map((item) => ({
       productId: item.id || item.productId,
@@ -44,7 +43,6 @@ export const getUserCart = async (req, res) => {
     const products = await Product.find({ id: { $in: cart.items.map((i) => i.productId) } });
     const byId = new Map(products.map((p) => [p.id, p]));
 
-    // a product can be deleted while it is sitting in someone's cart
     const items = cart.items
       .filter((item) => byId.has(item.productId))
       .map((item) => {

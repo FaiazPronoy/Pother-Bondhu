@@ -28,7 +28,7 @@ export const getVolunteerProfile = async (req, res) => {
     
     // Get volunteer info
     const volunteer = await userModel.findById(id)
-      .select('-password');
+      .select('-password -email');
     
     if (!volunteer || volunteer.role !== 'volunteer') {
       return res.status(404).json({ message: 'Volunteer not found' });
@@ -110,7 +110,6 @@ export const donateToVolunteer = async (req, res) => {
       return res.status(400).json({ message: 'Not enough PetPoints to donate.' });
     }
 
-    // a donation moves points between two accounts, it does not create them
     donor.points -= points;
     volunteer.points += points;
     await donor.save();

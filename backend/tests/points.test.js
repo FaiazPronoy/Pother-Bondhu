@@ -15,7 +15,7 @@ describe('donating to a volunteer', () => {
     expect(after.points).toBe(0);
   });
 
-  it('moves points from the donor instead of creating them', async () => {
+  it('takes the points from the donor', async () => {
     const volunteer = await createUser({ role: 'volunteer', points: 10 });
     const donor = await createUser({ points: 500 });
     const target = await getUser(volunteer.email);

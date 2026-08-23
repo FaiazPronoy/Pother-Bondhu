@@ -150,14 +150,17 @@ things worth listing:
   a class instead of the OS setting.
 - **Removed rather than finished:** the OTP email verification (its guard was
   inverted and there was no UI for it anywhere), socket.io (created but never
-  attached to the app, and never imported by the frontend), and a "coming soon"
-  payment page.
+  attached to the app, and never imported by the frontend), a "coming soon"
+  payment page, and a second set of team-invite endpoints that duplicated the
+  working ones: one of which let any user add themselves to any team.
 
 ## Known limitations
 
 - **Top-ups are simulated.** `add-points` credits the account without a payment
   gateway. It validates and caps the amount, but it is not a real transaction.
 - **No rate limiting on login.** Worth adding before this faced real users.
+- **`npm run lint` reports errors**: mostly unused variables in the admin
+  revenue page, which is the messiest file in the project.
 - **Product images are stored as data URIs** by the admin form, which bloats the
   documents. The Multer pipeline used for rescue photos would be the better fit.
 - **The frontend bundle is one ~600 kB chunk**: no code splitting yet.

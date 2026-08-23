@@ -39,9 +39,7 @@ export const register = async (req, res) => {
             text: "Welcome to SavePaws: Animal Rescue Network. Your Account has been created."
         }
 
-        // the account already exists at this point, so a mail failure must not
-        // be reported as a failed signup - the user would retry and be told
-        // their email is already taken
+        // account is already saved, don't fail the signup if the mail bounces
         try {
             await transporter.sendMail(mailOptions)
         } catch (mailError) {

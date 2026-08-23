@@ -24,51 +24,6 @@ export const createTeam = async (req, res) => {
   }
 };
 
-// Send an invite
-export const sendTeamInvite = async (req, res) => {
-  try {
-    const { toUserId } = req.body;
-    const { teamId } = req.params;
-
-    const invite = await TeamInvite.create({
-      team: teamId,
-      from: req.userId,
-      to: toUserId,
-    });
-
-    res.json(invite);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to send invite" });
-  }
-};
-
-// Accept or reject an invite
-export const respondToInvite = async (req, res) => {
-  try {
-    const { status } = req.body;
-    const { inviteId } = req.params;
-
-    const invite = await TeamInvite.findById(inviteId);
-    if (!invite || invite.to.toString() !== req.userId) {
-      return res.status(403).json({ error: "Unauthorized" });
-    }
-
-    invite.status = status;
-    await invite.save();
-
-    if (status === "accepted") {
-      await Team.findByIdAndUpdate(invite.team, {
-        $addToSet: { members: invite.to },
-      });
-    }
-
-    res.json(invite);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to respond to invite" });
-  }
-};
-
-// Post an activity update
 export const postTeamActivity = async (req, res) => {
   try {
     const { teamId } = req.params;
@@ -161,8 +116,8 @@ export const getAllTeams = async (req, res) => {
     const filter = {};
     if (type) filter.category = new RegExp(`^${escapeRegex(type)}$`, 'i'); // exact, case-insensitive
     const teams = await Team.find(filter)
-      .populate('creator', 'name email')
-      .populate('members', 'name email')
+      .populate('creator', 'name')
+      .populate('members', 'name')
       .lean();
     console.log(teams)
     res.status(200).json(teams);
@@ -251,8 +206,8 @@ export const getTeamByKey = async (req, res) => {
     }
 
     const populate = [
-      { path: 'creator', select: 'name email' },
-      { path: 'members', select: 'name email' }
+      { path: 'creator', select: 'name' },
+      { path: 'members', select: 'name' }
     ];
 
     // 1) Try custom id and slug first (string fields)

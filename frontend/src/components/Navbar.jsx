@@ -18,6 +18,7 @@ export default function Navbar() {
           withCredentials: true,
         }
       );
+      localStorage.removeItem("user");
       setIsLoggedIn(false);
       toast.success("Logged out successfully");
       navigate("/login");

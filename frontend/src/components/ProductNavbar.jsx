@@ -47,8 +47,7 @@ export default function ProductNavbar() {
 
       localStorage.removeItem("cart");
 
-      localStorage.removeItem("token");
-      localStorage.removeItem("userData");
+      localStorage.removeItem("user");
 
       window.location.href = "/login";
     } catch (err) {

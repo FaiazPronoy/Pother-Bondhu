@@ -18,7 +18,7 @@ describe('the saved cart', () => {
     expect(res.body.cart[0].quantity).toBe(2);
   });
 
-  it('reads price and stock back from the product, not from what the client sent', async () => {
+  it('reads price and stock from the product', async () => {
     const p = await createProduct({ sellingPrice: 150, stockQuantity: 7 });
     const user = await createUser();
 
@@ -50,7 +50,7 @@ describe('the saved cart', () => {
     expect(res.body.cart).toEqual([]);
   });
 
-  it('replaces the previous cart rather than appending to it', async () => {
+  it('replaces the previous cart', async () => {
     const a = await createProduct();
     const b = await createProduct();
     const user = await createUser();

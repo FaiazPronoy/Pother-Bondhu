@@ -33,8 +33,7 @@ export const setUserData = async (req, res) => {
   const { userId } = req;
   const { name, location, bio } = req.body;
 
-  // only these three are updatable here - passing req.body straight through
-  // let a user set their own role and points
+  // only name, location and bio are updatable here
   const updates = {};
   if (name !== undefined) updates.name = name;
   if (location !== undefined) updates.location = location;
@@ -60,8 +59,7 @@ export const addPoints = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // top-ups are simulated - there is no payment gateway behind this, so the
-    // amount is capped to keep a single request from minting a huge balance
+    // no real payment gateway yet, so cap it
     const points = Number(amount);
     if (!Number.isInteger(points) || points < 1 || points > 10000) {
       return res.status(400).json({ message: "Amount must be a whole number between 1 and 10000" });
