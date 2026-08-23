@@ -479,9 +479,6 @@ const RevenuePage = () => {
             setErrorTotalRevenueDetails(null);
             try {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 });
                 console.log("Total Revenue Order Details Response:", response.data);
@@ -505,9 +502,6 @@ const RevenuePage = () => {
             console.log("Fetching all orders for revenue calculation...");
             try {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 });
                 if (response.data?.success && response.data.orders) {
@@ -519,17 +513,7 @@ const RevenuePage = () => {
                         calculatedTotalRevenue += (order.totalPoints || 0);
                         if (order.items && Array.isArray(order.items)) {
                             for (const item of order.items) {
-                                try {
-                                    const productResponse = await axios.get(`${backendUrl}/api/products/${item._id}`);
-                                    if (productResponse.data?.success && productResponse.data.product) {
-                                        const purchaseCost = productResponse.data.product.purchaseCost || 0;
-                                        const quantity = item.quantity || 0;
-                                        const itemPurchaseCost = purchaseCost * quantity;
-                                        calculatedOrderedPurchaseCost += itemPurchaseCost;
-                                    }
-                                } catch (error) {
-                                    console.error(`Error fetching product details for ID: ${item._id}`, error);
-                                }
+                                calculatedOrderedPurchaseCost += (item.purchaseCost || 0) * (item.quantity || 0);
                             }
                         }
                     }
@@ -552,9 +536,6 @@ const RevenuePage = () => {
             setErrorMonthlyRevenueDetails(null);
             try {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 });
                 console.log("All Orders Response for Monthly Revenue Details:", response.data);
@@ -582,9 +563,6 @@ const RevenuePage = () => {
             setErrorWeeklyRevenue(null);
             try {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 });
                 console.log("All Orders Response for Weekly Revenue:", response.data);
@@ -617,9 +595,6 @@ const RevenuePage = () => {
             setErrorWeeklyRevenueDetails(null);
             try {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 });
                 console.log("All Orders Response for Weekly Revenue Details:", response.data);
@@ -651,9 +626,6 @@ const RevenuePage = () => {
             setErrorWeeklyOrderPurchaseCost(null);
             try {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 });
 
@@ -675,17 +647,7 @@ const RevenuePage = () => {
                     for (const order of weeklyOrders) {
                         if (order.items && Array.isArray(order.items)) {
                             for (const item of order.items) {
-                                try {
-                                    const productResponse = await axios.get(`${backendUrl}/api/products/${item._id}`);
-                                    if (productResponse.data?.success && productResponse.data.product) {
-                                        const purchaseCost = productResponse.data.product.purchaseCost || 0;
-                                        const quantity = item.quantity || 0;
-                                        const itemPurchaseCost = purchaseCost * quantity;
-                                        calculatedWeeklyOrderPurchaseCost += itemPurchaseCost;
-                                    }
-                                } catch (error) {
-                                    console.error(`Error fetching product details for ID: ${item._id}`, error);
-                                }
+                                calculatedWeeklyOrderPurchaseCost += (item.purchaseCost || 0) * (item.quantity || 0);
                             }
                         }
                     }

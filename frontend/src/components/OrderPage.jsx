@@ -49,9 +49,6 @@ const OrderPage = () => {
         setFetchError(null);
         try {
             const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                },
                 withCredentials: true,
             });
             if (response.data.success) {
@@ -101,9 +98,6 @@ const OrderPage = () => {
     const confirmDeleteOrder = async () => {
         try {
             const response = await axios.delete(`${backendUrl}/api/orders/${orderToDelete}`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                },
                 withCredentials: true,
             });
 
@@ -137,9 +131,6 @@ const OrderPage = () => {
                 `${backendUrl}/api/orders/${orderId}`,
                 { status: newStatus },
                 {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 }
             );

@@ -159,9 +159,6 @@ const AdminDashboard = () => {
             setFetchError(null);
             try {
                 const res = await axios.get(`${backendUrl}/api/orders/all`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 });
                 if (res.data?.success) {
@@ -210,9 +207,6 @@ const AdminDashboard = () => {
             setFetchError(null);
             try {
                 const res = await axios.get(`${backendUrl}/api/orders/all`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 });
                 if (res.data?.success) {
@@ -245,9 +239,6 @@ const AdminDashboard = () => {
             setErrorWeeklyRevenueChart(null);
             try {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 });
                 console.log("All Orders Response for Weekly Revenue Chart:", response.data);
@@ -580,9 +571,6 @@ const AdminDashboard = () => {
             console.log("Fetching all orders for revenue and cost calculation...");
             try {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 });
                 if (response.data?.success && response.data.orders) {
@@ -594,19 +582,7 @@ const AdminDashboard = () => {
                         calculatedTotalRevenue += (order.totalPoints || 0);
                         if (order.items && Array.isArray(order.items)) {
                             for (const item of order.items) {
-                                try {
-                                    const productResponse = await axios.get(`${backendUrl}/api/products/${item._id}`);
-                                    if (productResponse.data?.success && productResponse.data.product) {
-                                        const purchaseCost = productResponse.data.product.purchaseCost || 0;
-                                        const quantity = item.quantity || 0;
-                                        const itemPurchaseCost = purchaseCost * quantity;
-                                        calculatedOrderedPurchaseCost += itemPurchaseCost;
-                                    } else {
-                                        console.warn(`Could not fetch product details for ID: ${item._id}. Skipping cost calculation for this item.`);
-                                    }
-                                } catch (error) {
-                                    console.error(`Error fetching product details for ID: ${item._id}`, error);
-                                }
+                                calculatedOrderedPurchaseCost += (item.purchaseCost || 0) * (item.quantity || 0);
                             }
                         }
                     }
@@ -633,9 +609,6 @@ const AdminDashboard = () => {
             setErrorMonthlyRevenue(null);
             try {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-                    },
                     withCredentials: true,
                 });
                 console.log("All Orders Response for Monthly Revenue:", response.data);

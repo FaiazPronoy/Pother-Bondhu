@@ -37,7 +37,7 @@ export async function setup({ provide }) {
       NODE_ENV: 'test',
       PORT: '4100',
     },
-    stdio: 'ignore',
+    stdio: 'inherit',
   });
 
   await waitForServer('http://localhost:4100/');

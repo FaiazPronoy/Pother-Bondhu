@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+/* Tailwind v4 ties dark: to the OS setting unless you say otherwise. The app
+   has its own toggle, so drive it from a class instead. */
+@custom-variant dark (&:where(.dark, .dark *));
