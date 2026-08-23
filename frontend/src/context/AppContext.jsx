@@ -102,7 +102,8 @@ export const AppContextProvider = (props) => {
       quantity: item.quantity,
       name: item.name,
       sellingPrice: item.sellingPrice,
-      imageUrl: item.imageUrl
+      imageUrl: item.imageUrl,
+      stockQuantity: item.stockQuantity
     }));
 
     try {

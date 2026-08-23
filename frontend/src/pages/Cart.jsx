@@ -50,7 +50,7 @@ const Cart = () => {
         try {
           const res = await axios.get(`${backendUrl}/api/products/${item.id}`);
           const stockQty = res.data.product?.stockQuantity ?? 0;
-          stockData[item._id] = stockQty;
+          stockData[item.id] = stockQty;
 
           if (stockQty === 0) {
             toast.info(`${item.name} is out of stock and removed from cart.`);
@@ -101,7 +101,7 @@ const Cart = () => {
               {cart.map((item) => {
                 const stock = stockMap[item.id] ?? item.stockQuantity ?? 0;
                 return (
-                  <div key={item._id} className="flex gap-4 border-b pb-4">
+                  <div key={item.id} className="flex gap-4 border-b pb-4">
                     <img
                       src={item.imageUrl}
                       alt={item.name}
@@ -126,7 +126,7 @@ const Cart = () => {
                         <label>Qty:</label>
                         <select
                           value={item.quantity}
-                          onChange={(e) => updateCartItemQuantity(item._id, parseInt(e.target.value))}
+                          onChange={(e) => updateCartItemQuantity(item.id, parseInt(e.target.value))}
                           className="border px-2 py-1 rounded"
                           disabled={stock === 0}
                         >
@@ -135,7 +135,7 @@ const Cart = () => {
                           ))}
                         </select>
                         <button
-                          onClick={() => removeFromCart(item._id)}
+                          onClick={() => removeFromCart(item.id)}
                           className="text-sm text-red-500 hover:underline"
                         >
                           Delete

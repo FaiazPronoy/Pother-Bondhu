@@ -34,7 +34,7 @@ const CheckoutPage = () => {
         ? [product, ...cart]
         : [product];
 
-    for (let item of allItems) {
+    for (let item of allItems.filter(Boolean)) {
       const id = item.id;
       const qty = item.quantity || 1;
       if (productMap[id]) {
@@ -108,6 +108,37 @@ const CheckoutPage = () => {
       setPlacingOrder(false);
     }
   };
+
+  // reaching /checkout directly, or refreshing it, loses the navigation state
+  // that says what is being bought
+  if (products.length === 0) {
+    return (
+      <div className="bg-blue-50 text-gray-800 min-h-screen">
+        <ProductNavbar />
+        <div className="max-w-2xl mx-auto py-20 px-6 text-center">
+          <h2 className="text-2xl font-bold text-blue-700 mb-3">Nothing to check out</h2>
+          <p className="text-gray-600 mb-8">
+            Your checkout session has expired. Add something to your cart and try again.
+          </p>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={() => navigate('/cart')}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Go to cart
+            </button>
+            <button
+              onClick={() => navigate('/products')}
+              className="border border-blue-600 text-blue-600 px-6 py-2 rounded-lg hover:bg-blue-100"
+            >
+              Browse products
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-blue-50 text-gray-800 min-h-screen">
