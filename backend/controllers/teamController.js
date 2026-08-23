@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import escapeRegex from '../utils/escapeRegex.js';
 import Team from '../models/teamModel.js';
 import TeamInvite from "../models/inviteModel.js";
 import userModel from "../models/userModel.js";
@@ -158,7 +159,7 @@ export const getAllTeams = async (req, res) => {
   try {
     const { type = '' } = req.query;
     const filter = {};
-    if (type) filter.category = new RegExp(`^${type}$`, 'i'); // exact, case-insensitive
+    if (type) filter.category = new RegExp(`^${escapeRegex(type)}$`, 'i'); // exact, case-insensitive
     const teams = await Team.find(filter)
       .populate('creator', 'name email')
       .populate('members', 'name email')
@@ -183,7 +184,7 @@ export const listTeams = async (req, res) => {
     let useText = false; // only true when we actually use $text
 
     if (raw) {
-      const words = raw.split(/\s /).filter(Boolean);
+      const words = raw.split(/\s+/).filter(Boolean).map(escapeRegex);
 
       if (words.length === 1) {
         // 1 word -> fuzzy regex
@@ -215,7 +216,7 @@ export const listTeams = async (req, res) => {
       // query = { $text: { $search: `"${raw}"` } };
     }
     if (type) {
-     query.category = new RegExp(`^${type}$`, 'i'); // exact type
+     query.category = new RegExp(`^${escapeRegex(type)}$`, 'i'); // exact type
     }
 
     const findQuery = Team.find(query);

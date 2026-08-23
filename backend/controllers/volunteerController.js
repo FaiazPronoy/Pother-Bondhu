@@ -1,5 +1,6 @@
 import userModel from '../models/userModel.js';
 import RescueImage from '../models/imageModel.js';
+import escapeRegex from '../utils/escapeRegex.js';
 
 export const volunteers = async (req, res) => {
   try {
@@ -8,11 +9,11 @@ export const volunteers = async (req, res) => {
     let query = { role: 'volunteer' };
 
     if (location) {
-      query.location = { $regex: new RegExp(location, 'i') };
+      query.location = { $regex: new RegExp(escapeRegex(location), 'i') };
     }
 
     const volunteers = await userModel.find(query)
-      .select('-password')
+      .select('-password -email')
       .sort({ points: -1 }); // Sort by points descending
       
     res.status(200).json(volunteers);
