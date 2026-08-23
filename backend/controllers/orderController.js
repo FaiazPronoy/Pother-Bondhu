@@ -99,14 +99,6 @@ export const placeOrder = async (req, res) => {
     // Deduct PetPoints
     user.points -= totalPoints;
     await user.save();
-    
-    if (req.app.get("io")) {
-      req.app.get("io").emit("orderPlaced", {
-        userId,
-        items,
-        totalPoints
-      });
-    }
 
     res.status(200).json({ success: true, message: "Order placed successfully." });
 
@@ -163,9 +155,6 @@ export const updateOrderStatus = async (req, res) => {
     }
 
 // Notify frontend (real-time order status update)
-    if (req.app.get("io")) {
-      req.app.get("io").emit("orderUpdated", updatedOrder);
-    }
 
     
     res.status(200).json({ success: true, message: 'Order status updated successfully.', order: updatedOrder });

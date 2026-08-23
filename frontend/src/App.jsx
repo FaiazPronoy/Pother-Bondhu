@@ -6,7 +6,6 @@ import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
-import PayNow from './pages/PayNow';
 import SearchPage from './pages/SearchPage';
 import CategoryPage from './pages/CategoryPage';
 import Cart from './pages/Cart';
@@ -24,6 +23,7 @@ import CreateTeam from './pages/CreateTeam';
 import MyTeam from './pages/MyTeam';
 import TeamInvitations from './pages/TeamInvitation';
 import Teams from './pages/Teams';
+import NotFound from './pages/NotFound';
 import ProtectedAdminRoute from './components/ProtectAdminRoute';
 import TeamDetails from "./pages/TeamDetails";
 
@@ -45,7 +45,6 @@ const App = () => {
         <Route path="/products" element={<Products />} />
         <Route path="/products/:id" element={<ProductDetail />} />
         <Route path="/products/category/:category" element={<CategoryPage />} />
-        <Route path="/paynow" element={<PayNow />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<CheckoutPage />} />
@@ -57,6 +56,7 @@ const App = () => {
         <Route path='/team-invitations' element={<TeamInvitations />} />
         <Route path='/teams' element={<Teams />} />
         <Route path="/teams/:key" element={<TeamDetails />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );

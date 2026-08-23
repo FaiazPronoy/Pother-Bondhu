@@ -43,8 +43,6 @@ export async function createUser({ role = 'donor', points = 0 } = {}) {
       password: bcrypt.hashSync(password, 10),
       role,
       points,
-      isAccountVerified: true,
-      verifyOtp: '', verifyOtpExpireAt: 0, resetOtp: '', resetOtpExpireAt: 0,
       location: '', bio: '',
       createdAt: new Date(), updatedAt: new Date(),
     })

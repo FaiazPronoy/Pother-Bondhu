@@ -12,7 +12,7 @@ export const volunteers = async (req, res) => {
     }
 
     const volunteers = await userModel.find(query)
-      .select('-password -verifyOtp -resetOtp')
+      .select('-password')
       .sort({ points: -1 }); // Sort by points descending
       
     res.status(200).json(volunteers);
@@ -27,7 +27,7 @@ export const getVolunteerProfile = async (req, res) => {
     
     // Get volunteer info
     const volunteer = await userModel.findById(id)
-      .select('-password -verifyOtp -verifyOtpExpireAt -resetOtp -resetOtpExpireAt');
+      .select('-password');
     
     if (!volunteer || volunteer.role !== 'volunteer') {
       return res.status(404).json({ message: 'Volunteer not found' });

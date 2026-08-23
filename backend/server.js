@@ -4,8 +4,6 @@ import "dotenv/config";
 import cookieParser from "cookie-parser";
 import path from "path";
 import { fileURLToPath } from "url";
-import http from "http"; // ✅ socket.io এর জন্য দরকার
-import { Server } from "socket.io";
 
 import connectDB from "./config/mongodb.js";
 import authRouter from "./routes/authRoutes.js";
@@ -51,26 +49,5 @@ app.use("/api/teams", teamRouter);
 app.use("/api", inviteRoutes);
 app.use("/api/orders", orderRoutes);
 
-// ✅ Create HTTP server for socket.io
-const server = http.createServer(app);
-
-// ✅ Setup socket.io
-const io = new Server(server, {
-  cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
-
-// ✅ socket.io connection
-io.on("connection", (socket) => {
-  console.log("⚡ A user connected");
-
-  socket.on("disconnect", () => {
-    console.log("❌ A user disconnected");
-  });
-});
-
 // ✅ Start server
-server.listen(port, () => console.log(`🚀 Server started on PORT: ${port}`));
+app.listen(port, () => console.log(`🚀 Server started on PORT: ${port}`));
