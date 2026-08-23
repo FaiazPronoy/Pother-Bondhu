@@ -9,11 +9,13 @@ import {
     getMostOrderedProducts
 } from '../controllers/productController.js';;
 import Product from '../models/ProductModel.js';
+import userAuth from '../middleware/userAuth.js';
+import adminAuth from '../middleware/adminAuth.js';
 
 const router = express.Router();
 
 // GET the number of products
-router.get('/count', async (req, res) => {
+router.get('/count', userAuth, adminAuth, async (req, res) => {
     try {
         const count = await Product.countDocuments();
         res.json({ count });
@@ -27,7 +29,7 @@ router.get('/recommendations', getRecommendedProducts);
 router.get('/most-ordered', getMostOrderedProducts); // Moved this line up
 
 // GET products with low stock
-router.get('/low-stock', async (req, res) => {
+router.get('/low-stock', userAuth, adminAuth, async (req, res) => {
     try {
         const lowStockProducts = await Product.find({ stockQuantity: { $lte: 10 } });
         res.json(lowStockProducts);
@@ -37,7 +39,7 @@ router.get('/low-stock', async (req, res) => {
 });
 
 // GET total purchase cost
-router.get('/total-purchase-cost', async (req, res) => {
+router.get('/total-purchase-cost', userAuth, adminAuth, async (req, res) => {
     try {
         const products = await Product.find();
         const totalPurchaseCost = products.reduce((sum, p) => sum + (p.purchaseCost || 0), 0);
@@ -48,7 +50,7 @@ router.get('/total-purchase-cost', async (req, res) => {
 });
 
 // GET total purchase value with details
-router.get('/total-purchase-value/details', async (req, res) => {
+router.get('/total-purchase-value/details', userAuth, adminAuth, async (req, res) => {
     try {
         const products = await Product.find({}, 'name purchaseCost stockQuantity productAddDate');
         const totalPurchaseValue = products.reduce(
@@ -69,7 +71,7 @@ router.get('/total-purchase-value/details', async (req, res) => {
 });
 
 // GET monthly purchase cost
-router.get('/monthly-purchase-cost', async (req, res) => {
+router.get('/monthly-purchase-cost', userAuth, adminAuth, async (req, res) => {
     const { year, month } = req.query;
     if (!year || !month) return res.status(400).json({ message: 'Please provide year and month.' });
 
@@ -88,7 +90,7 @@ router.get('/monthly-purchase-cost', async (req, res) => {
 });
 
 // GET detailed monthly purchase cost
-router.get('/monthly-purchase-cost/details', async (req, res) => {
+router.get('/monthly-purchase-cost/details', userAuth, adminAuth, async (req, res) => {
     const { year, month } = req.query;
     if (!year || !month) return res.status(400).json({ message: 'Please provide year and month.' });
     const y = parseInt(year);
@@ -119,7 +121,7 @@ router.get('/', getAllProducts);
 router.get('/:id', getProductById);
 
 // POST a new product
-router.post('/', async (req, res) => {
+router.post('/', userAuth, adminAuth, async (req, res) => {
     const product = new Product({
         id: req.body.id,
         name: req.body.name,
@@ -141,7 +143,7 @@ router.post('/', async (req, res) => {
 });
 
 // PUT update product by ID
-router.put('/:id', async (req, res) => {
+router.put('/:id', userAuth, adminAuth, async (req, res) => {
     try {
         const product = await Product.findOne({ id: req.params.id });
         if (!product) return res.status(404).json({ message: 'Product not found' });
@@ -161,6 +163,6 @@ router.put('/:id', async (req, res) => {
 });
 
 // DELETE product by ID
-router.delete('/:id', deleteProduct);
+router.delete('/:id', userAuth, adminAuth, deleteProduct);
 
 export default router;

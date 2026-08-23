@@ -87,12 +87,32 @@ export const donateToVolunteer = async (req, res) => {
       return res.status(400).json({ message: 'Bkash number and amount are required.' });
     }
 
+    const points = Number(amount);
+    if (!Number.isInteger(points) || points < 1) {
+      return res.status(400).json({ message: 'Amount must be a positive whole number.' });
+    }
+
     const volunteer = await userModel.findById(id);
     if (!volunteer || volunteer.role !== 'volunteer') {
       return res.status(404).json({ message: 'Volunteer not found.' });
     }
 
-    volunteer.points += Number(amount);
+    if (volunteer._id.toString() === req.userId) {
+      return res.status(400).json({ message: 'You cannot donate to yourself.' });
+    }
+
+    const donor = await userModel.findById(req.userId);
+    if (!donor) {
+      return res.status(404).json({ message: 'Donor not found.' });
+    }
+    if (donor.points < points) {
+      return res.status(400).json({ message: 'Not enough PetPoints to donate.' });
+    }
+
+    // a donation moves points between two accounts, it does not create them
+    donor.points -= points;
+    volunteer.points += points;
+    await donor.save();
     await volunteer.save();
 
     res.status(200).json({ message: 'Donation successful', updatedPoints: volunteer.points });

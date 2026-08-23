@@ -15,7 +15,6 @@ import productRouter from "./routes/productRoutes.js";
 import volunteerRouter from "./routes/volunteerRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
-import teamRoutes from './routes/teamRoutes.js';
 
 import teamRouter from "./routes/teamRoutes.js";
 import inviteRoutes from "./routes/inviteRoutes.js";
@@ -50,7 +49,6 @@ app.use("/api/volunteers", volunteerRouter);
 app.use("/api/cart", cartRoutes);
 app.use("/api/teams", teamRouter);
 app.use("/api", inviteRoutes);
-app.use('/api/teams', teamRoutes);
 app.use("/api/orders", orderRoutes);
 
 // ✅ Create HTTP server for socket.io

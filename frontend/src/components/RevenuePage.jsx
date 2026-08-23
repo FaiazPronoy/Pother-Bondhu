@@ -436,7 +436,7 @@ const RevenuePage = () => {
     const [loadingWeeklyProfit, setLoadingWeeklyProfit] = useState(false);
     const [errorWeeklyProfit, setErrorWeeklyProfit] = useState(null);
 
-    const backendUrl = 'http://localhost:4000';
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
     const handleCardClick = (title) => {
         setShowCalculation(title);
         if (title === 'Total Revenue') {
@@ -459,7 +459,7 @@ const RevenuePage = () => {
             setLoadingTotalPurchaseValue(true);
             setErrorTotalPurchaseValue(null);
             try {
-                const response = await fetch('http://localhost:4000/api/products/total-purchase-value/details');
+                const response = await fetch(`${backendUrl}/api/products/total-purchase-value/details`, { credentials: 'include' });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

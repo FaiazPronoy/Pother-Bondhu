@@ -26,8 +26,8 @@ export const register = async (req, res) => {
         
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.Node_ENV === 'production',
-            sameSite: process.env.Node_ENV === 'production' ? 'none' : 'strict', 
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', 
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
@@ -39,7 +39,14 @@ export const register = async (req, res) => {
             text: "Welcome to SavePaws: Animal Rescue Network. Your Account has been created."
         }
 
-        await transporter.sendMail(mailOptions)
+        // the account already exists at this point, so a mail failure must not
+        // be reported as a failed signup - the user would retry and be told
+        // their email is already taken
+        try {
+            await transporter.sendMail(mailOptions)
+        } catch (mailError) {
+            console.error('Welcome email failed to send:', mailError.message)
+        }
 
         return res.json({success:true})
 
@@ -104,8 +111,8 @@ export const logout = async (req, res) => {
     try {
         res.clearCookie('token', {
             httpOnly: true,
-            secure: process.env.Node_ENV === 'production',
-            sameSite: process.env.Node_ENV === 'production' ? 'none' : 'strict', 
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict', 
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
 

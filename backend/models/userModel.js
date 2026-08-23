@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
     resetOtpExpireAt : {type: Number, default: 0},
     location: {type: String, default: ''},
     role: {type: String, enum: ['donor', 'volunteer', 'admin'], default: 'donor'},
-    points: {type: Number,default: 0},
+    points: {type: Number,default: 0, min: 0},
     bio: {type: String, default:''}
 },{
     timestamps: true

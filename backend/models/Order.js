@@ -6,15 +6,16 @@ const orderSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'User'
+    ref: 'user'
   },
   items: [
     {
-      
+      productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
       name: String,
       imageUrl: String,
-      quantity: Number,
-      sellingPrice: Number
+      quantity: { type: Number, min: 1 },
+      sellingPrice: { type: Number, min: 0 },
+      purchaseCost: { type: Number, min: 0, default: 0 }
     }
   ],
   
@@ -27,14 +28,17 @@ const orderSchema = new mongoose.Schema({
   },
   donation: {
     type: Number,
-    default: 0
+    default: 0,
+    min: 0
   },
   totalPoints: {
     type: Number,
-    required: true
+    required: true,
+    min: 0
   },
   status: {
     type: String,
+    enum: ['Pending', 'Out for Delivery', 'Delivered'],
     default: 'Pending'
   }
 }, {

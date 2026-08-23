@@ -14,10 +14,19 @@ export const placeOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "Please fill in all required fields." });
     }
 
+    if (!Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ success: false, message: "Your cart is empty." });
+    }
+
+    const donationPoints = Number(donation) || 0;
+    if (donationPoints < 0) {
+      return res.status(400).json({ success: false, message: "Donation cannot be negative." });
+    }
+
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ success: false, message: "User not found." });
 
-    let totalPoints = Number(donation) || 0;
+    let totalPoints = 0;
     const resolvedItems = []; // keep the resolved DB products  quantities
 
 
@@ -33,20 +42,29 @@ export const placeOrder = async (req, res) => {
       if (!product) {
         return res.status(400).json({ success: false, message: `Product not found: ${item.name || key}` });
       }
-      if (product.stockQuantity < item.quantity) {
+
+      const quantity = Number(item.quantity);
+      if (!Number.isInteger(quantity) || quantity < 1) {
+        return res.status(400).json({ success: false, message: `Invalid quantity for ${product.name}` });
+      }
+
+      if (product.stockQuantity < quantity) {
         return res.status(400).json({ success: false, message: `Not enough stock for ${item.name}` });
       }
 
-      totalPoints = Number(product.sellingPrice) * Number(item.quantity);
+      totalPoints += Number(product.sellingPrice) * quantity;
       resolvedItems.push({
               id: product.id,
               _id: product._id,
               name: product.name,
               imageUrl: product.imageUrl,
-              quantity: Number(item.quantity),
-              sellingPrice: Number(product.sellingPrice)
+              quantity,
+              sellingPrice: Number(product.sellingPrice),
+              purchaseCost: Number(product.purchaseCost) || 0
       });
     }
+
+    totalPoints += donationPoints;
 
     if (user.points < totalPoints) {
       return res.status(400).json({ success: false, message: "Not enough PetPoints." });
@@ -54,8 +72,8 @@ export const placeOrder = async (req, res) => {
 
     const newOrder = new Order({
       userId,
-      items: resolvedItems.map(({ name, imageUrl, quantity, sellingPrice }) => ({
-        name, imageUrl, quantity, sellingPrice
+      items: resolvedItems.map(({ _id, name, imageUrl, quantity, sellingPrice, purchaseCost }) => ({
+        productId: _id, name, imageUrl, quantity, sellingPrice, purchaseCost
       })),
       userInfo: {
         name,

@@ -540,6 +540,7 @@ const AdminDashboard = () => {
                 }
                 const response = await fetch(`${backendUrl}/api/products/count`, {
                     method: 'GET',
+                    credentials: 'include',
                 });
                 if (!response.ok) {
                     const errorText = await response.text();
@@ -562,7 +563,7 @@ const AdminDashboard = () => {
                 if (!backendUrl) {
                     throw new Error("VITE_BACKEND_URL is not defined. Please configure your environment.");
                 }
-                const response = await axios.get(`${backendUrl}/api/products/low-stock`);
+                const response = await axios.get(`${backendUrl}/api/products/low-stock`, { withCredentials: true });
                 setLowStockProducts(response.data);
             } catch (error) {
                 console.error("Error fetching low stock products:", error);

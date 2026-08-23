@@ -28,6 +28,7 @@ const ProductPage = () => {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [selectedProductDetails, setSelectedProductDetails] = useState(null);
     const { isDarkMode } = useContext(DarkmodeContext);
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -46,7 +47,7 @@ const ProductPage = () => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await fetch('http://localhost:4000/api/products');
+                const response = await fetch(`${backendUrl}/api/products`);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch products: ${response.status}`);
                 }
@@ -78,13 +79,14 @@ const ProductPage = () => {
         try {
             const productData = isEditing ? editingProduct : newProduct;
             const method = isEditing ? 'PUT' : 'POST';
-            const url = isEditing ? `http://localhost:4000/api/products/${editingProduct.id}` : 'http://localhost:4000/api/products';
+            const url = isEditing ? `${backendUrl}/api/products/${editingProduct.id}` : `${backendUrl}/api/products`;
 
             const response = await fetch(url, {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify(productData),
             });
             if (!response.ok) {
@@ -117,8 +119,9 @@ const ProductPage = () => {
     };
     const confirmDeleteProduct = async () => {
         try {
-            const response = await fetch(`http://localhost:4000/api/products/${productToDelete}`, {
+            const response = await fetch(`${backendUrl}/api/products/${productToDelete}`, {
                 method: 'DELETE',
+                credentials: 'include',
             });
             if (!response.ok) {
                 throw new Error(`Failed to delete product: ${response.status}`);
@@ -216,11 +219,12 @@ const ProductPage = () => {
     };
     const updateStockInDatabase = async (productId, newQuantity) => {
         try {
-            const response = await fetch(`http://localhost:4000/api/products/${productId}`, {
+            const response = await fetch(`${backendUrl}/api/products/${productId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ stockQuantity: newQuantity }),
             });
             if (!response.ok) {
