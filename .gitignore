@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Secrets - never commit these
+.env
+.env.*
+!.env.example
+
+# Runtime user uploads (not source)
+backend/uploads/**
+!backend/uploads/.gitkeep
+!backend/uploads/rescue-images/.gitkeep
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Coverage
+coverage/
