@@ -52,7 +52,7 @@ cd "Save Paws"
 ```bash
 cd backend
 npm install
-copy .env.example .env
+cp .env.example .env
 ```
 
 Open `backend/.env` and set `MONGODB_URI` and `JWT_SECRET`. For the secret:
@@ -90,7 +90,7 @@ Multer upload path is relative to the working directory.
 ```bash
 cd frontend
 npm install
-copy .env.example .env
+cp .env.example .env
 npm run dev
 ```
 
@@ -127,8 +127,7 @@ frontend/
 
 ## What I changed on the second pass
 
-I audited this cold before touching it and found more than I expected. The
-things worth listing:
+Going back through it properly, a fair bit was worse than I remembered:
 
 - **No admin authorization existed.** `adminAuth` read `req.user.role`, but
   `userAuth` only ever set `req.userId`, and the router using it was never
