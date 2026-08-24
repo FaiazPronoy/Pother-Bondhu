@@ -5,65 +5,65 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* =====================================================================
-   Save Paws: "coral and plum"
+   Save Paws: "orange and plum"
 
    The app was built on Tailwind's stock blue and grey, which is the palette
    every other project of mine already had. Rather than rewrite forty
    components, the scales themselves are redefined here: every existing
-   bg-blue-600 is now coral, every purple is plum, and the greys carry a
+   bg-blue-600 is now orange, every purple is plum, and the greys carry a
    little plum in them so they read as chosen rather than inherited.
 
-   Coral for anything urgent, plum for anything secondary, and a neutral
+   Orange for anything urgent, plum for anything secondary, and a neutral
    that is warm because a page about hurt animals should not feel clinical.
    ===================================================================== */
 
 @theme {
-  /* --- primary: coral (was blue) ------------------------------------ */
-  --color-blue-50:  #FFF4F0;
-  --color-blue-100: #FFE4DB;
-  --color-blue-200: #FFC6B6;
-  --color-blue-300: #FCA189;
-  --color-blue-400: #F47A5D;
-  --color-blue-500: #E5563E;
-  --color-blue-600: #D9452C;
-  --color-blue-700: #B5341F;
-  --color-blue-800: #8F2A1A;
-  --color-blue-900: #6B2216;
+  /* --- primary: orange (was blue) ----------------------------------- */
+  --color-blue-50:  #FFF4E8;
+  --color-blue-100: #FFE3C6;
+  --color-blue-200: #FFC894;
+  --color-blue-300: #FFA95E;
+  --color-blue-400: #FB8B33;
+  --color-blue-500: #F26F16;
+  --color-blue-600: #E25E0B;
+  --color-blue-700: #B84A09;
+  --color-blue-800: #8D390B;
+  --color-blue-900: #6A2C0B;
 
   /* --- secondary: plum (was purple and indigo) ---------------------- */
-  --color-purple-50:  #FAF2F9;
-  --color-purple-100: #F1DFEF;
-  --color-purple-200: #E0BEDD;
-  --color-purple-300: #C89BC5;
-  --color-purple-400: #A76FA3;
-  --color-purple-500: #874E84;
-  --color-purple-600: #6B3568;
-  --color-purple-700: #562A54;
-  --color-purple-800: #422141;
-  --color-purple-900: #2F182F;
+  --color-purple-50:  #FBF1F7;
+  --color-purple-100: #F5DCEB;
+  --color-purple-200: #EBB9D7;
+  --color-purple-300: #DA90BD;
+  --color-purple-400: #C2649D;
+  --color-purple-500: #A2437E;
+  --color-purple-600: #7C2E5F;
+  --color-purple-700: #64254C;
+  --color-purple-800: #4B1C3A;
+  --color-purple-900: #331327;
 
-  --color-indigo-50:  #FAF2F9;
-  --color-indigo-100: #F1DFEF;
-  --color-indigo-200: #E0BEDD;
-  --color-indigo-300: #C89BC5;
-  --color-indigo-400: #A76FA3;
-  --color-indigo-500: #874E84;
-  --color-indigo-600: #6B3568;
-  --color-indigo-700: #562A54;
-  --color-indigo-800: #422141;
-  --color-indigo-900: #2F182F;
+  --color-indigo-50:  #FBF1F7;
+  --color-indigo-100: #F5DCEB;
+  --color-indigo-200: #EBB9D7;
+  --color-indigo-300: #DA90BD;
+  --color-indigo-400: #C2649D;
+  --color-indigo-500: #A2437E;
+  --color-indigo-600: #7C2E5F;
+  --color-indigo-700: #64254C;
+  --color-indigo-800: #4B1C3A;
+  --color-indigo-900: #331327;
 
   /* --- neutral: warmed towards peach, so the page is never clinical -- */
-  --color-gray-50:  #FFF3EC;
-  --color-gray-100: #FBE7DD;
-  --color-gray-200: #F2D6C9;
-  --color-gray-300: #DFBCAE;
-  --color-gray-400: #A99AA3;
-  --color-gray-500: #85757F;
-  --color-gray-600: #6B5C66;
-  --color-gray-700: #52454D;
-  --color-gray-800: #322A30;
-  --color-gray-900: #241D22;
+  --color-gray-50:  #FFF5EA;
+  --color-gray-100: #FBE8D4;
+  --color-gray-200: #F1D6BC;
+  --color-gray-300: #DCBB9C;
+  --color-gray-400: #AB9483;
+  --color-gray-500: #877263;
+  --color-gray-600: #6C5A4D;
+  --color-gray-700: #53443A;
+  --color-gray-800: #362A22;
+  --color-gray-900: #261D17;
 
   /* --- semantic colours, warmed to sit with the rest ---------------- */
   --color-green-50:  #EEF7F1;
@@ -71,11 +71,13 @@
   --color-green-500: #3E9268;
   --color-green-600: #2F7A55;
   --color-green-700: #256244;
-  --color-red-50:  #FDF1EE;
-  --color-red-100: #FADCD4;
-  --color-red-500: #C9412A;
-  --color-red-600: #AC3522;
-  --color-red-700: #8C2A1B;
+  /* pushed to a true red: the primary is orange now, and a delete button
+     must not read as another call to action */
+  --color-red-50:  #FDEFEF;
+  --color-red-100: #F9D7D7;
+  --color-red-500: #CE2F35;
+  --color-red-600: #AF2129;
+  --color-red-700: #8C1B22;
   --color-yellow-50:  #FDF6E9;
   --color-yellow-100: #F8E8C6;
   --color-yellow-500: #C98B23;
@@ -100,7 +102,7 @@
   }
 
   .dark body {
-    background-color: #180E16;
-    color: #F8E9E5;
+    background-color: #180F08;
+    color: #F8EBDD;
   }
 }
