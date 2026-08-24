@@ -238,29 +238,29 @@ const ProductPage = () => {
         }
     };
     return (
-        <div className={`flex min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-[#F5F5F5]'}`}>
+        <div className={`flex min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
             <AdminNavbar
                 isSidebarOpen={isSidebarOpen}
                 toggleSidebar={toggleSidebar}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab} />
             <div className="flex-1 p-6">
-                <h1 className={`text-3xl font-bold text-center mb-6 ${isDarkMode ? 'text-white' : 'text-[#64332d]'}`}><u>Products Details</u></h1>
+                <h1 className={`text-3xl font-bold text-center mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}><u>Products Details</u></h1>
                 <div className={`shadow-md rounded-md flex justify-center ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                     <div className="w-full">
-                        <div className={`p-4 rounded-t-md ${isDarkMode ? 'bg-gray-800' : 'bg-[#f5f5f5]'}`}>
-                            <h2 className={`text-lg font-semibold text-center ${isDarkMode ? 'text-white' : 'text-[#A2574F]'}`}>Product List</h2>
-                            <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>View and manage your products</p>
+                        <div className={`p-4 rounded-t-md ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}>
+                            <h2 className={`text-lg font-semibold text-center ${isDarkMode ? 'text-white' : 'text-blue-700'}`}>Product List</h2>
+                            <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>View and manage your products</p>
                         </div>
                         <div className="p-4">
                             <table className="min-w-full">
-                                <thead className={isDarkMode ? "bg-gray-600" : "bg-[#e4ccb8]"}>
+                                <thead className={isDarkMode ? "bg-gray-600" : "bg-gray-200"}>
                                     <tr>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>Image</th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>ID</th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>Name</th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>Stock</th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>Actions</th>
+                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Image</th>
+                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>ID</th>
+                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Name</th>
+                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Stock</th>
+                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className={`divide-y ${isDarkMode ? 'divide-gray-700 bg-gray-900' : 'divide-gray-200 bg-white'}`}>
@@ -274,9 +274,9 @@ const ProductPage = () => {
                                                         className="h-16 w-16 rounded object-cover"
                                                     />)}
                                             </td>
-                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-[#664C36]'}`}>{product.id}</td>
-                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-[#664C36]'}`}>{product.name}</td>
-                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-[#664C36]'}`}>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{product.id}</td>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{product.name}</td>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
                                                 <div className="flex items-center">
                                                     <button
                                                         onClick={() => handleDecreaseStock(product.id)}
@@ -304,7 +304,7 @@ const ProductPage = () => {
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteProduct(product.id)}
-                                                        className=" text-[#A2574F] hover:text-[#64332d] px-2 py-1 rounded" >
+                                                        className=" text-blue-700 hover:text-gray-800 px-2 py-1 rounded" >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
                                                 </div>
@@ -320,12 +320,12 @@ const ProductPage = () => {
                 <div className={`mt-8 shadow-md rounded-md p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                     <div className="flex justify-between items-start mb-4">
                         <div>
-                            <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-[#A2574F]'}`}>Add New Product</h2>
-                            <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>Add a new product to the list</p>
+                            <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-blue-700'}`}>Add New Product</h2>
+                            <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>Add a new product to the list</p>
                         </div>
                         <button
                             onClick={handleAddProduct}
-                            className="bg-[#A2574F] hover:bg-[#64332d] text-white font-bold py-2 px-4 rounded"
+                            className="bg-blue-600 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded"
                         >
                             <Plus className="mr-2 h-4 w-4 inline-block" /> Add Product
                         </button>
@@ -338,16 +338,16 @@ const ProductPage = () => {
                             <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="sm:flex sm:items-start">
                                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                        <h2 className={`text-lg leading-6 font-medium ${isDarkMode ? 'text-white' : 'text-[#A2574F]'}`} id="modal-title">
+                                        <h2 className={`text-lg leading-6 font-medium ${isDarkMode ? 'text-white' : 'text-blue-700'}`} id="modal-title">
                                             {isEditing ? 'Edit Product' : 'Add Product'} </h2>
-                                        <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                             {isEditing
                                                 ? 'Make changes to the product below. Click save when you are done.'
                                                 : 'Enter product details below.'}
                                         </p>
                                         <div className="grid gap-4 py-4">
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <label htmlFor="id" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                                                <label htmlFor="id" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                     Product ID
                                                 </label>
                                                 <input
@@ -361,7 +361,7 @@ const ProductPage = () => {
                                                 />
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <label htmlFor="productAddDate" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                                                <label htmlFor="productAddDate" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                     Product Add Date
                                                 </label>
                                                 <input
@@ -375,7 +375,7 @@ const ProductPage = () => {
                                                 />
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <label htmlFor="name" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                                                <label htmlFor="name" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                     Name
                                                 </label>
                                                 <input
@@ -388,7 +388,7 @@ const ProductPage = () => {
                                                 />
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <label htmlFor="description" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                                                <label htmlFor="description" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                     Description
                                                 </label>
                                                 <textarea
@@ -401,7 +401,7 @@ const ProductPage = () => {
                                                 />
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <label htmlFor="purchaseCost" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                                                <label htmlFor="purchaseCost" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                     Purchase Cost
                                                 </label>
                                                 <input
@@ -415,7 +415,7 @@ const ProductPage = () => {
                                                 />
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <label htmlFor="sellingPrice" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                                                <label htmlFor="sellingPrice" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                     Selling Price
                                                 </label>
                                                 <input
@@ -430,7 +430,7 @@ const ProductPage = () => {
                                             </div>
                                            
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <label htmlFor="stockQuantity" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                                                <label htmlFor="stockQuantity" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                     Stock Quantity
                                                 </label>
                                                 <input
@@ -444,7 +444,7 @@ const ProductPage = () => {
                                                 />
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <label htmlFor="category" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                                                <label htmlFor="category" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                     Category
                                                 </label>
                                                 <input
@@ -458,7 +458,7 @@ const ProductPage = () => {
                                                 />
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <label htmlFor="features" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                                                <label htmlFor="features" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                     Features (comma-separated)
                                                 </label>
                                                 <input
@@ -471,7 +471,7 @@ const ProductPage = () => {
                                                 />
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <label htmlFor="image" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                                                <label htmlFor="image" className={`text-right ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                                     Image
                                                 </label>
                                                 <div className="col-span-3">
@@ -505,13 +505,13 @@ const ProductPage = () => {
                                 <button
                                     type="submit"
                                     onClick={handleSaveProduct}
-                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[#A2574F] text-base font-medium text-white hover:bg-[#64332d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A2574F] sm:ml-3 sm:w-auto sm:text-sm" >
+                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm" >
                                     <Save className="mr-2 h-4 w-4 inline-block" /> {isEditing ? 'Save' : 'Add'}
                                 </button>
                                 <button
                                     type="button"
                                     onClick={handleCloseModal}
-                                    className={`mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2  text-base font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A2574F] sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`} >
+                                    className={`mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2  text-base font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm ${isDarkMode ? 'bg-gray-800 border-gray-700 hover:bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`} >
                                     <X className="mr-2 h-4 w-4 inline-block" /> Cancel
                                 </button>
                             </div>
@@ -525,41 +525,41 @@ const ProductPage = () => {
                             <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="sm:flex sm:items-start">
                                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                        <h3 className={`text-lg leading-6 font-medium ${isDarkMode ? 'text-white' : 'text-[#A2574F]'}`} id="modal-title">
+                                        <h3 className={`text-lg leading-6 font-medium ${isDarkMode ? 'text-white' : 'text-blue-700'}`} id="modal-title">
                                             Product Details
                                         </h3>
                                         {selectedProductDetails && (
                                             <div className="mt-2">
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong> ID: </strong> {selectedProductDetails.id}
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong> Added On:</strong> {new Date(selectedProductDetails.productAddDate).toLocaleDateString()}
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong> Name: </strong> {selectedProductDetails.name}
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong> Description: </strong>{selectedProductDetails.description}
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong> Purchase Cost:</strong> {selectedProductDetails.purchaseCost?.toFixed(2)}$
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong> Selling Price: </strong> {selectedProductDetails.sellingPrice?.toFixed(2)}$
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong> Stock Quantity:</strong> {selectedProductDetails.stockQuantity}
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong> Category:</strong> {selectedProductDetails.category}
                                                 </p>
                                                 {selectedProductDetails.features && selectedProductDetails.features.length > 0 && (
-                                                    <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                    <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                         <strong> Features:</strong> {selectedProductDetails.features.join(', ')}
                                                     </p>
                                                 )}
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong> Added On:</strong> {new Date(selectedProductDetails.productAddDate).toLocaleDateString()}
                                                 </p>
                                                 {selectedProductDetails.imageUrl && (
@@ -579,7 +579,7 @@ const ProductPage = () => {
                             <div className={`px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
                                 <button
                                     type="button"
-                                    className={`w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A2574F] sm:ml-3 sm:w-auto sm:text-sm ${isDarkMode ? 'bg-gray-800 text-bg-white border-gray-700 hover:bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                                    className={`w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 text-base font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm ${isDarkMode ? 'bg-gray-800 text-bg-white border-gray-700 hover:bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
                                     onClick={closeDetailsModal}
                                 >
                                     Close
@@ -595,10 +595,10 @@ const ProductPage = () => {
                             <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                 <div className="sm:flex sm:items-start justify-center">
                                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-center">
-                                        <h2 className={`text-lg leading-6 font-medium text-center ${isDarkMode ? 'text-white' : 'text-[#A2574F]'}`} id="modal-title">
+                                        <h2 className={`text-lg leading-6 font-medium text-center ${isDarkMode ? 'text-white' : 'text-blue-700'}`} id="modal-title">
                                             Are you sure?
                                         </h2>
-                                        <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                                        <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                             Are you sure you want to delete this product?
                                         </p>
                                     </div>
@@ -608,13 +608,13 @@ const ProductPage = () => {
                                 <button
                                     type="button"
                                     onClick={confirmDeleteProduct}
-                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[#A2574F] text-base font-medium text-white hover:bg-[#64332d] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A2574F] sm:ml-3 sm:w-auto sm:text-sm" >
+                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm" >
                                     Yes, Delete
                                 </button>
                                 <button
                                     type="button"
                                     onClick={cancelDeleteProduct}
-                                    className={`mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2  text-base font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A2574F] sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm ${isDarkMode ? 'bg-gray-800 text-bg-white border-gray-700 hover:bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                                    className={`mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2  text-base font-medium  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm ${isDarkMode ? 'bg-gray-800 text-bg-white border-gray-700 hover:bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
                                 >
                                     No, Cancel
                                 </button>

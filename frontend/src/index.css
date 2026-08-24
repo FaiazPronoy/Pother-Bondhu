@@ -3,3 +3,104 @@
 /* Tailwind v4 ties dark: to the OS setting unless you say otherwise. The app
    has its own toggle, so drive it from a class instead. */
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* =====================================================================
+   Save Paws: "coral and plum"
+
+   The app was built on Tailwind's stock blue and grey, which is the palette
+   every other project of mine already had. Rather than rewrite forty
+   components, the scales themselves are redefined here: every existing
+   bg-blue-600 is now coral, every purple is plum, and the greys carry a
+   little plum in them so they read as chosen rather than inherited.
+
+   Coral for anything urgent, plum for anything secondary, and a neutral
+   that is warm because a page about hurt animals should not feel clinical.
+   ===================================================================== */
+
+@theme {
+  /* --- primary: coral (was blue) ------------------------------------ */
+  --color-blue-50:  #FFF4F0;
+  --color-blue-100: #FFE4DB;
+  --color-blue-200: #FFC6B6;
+  --color-blue-300: #FCA189;
+  --color-blue-400: #F47A5D;
+  --color-blue-500: #E5563E;
+  --color-blue-600: #D9452C;
+  --color-blue-700: #B5341F;
+  --color-blue-800: #8F2A1A;
+  --color-blue-900: #6B2216;
+
+  /* --- secondary: plum (was purple and indigo) ---------------------- */
+  --color-purple-50:  #FAF2F9;
+  --color-purple-100: #F1DFEF;
+  --color-purple-200: #E0BEDD;
+  --color-purple-300: #C89BC5;
+  --color-purple-400: #A76FA3;
+  --color-purple-500: #874E84;
+  --color-purple-600: #6B3568;
+  --color-purple-700: #562A54;
+  --color-purple-800: #422141;
+  --color-purple-900: #2F182F;
+
+  --color-indigo-50:  #FAF2F9;
+  --color-indigo-100: #F1DFEF;
+  --color-indigo-200: #E0BEDD;
+  --color-indigo-300: #C89BC5;
+  --color-indigo-400: #A76FA3;
+  --color-indigo-500: #874E84;
+  --color-indigo-600: #6B3568;
+  --color-indigo-700: #562A54;
+  --color-indigo-800: #422141;
+  --color-indigo-900: #2F182F;
+
+  /* --- neutral: warmed towards peach, so the page is never clinical -- */
+  --color-gray-50:  #FFF3EC;
+  --color-gray-100: #FBE7DD;
+  --color-gray-200: #F2D6C9;
+  --color-gray-300: #DFBCAE;
+  --color-gray-400: #A99AA3;
+  --color-gray-500: #85757F;
+  --color-gray-600: #6B5C66;
+  --color-gray-700: #52454D;
+  --color-gray-800: #322A30;
+  --color-gray-900: #241D22;
+
+  /* --- semantic colours, warmed to sit with the rest ---------------- */
+  --color-green-50:  #EEF7F1;
+  --color-green-100: #D6ECDE;
+  --color-green-500: #3E9268;
+  --color-green-600: #2F7A55;
+  --color-green-700: #256244;
+  --color-red-50:  #FDF1EE;
+  --color-red-100: #FADCD4;
+  --color-red-500: #C9412A;
+  --color-red-600: #AC3522;
+  --color-red-700: #8C2A1B;
+  --color-yellow-50:  #FDF6E9;
+  --color-yellow-100: #F8E8C6;
+  --color-yellow-500: #C98B23;
+  --color-yellow-600: #A8721B;
+
+  /* --- type --------------------------------------------------------- */
+  --font-sans: "Nunito Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-display: "Baloo 2", "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  /* Headings pick up the rounded display face without a single className
+     change in the components. */
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  body {
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-800);
+  }
+
+  .dark body {
+    background-color: #180E16;
+    color: #F8E9E5;
+  }
+}

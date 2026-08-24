@@ -11,12 +11,14 @@ const Card = ({ title, children, className, onClick }) => {
     const { isDarkMode } = useContext(DarkmodeContext);
     return (
         <motion.div
-            className={`rounded-xl shadow-md border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/10'} ${className} cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.01]`}
+            className={`rounded-xl shadow-md border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${className} cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.01]`}
             whileHover={{ scale: 1.01, boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" }}
             onClick={onClick}
         >
             <div className="p-6">
-                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>{title}</h3>
+                {title && (
+                    <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>{title}</h3>
+                )}
                 {children}
             </div>
         </motion.div>
@@ -28,7 +30,7 @@ const StyledLink = ({ to, children, className }) => {
     return (
         <Link
             to={to}
-            className={`transition-colors duration-200 ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-[#A2574F] hover:text-[#8c453e]'} ${className}`}
+            className={`transition-colors duration-200 ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-700 hover:text-blue-700'} ${className}`}
         >
             {children}
         </Link>
@@ -61,20 +63,23 @@ const OverviewCard = ({ title, value, icon: Icon, onClick }) => {
 
     return (
         <Card
-            className={`flex items-center justify-between p-4 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-md'}`}
+            className={`relative overflow-hidden ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
             onClick={onClick}>
-            <div>
-                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>{title}</h3>
-                <motion.p
-                    className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-[#A2574F]'}`}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    {typeof displayValue === 'number' ? displayValue : value}
-                </motion.p>
+            <span className="absolute left-0 inset-y-0 w-1 bg-blue-600" aria-hidden="true" />
+            <div className="flex items-start justify-between gap-4">
+                <div className="min-w-0">
+                    <h3 className={`text-xs font-semibold uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{title}</h3>
+                    <motion.p
+                        className={`mt-1 text-3xl font-bold tabular-nums leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        {typeof displayValue === 'number' ? displayValue : value}
+                    </motion.p>
+                </div>
+                <Icon className={`w-7 h-7 shrink-0 ${isDarkMode ? 'text-gray-500' : 'text-blue-600'}`} />
             </div>
-            <Icon className={`w-8 h-8 ${isDarkMode ? 'text-gray-400' : 'text-[#A2574F] opacity-70'}`} />
         </Card>
     );
 };
@@ -82,8 +87,8 @@ const OverviewCard = ({ title, value, icon: Icon, onClick }) => {
 const AnalyticsCard = ({ title, children, chartRef }) => {
     const { isDarkMode } = useContext(DarkmodeContext);
     return (
-        <Card className={isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white/5 backdrop-blur-md'}>
-            <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>{title}</h3>
+        <Card className={isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}>
+            <h3 className={`text-sm font-semibold uppercase tracking-wide mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{title}</h3>
             <div ref={chartRef}>
                 {children}
             </div>
@@ -111,7 +116,7 @@ const DraggablePanel = ({ title, children }) => {
             animate={{ opacity: 1, x: 0, y: 0 }}
             transition={{ type: "spring", stiffness: 100, damping: 20 }}
         >
-            <div className="flex items-center gap-2 p-3 bg-[#A2574F] rounded-t-xl cursor-move">
+            <div className="flex items-center gap-2 p-3 bg-blue-600 rounded-t-xl cursor-move">
                 <GripVertical className="w-4 h-4 text-white/50" />
                 <h4 className="text-sm font-medium text-white">{title}</h4>
             </div>
@@ -632,7 +637,7 @@ const AdminDashboard = () => {
         fetchMonthlyRevenue();
     }, []);
     return (
-        <div className={`flex min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-[#F5F5F5]'}`}>
+        <div className={`flex min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
             <AdminNavbar
                 isSidebarOpen={isSidebarOpen}
                 toggleSidebar={toggleSidebar}
@@ -644,18 +649,18 @@ const AdminDashboard = () => {
                 <AnimatePresence>
                     {showDraggablePanel && (
                         <DraggablePanel title="Dashboard Notes">
-                            <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                            <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 <AlertTriangle className="inline-block w-4 h-4 mr-1 text-yellow-400" />
                                 <span className="font-medium">Important:</span> Welcome to our Save Paw's admin dashboard.
                             </p>
-                            <ul className={`list-disc list-inside mt-2 space-y-1 ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                            <ul className={`list-disc list-inside mt-2 space-y-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 <li>Click on the overview cards to view details.</li>
                                 <li>Charts are placeholders; real data will be dynamic.</li>
                                 <li>Use the sidebar to navigate to other sections.</li>
                             </ul>
                             <button
                                 onClick={() => setShowDraggablePanel(false)}
-                                className="mt-4 px-4 py-2 bg-[#A2574F] text-white rounded-md hover:bg-[#8c453e] transition-colors"
+                                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                             >
                                 <CheckCircle className="w-4 h-4 mr-2 inline-block" />
                                 Got it!
@@ -666,19 +671,19 @@ const AdminDashboard = () => {
                 {activeTab === 'Dashboard' && (
                     <>
                         <div className="flex justify-center mb-8">
-                            <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-[#64332d]'}`}>
+                            <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                                 <u>Admin Dashboard</u>
                             </h2>
                         </div>
                         <div className="flex items-center justify-between mb-12">
                             <div>
-                                <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-200' : 'text-[#664C36]'}`}>
+                                <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                                     Welcome to your e-commerce management hub.
                                 </p>
                             </div>
                             <button
                                 onClick={() => setShowDraggablePanel(true)}
-                                className="px-4 py-2 bg-[#A2574F] text-white rounded-md hover:bg-[#8c453e] transition-colors"
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                             >
                                 <ClipboardList className="w-4 h-4 mr-2 inline-block" />
                                 Show Notes
@@ -729,10 +734,10 @@ const AdminDashboard = () => {
                         </div>
                     
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <Card title={<span><span className="text-3xl mr-1">🛒</span> Recent Orders </span>} className="bg-[#e4c2a6]">
+                            <Card title={<span><span className="text-3xl mr-1">🛒</span> Recent Orders </span>} className="bg-gray-200">
                                 <ul className="space-y-3.5 mt-2">
                                     {recentOrders.map(order => (
-                                        <li key={order._id} className={isDarkMode ? 'text-gray-300 text-sm' : 'text-[#664C36] text-sm'}>
+                                        <li key={order._id} className={isDarkMode ? 'text-gray-300 text-sm' : 'text-gray-700 text-sm'}>
                                             <span className="font-medium">Order #{order._id}</span> -{' '}
                                             <span
                                                 className={
@@ -749,10 +754,10 @@ const AdminDashboard = () => {
                                     View All Orders <ArrowRight className="w-4 h-4 ml-1" />
                                 </StyledLink>
                             </Card>
-                            <Card title={<span><span className="text-2xl mr-1">🔴</span> Low Stock Alert </span>} className="bg-[#e4c2a6]">
+                            <Card title={<span><span className="text-2xl mr-1">🔴</span> Low Stock Alert </span>} className="bg-gray-200">
                                 <ul className="space-y-3.5 mt-2">
                                     {lowStockProducts.map((alert, index) => (
-                                        <li key={index} className={isDarkMode ? 'text-gray-300 text-sm flex items-center' : 'text-[#664C36] text-sm flex items-center'}>
+                                        <li key={index} className={isDarkMode ? 'text-gray-300 text-sm flex items-center' : 'text-gray-700 text-sm flex items-center'}>
                                             <AlertTriangle className="w-6 h-6 mr-2 text-red-500 inline-block" />
                                             <span className="font-medium">{alert.name}</span> -{' '}
                                             {alert.stockQuantity} pcs!
@@ -762,28 +767,28 @@ const AdminDashboard = () => {
                                     Manage Stock <ArrowRight className="w-4 h-4 ml-1" />
                                 </StyledLink>
                             </Card>
-                            <Card title={<span><span className="text-3xl mr-1">💰</span> Financial Overview</span>} className="bg-[#e4c2a6]">
+                            <Card title={<span><span className="text-3xl mr-1">💰</span> Financial Overview</span>} className="bg-gray-200">
                                 <ul className="space-y-3.5 mt-2">
                                     <li className="flex items-center space-x-2">
-                                        <DollarSign className="w-6 h-6 text-[#F44336]" />
-                                        <span className={isDarkMode ? 'text-gray-300' : 'text-[#664C36] text-sm flex items-center'}>
+                                        <DollarSign className="w-6 h-6 text-red-600" />
+                                        <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700 text-sm flex items-center'}>
                                             <span className="font-semibold">Ordered Purchase Cost</span>: {orderedPurchaseCost?.toFixed(2)}$
                                         </span>
                                     </li>
                                     <li className="flex items-center space-x-2">
-                                        <TrendingUp className="w-6 h-6 text-[#00C49F]" />
-                                        <span className={isDarkMode ? 'text-gray-300' : 'text-[#664C36] text-sm flex items-center'}>
+                                        <TrendingUp className="w-6 h-6 text-green-500" />
+                                        <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700 text-sm flex items-center'}>
                                             <span className="font-semibold">Total Revenue</span>: {typeof totalRevenue === 'number' ? `${totalRevenue.toFixed(2)}$` : totalRevenue}
                                         </span>
                                     </li>
                                     <li className="flex items-center space-x-2">
-                                        <PiggyBank className="w-6 h-6 text-[#AF19FF]" />
-                                        <span className={isDarkMode ? 'text-gray-300' : 'text-[#664C36] text-sm flex items-center'}>
+                                        <PiggyBank className="w-6 h-6 text-purple-500" />
+                                        <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700 text-sm flex items-center'}>
                                             <span className="font-semibold">Net Profit</span>: {totalProfit?.toFixed(2)}$
                                         </span>
                                     </li>
                                 </ul>
-                                <StyledLink to="/adminrevenue" className="mt-4 inline-flex items-center text-sm font-medium text-[#664C36] hover:underline">
+                                <StyledLink to="/adminrevenue" className="mt-4 inline-flex items-center text-sm font-medium text-gray-700 hover:underline">
                                     View Detailed Revenue <ArrowRight className="w-4 h-4 ml-1" />
                                 </StyledLink>
                             </Card>
@@ -792,9 +797,9 @@ const AdminDashboard = () => {
                 )}
                 {activeTab === 'Products' && (
                     <div className={isDarkMode ? 'bg-gray-800 backdrop-blur-md p-6 rounded-xl shadow-md border border-gray-700' : 'bg-white/5 backdrop-blur-md p-6 rounded-xl shadow-md border border-white/10'}>
-                        <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-[#A2574F]'} mb-6`}>Products</h2>
-                        <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>This is the Products Management page.</p>
-                        <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>You can Add, edit, and delete products here.</p>
+                        <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-blue-700'} mb-6`}>Products</h2>
+                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>This is the Products Management page.</p>
+                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>You can Add, edit, and delete products here.</p>
                         <StyledLink to="/adminproducts" className="mt-4 inline-flex items-center">
                             Go to Products <ArrowRight className="w-4 h-4 ml-1" />
                         </StyledLink>
@@ -802,14 +807,14 @@ const AdminDashboard = () => {
                 )}
                 {activeTab === 'Orders' && (
                     <div className={isDarkMode ? 'bg-gray-800 backdrop-blur-md p-6 rounded-xl shadow-md border border-gray-700' : 'bg-white/5 backdrop-blur-md p-6 rounded-xl shadow-md border border-white/10'}>
-                        <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-[#A2574F]'} mb-6`}>Orders</h2>
-                        <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>This is the Orders Management page.</p>
-                        <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>You can View past orders and orders to be delivered here.</p>
+                        <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-blue-700'} mb-6`}>Orders</h2>
+                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>This is the Orders Management page.</p>
+                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>You can View past orders and orders to be delivered here.</p>
                     </div>
                 )}
                 {activeTab === 'Revenue' && (
                     <div className={isDarkMode ? 'bg-gray-800 backdrop-blur-md p-6 rounded-xl shadow-md border border-gray-700' : 'bg-white/5 backdrop-blur-md p-6 rounded-xl shadow-md border border-white/10'}>
-                        <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-[#A2574F]'} mb-6`}>Revenue</h2>
+                        <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-blue-700'} mb-6`}>Revenue</h2>
                         <StyledLink to="/adminrevenue" className="mt-4 inline-flex items-center">
                             View Revenue Details <ArrowRight className="w-4 h-4 ml-1" />
                         </StyledLink>

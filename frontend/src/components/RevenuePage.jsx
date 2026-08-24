@@ -11,19 +11,19 @@ const Card = ({ title, children, className, onClick }) => {
         <div
             className={`rounded-xl shadow-md p-6 border cursor-pointer ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/10'} ${className}`}
             onClick={onClick}>
-            <h3 className={`text-lg font-semibold text-center ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'} mb-4`}>{title}</h3>
+            <h3 className={`text-lg font-semibold text-center ${isDarkMode ? 'text-gray-200' : 'text-blue-700'} mb-4`}>{title}</h3>
             {children}</div>);
 };
 
 const InvestmentCalculationDisplay = ({ title, calculation, onClose, isDarkMode, totalRevenue, orderedPurchaseCost, weeklyRevenue, weeklyOrderPurchaseCost, weeklyProfit }) => {
     const textColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-gray-700';
     const fontWeight = 'font-semibold';
-    const rowBgLight = isDarkMode ? 'bg-gray-50 dark:bg-gray-800' : 'bg-[#f8f4f0]';
-    const totalTextColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-[#664C36]';
-    const valueTextColor = isDarkMode ? 'text-gray-800 dark:text-gray-200' : 'text-[#503a2d]';
+    const rowBgLight = isDarkMode ? 'bg-gray-50 dark:bg-gray-800' : 'bg-gray-50';
+    const totalTextColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-gray-700';
+    const valueTextColor = isDarkMode ? 'text-gray-800 dark:text-gray-200' : 'text-gray-800';
     const modalBg = isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200';
     const titleColor = isDarkMode ? 'text-gray-200' : '#A2574F';
-    const closeButtonColor = isDarkMode ? 'text-white hover:text-gray-300' : 'text-[#664C36] hover:text-[#3d2d24]';
+    const closeButtonColor = isDarkMode ? 'text-white hover:text-gray-300' : 'text-gray-700 hover:text-gray-900';
     const headerBgColor = isDarkMode ? 'bg-gray-700' : '#D4A373';
 
     if (title === "Average Order Value Calculation") {
@@ -45,7 +45,7 @@ const InvestmentCalculationDisplay = ({ title, calculation, onClose, isDarkMode,
                             <span className={`${fontWeight} ${textColor}`}>Total Orders:</span>
                             <span className={`${valueTextColor}`}> {calculation.productDetails.find(item => item.name === 'Total Orders')?.totalValue || '0'} </span>
                         </div>
-                        <div className={`flex justify-between ${isDarkMode ? 'bg-gray-100 dark:bg-gray-800' : 'bg-[#f6ebe3]'} py-2 px-3 rounded-md`}>
+                        <div className={`flex justify-between ${isDarkMode ? 'bg-gray-100 dark:bg-gray-800' : 'bg-gray-100'} py-2 px-3 rounded-md`}>
                             <span className={`text-lg ${fontWeight} ${totalTextColor}`}>Average Order Value:</span>
                             <span className={`text-lg ${fontWeight} ${totalTextColor}`}>${calculation.totalPurchaseValue ? calculation.totalPurchaseValue.toFixed(2) : '0.00'}</span>
                         </div>
@@ -73,7 +73,7 @@ const InvestmentCalculationDisplay = ({ title, calculation, onClose, isDarkMode,
                             <span className={`${fontWeight} ${textColor}`}>Ordered Purchase Cost:</span>
                             <span className={`${valueTextColor}`}> ${orderedPurchaseCost !== null ? orderedPurchaseCost.toFixed(2) : '0.00'} </span>
                         </div>
-                        <div className={`flex justify-between ${isDarkMode ? 'bg-gray-100 dark:bg-gray-800' : 'bg-[#f6ebe3]'} py-2 px-3 rounded-md`}>
+                        <div className={`flex justify-between ${isDarkMode ? 'bg-gray-100 dark:bg-gray-800' : 'bg-gray-100'} py-2 px-3 rounded-md`}>
                             <span className={`text-lg ${fontWeight} ${totalTextColor}`}>Total Profit:</span>
                             <span className={`text-lg ${fontWeight} ${totalTextColor}`}>${totalRevenue !== null && orderedPurchaseCost !== null ? (totalRevenue - orderedPurchaseCost).toFixed(2) : '0.00'}</span>
                         </div>
@@ -102,7 +102,7 @@ const InvestmentCalculationDisplay = ({ title, calculation, onClose, isDarkMode,
                             <span className={`${fontWeight} ${textColor}`}>Weekly Purchase Cost:</span>
                             <span className={`${valueTextColor}`}> ${weeklyOrderPurchaseCost !== undefined ? weeklyOrderPurchaseCost.toFixed(2) : '0.00'} </span>
                         </div>
-                        <div className={`flex justify-between ${isDarkMode ? 'bg-gray-100 dark:bg-gray-800' : 'bg-[#f6ebe3]'} py-2 px-3 rounded-md`}>
+                        <div className={`flex justify-between ${isDarkMode ? 'bg-gray-100 dark:bg-gray-800' : 'bg-gray-100'} py-2 px-3 rounded-md`}>
                             <span className={`text-lg ${fontWeight} ${totalTextColor}`}>Weekly Profit:</span>
                             <span className={`text-lg ${fontWeight} ${totalTextColor}`}>${weeklyProfit !== undefined ? weeklyProfit.toFixed(2) : '0.00'}</span>
                         </div>
@@ -162,13 +162,13 @@ const InvestmentCalculationDisplay = ({ title, calculation, onClose, isDarkMode,
 const TotalRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, error, isDarkMode }) => {
     const textColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-gray-700';
     const fontWeight = 'font-semibold';
-    const rowBgLight = isDarkMode ? 'bg-gray-50 dark:bg-gray-800' : 'bg-[#f8f4f0]';
-    const rowBgDark = isDarkMode ? 'bg-white dark:bg-gray-700' : 'bg-[#f2ebe1]';
-    const headerTextColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-[#664C36]';
-    const valueTextColor = isDarkMode ? 'text-gray-800 dark:text-gray-200' : 'text-[#503a2d]';
+    const rowBgLight = isDarkMode ? 'bg-gray-50 dark:bg-gray-800' : 'bg-gray-50';
+    const rowBgDark = isDarkMode ? 'bg-white dark:bg-gray-700' : 'bg-gray-100';
+    const headerTextColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-gray-700';
+    const valueTextColor = isDarkMode ? 'text-gray-800 dark:text-gray-200' : 'text-gray-800';
     const modalBg = isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200';
     const titleColor = isDarkMode ? 'text-gray-200' : '#A2574F';
-    const closeButtonColor = isDarkMode ? 'text-white hover:text-gray-300' : 'text-[#664C36] hover:text-[#3d2d24]';
+    const closeButtonColor = isDarkMode ? 'text-white hover:text-gray-300' : 'text-gray-700 hover:text-gray-900';
     const headerBgColor = isDarkMode ? 'bg-gray-600' : '#A2574F';
     if (!isOpen) {
         return null;
@@ -235,13 +235,13 @@ const TotalRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, erro
 const MonthlyRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, error, isDarkMode }) => {
     const textColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-gray-700';
     const fontWeight = 'font-semibold';
-    const rowBgLight = isDarkMode ? 'bg-gray-50 dark:bg-gray-800' : 'bg-[#f8f4f0]';
-    const rowBgDark = isDarkMode ? 'bg-white dark:bg-gray-700' : 'bg-[#f2ebe1]';
-    const headerTextColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-[#664C36]';
-    const valueTextColor = isDarkMode ? 'text-gray-800 dark:text-gray-200' : 'text-[#503a2d]';
+    const rowBgLight = isDarkMode ? 'bg-gray-50 dark:bg-gray-800' : 'bg-gray-50';
+    const rowBgDark = isDarkMode ? 'bg-white dark:bg-gray-700' : 'bg-gray-100';
+    const headerTextColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-gray-700';
+    const valueTextColor = isDarkMode ? 'text-gray-800 dark:text-gray-200' : 'text-gray-800';
     const modalBg = isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200';
     const titleColor = isDarkMode ? 'text-gray-200' : '#A2574F';
-    const closeButtonColor = isDarkMode ? 'text-white hover:text-gray-300' : 'text-[#664C36] hover:text-[#3d2d24]';
+    const closeButtonColor = isDarkMode ? 'text-white hover:text-gray-300' : 'text-gray-700 hover:text-gray-900';
     const headerBgColor = isDarkMode ? 'bg-gray-600' : '#A2574F';
     if (!isOpen) return null;
     if (loading) {
@@ -315,13 +315,13 @@ const MonthlyRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, er
 const WeeklyRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, error, isDarkMode }) => {
     const textColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-gray-700';
     const fontWeight = 'font-semibold';
-    const rowBgLight = isDarkMode ? 'bg-gray-50 dark:bg-gray-800' : 'bg-[#f8f4f0]';
-    const rowBgDark = isDarkMode ? 'bg-white dark:bg-gray-700' : 'bg-[#f2ebe1]';
-    const headerTextColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-[#664C36]';
-    const valueTextColor = isDarkMode ? 'text-gray-800 dark:text-gray-200' : 'text-[#503a2d]';
+    const rowBgLight = isDarkMode ? 'bg-gray-50 dark:bg-gray-800' : 'bg-gray-50';
+    const rowBgDark = isDarkMode ? 'bg-white dark:bg-gray-700' : 'bg-gray-100';
+    const headerTextColor = isDarkMode ? 'text-gray-700 dark:text-gray-300' : 'text-gray-700';
+    const valueTextColor = isDarkMode ? 'text-gray-800 dark:text-gray-200' : 'text-gray-800';
     const modalBg = isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200';
     const titleColor = isDarkMode ? 'text-gray-200' : '#A2574F'; 
-    const closeButtonColor = isDarkMode ? 'text-white hover:text-gray-300' : 'text-[#664C36] hover:text-[#3d2d24]';
+    const closeButtonColor = isDarkMode ? 'text-white hover:text-gray-300' : 'text-gray-700 hover:text-gray-900';
     const headerBgColor = isDarkMode ? 'bg-gray-600' : '#A2574F'; 
     if (!isOpen) return null;
     if (loading) {
@@ -716,7 +716,7 @@ const RevenuePage = () => {
         setShowCalculation(null);
     };
     return (
-        <div className={`flex min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-[#F5F5F5]'}`}>
+        <div className={`flex min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
             <AdminNavbar
                 isSidebarOpen={isSidebarOpen}
                 toggleSidebar={toggleSidebar}
@@ -724,18 +724,18 @@ const RevenuePage = () => {
                 setActiveTab={setActiveTab}
             />
             <div className="flex-1 p-6">
-                <h2 className={`text-3xl font-bold text-center ${isDarkMode ? 'text-white' : 'text-[#64332d]'} mb-8`}><u>Revenue & Profit Overview</u></h2>
+                <h2 className={`text-3xl font-bold text-center ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-8`}><u>Revenue & Profit Overview</u></h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 
                     <Card title="Total Revenue" onClick={() => handleCardClick("Total Revenue")}>
                         <div className="flex items-center justify-center">
                             <DollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
                             {loadingTotalRevenue ? (
-                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>Loading...</p>
+                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>Loading...</p>
                             ) : errorTotalRevenue ? (
                                 <p className={`text-red-500`}>{errorTotalRevenue}</p>
                             ) : (
-                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>${totalRevenue !== null ? totalRevenue.toFixed(2) : '0.00'}</p>
+                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>${totalRevenue !== null ? totalRevenue.toFixed(2) : '0.00'}</p>
                             )}
                         </div>
                         <p className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total revenue generated from all orders.</p>
@@ -743,7 +743,7 @@ const RevenuePage = () => {
                     <Card title="Ordered Purchase Cost" onClick={() => handleCardClick("Ordered Purchase Cost")}>
                         <div className="flex items-center justify-center">
                             <DollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-lime-400' : 'text-lime-600'}`} />
-                            <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>
+                            <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>
                                 ${orderedPurchaseCost !== null ? orderedPurchaseCost.toFixed(2) : '0.00'}
                             </p>
                         </div>
@@ -752,7 +752,7 @@ const RevenuePage = () => {
                     <Card title="Total Profit" onClick={() => handleCardClick('Total Profit')}>
                         <div className="flex items-center justify-center">
                             <DollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
-                            <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : (totalRevenue !== null && orderedPurchaseCost !== null && (totalRevenue - orderedPurchaseCost) > 0 ? 'text-[#2E7D32]' : 'text-[#F44336]')}`}>
+                            <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : (totalRevenue !== null && orderedPurchaseCost !== null && (totalRevenue - orderedPurchaseCost) > 0 ? 'text-green-600' : 'text-red-600')}`}>
                                 ${totalRevenue !== null && orderedPurchaseCost !== null ? (totalRevenue - orderedPurchaseCost).toFixed(2) : '0.00'}
                             </p>
                         </div>
@@ -761,14 +761,14 @@ const RevenuePage = () => {
                     <Card title="Average Order Value" onClick={() => handleCardClick("Average Order Value")}>
                         <div className="flex items-center justify-center">
                             <DollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
-                            <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>${averageOrderValue.toFixed(2) || '0.00'}</p>
+                            <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>${averageOrderValue.toFixed(2) || '0.00'}</p>
                         </div>
                         <p className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Average revenue generated per order.</p>
                     </Card>
                     <Card title="Weekly Revenue" onClick={() => handleCardClick("Weekly Revenue")}>
                         <div className="flex items-center justify-center">
                             <CircleDollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`} />
-                            <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>${weeklyRevenue !== null ? weeklyRevenue.toFixed(2) : '0.00'}</p>
+                            <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>${weeklyRevenue !== null ? weeklyRevenue.toFixed(2) : '0.00'}</p>
                         </div>
                         <p className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Revenue for the current week (starting Sunday).</p>
                     </Card>
@@ -776,11 +776,11 @@ const RevenuePage = () => {
                         <div className="flex items-center justify-center">
                             <DollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-lime-400' : 'text-lime-600'}`} />
                             {loadingWeeklyOrderPurchaseCost ? (
-                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>Loading...</p>
+                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>Loading...</p>
                             ) : errorWeeklyOrderPurchaseCost ? (
                                 <p className={`text-red-500`}>{errorWeeklyOrderPurchaseCost}</p>
                             ) : (
-                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>
+                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>
                                     ${weeklyOrderPurchaseCost !== null ? weeklyOrderPurchaseCost.toFixed(2) : '0.00'}
                                 </p>
                             )}
@@ -793,11 +793,11 @@ const RevenuePage = () => {
                         <div className="flex items-center justify-center">
                             <CircleDollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-lime-400' : 'text-lime-600'}`} />
                             {loadingWeeklyProfit ? (
-                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>Loading...</p>
+                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>Loading...</p>
                             ) : errorWeeklyProfit ? (
                                 <p className={`text-red-500`}>{errorWeeklyProfit}</p>
                             ) : (
-                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : (weeklyProfit >= 0 ? 'text-[#2E7D32]' : 'text-[#F44336]')}`}>
+                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : (weeklyProfit >= 0 ? 'text-green-600' : 'text-red-600')}`}>
                                     ${weeklyProfit !== null ? weeklyProfit.toFixed(2) : '0.00'}
                                 </p>
                             )}
@@ -811,11 +811,11 @@ const RevenuePage = () => {
                         <div className="flex items-center justify-center">
                             <CalendarDays className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
                             {loadingMonthlyRevenue ? (
-                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>Loading...</p>
+                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>Loading...</p>
                             ) : errorMonthlyRevenue ? (
                                 <p className={`text-red-500`}>{errorMonthlyRevenue}</p>
                             ) : (
-                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-[#A2574F]'}`}>${monthlyRevenue !== null ? monthlyRevenue.toFixed(2) : '0.00'}</p>
+                                <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>${monthlyRevenue !== null ? monthlyRevenue.toFixed(2) : '0.00'}</p>
                             )}
                         </div>
                         <p className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Revenue for the current month (May 2025).</p>

@@ -41,10 +41,10 @@ const VolunteerPage = () => {
     const formatDate = (value) =>
         value ? new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '--';
 
-    const pageClass = isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-[#FDF6F0] text-gray-800';
+    const pageClass = isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-800';
     const cardClass = isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-white/10';
-    const headClass = isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-[#F5E9E2] text-[#A2574F]';
-    const rowClass = isDarkMode ? 'hover:bg-gray-700 border-gray-700' : 'hover:bg-[#FDF6F0] border-gray-200';
+    const headClass = isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-blue-700';
+    const rowClass = isDarkMode ? 'hover:bg-gray-700 border-gray-700' : 'hover:bg-gray-50 border-gray-200';
 
     return (
         <div className={`flex min-h-screen ${pageClass}`}>
@@ -57,7 +57,7 @@ const VolunteerPage = () => {
 
             <main className="flex-1 p-6 overflow-x-hidden">
                 <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
-                    <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-[#A2574F]'}`}>
+                    <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-blue-700'}`}>
                         Volunteers
                     </h1>
                     <select
@@ -162,7 +162,7 @@ const VolunteerPage = () => {
                             </dl>
                             <button
                                 onClick={() => setSelectedVolunteer(null)}
-                                className="mt-6 w-full bg-[#A2574F] text-white py-2 rounded-md hover:opacity-90"
+                                className="mt-6 w-full bg-blue-600 text-white py-2 rounded-md hover:opacity-90"
                             >
                                 Close
                             </button>

@@ -166,13 +166,13 @@ const OrderPage = () => {
     };
 
     if (loading) {
-        return <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-[#F5F5F5]'}`}><p className={isDarkMode ? 'text-white' : 'text-gray-800'}>Loading orders...</p></div>;
+        return <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}><p className={isDarkMode ? 'text-white' : 'text-gray-800'}>Loading orders...</p></div>;
     }
     if (fetchError) {
-        return <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-[#F5F5F5]'}`}><p className={`text-red-500`}>Error loading orders: {fetchError}</p></div>;
+        return <div className={`flex justify-center items-center min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}><p className={`text-red-500`}>Error loading orders: {fetchError}</p></div>;
     }
     return (
-        <div className={`flex min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-[#F5F5F5]'}`}>
+        <div className={`flex min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
             <AdminNavbar
                 isSidebarOpen={isSidebarOpen}
                 toggleSidebar={toggleSidebar}
@@ -180,18 +180,18 @@ const OrderPage = () => {
                 setActiveTab={setActiveTab}
             />
             <div className="flex-1 p-6">
-                <h1 className={`text-3xl font-bold text-center mb-6 ${isDarkMode ? 'text-white' : 'text-[#64332d]'}`}><u>Orders Details</u></h1>
+                <h1 className={`text-3xl font-bold text-center mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}><u>Orders Details</u></h1>
                 <div className="mt-8"></div>
                 <div className={`shadow-md rounded-md flex justify-center ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                     <div className="w-full">
-                        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-[#f5f5f5]'} p-4 rounded-t-md`}>
-                            <h2 className={`text-lg font-semibold text-center ${isDarkMode ? 'text-white' : 'text-[#A2574F]'}`}>
+                        <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'} p-4 rounded-t-md`}>
+                            <h2 className={`text-lg font-semibold text-center ${isDarkMode ? 'text-white' : 'text-blue-700'}`}>
                                 {filterView === '' && 'All Orders'}
                                 {filterView === 'delivered' && 'Past Orders'}
                                 {filterView === 'outfordelivery' && 'Orders in Transit'}
                                 {filterView === 'queued' && 'Queued Orders'}
                             </h2>
-                            <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>
+                            <p className={`text-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 {filterView === '' && 'View all orders'}
                                 {filterView === 'delivered' && 'View orders that have been successfully delivered'}
                                 {filterView === 'outfordelivery' && 'View orders currently in transit'}
@@ -204,7 +204,7 @@ const OrderPage = () => {
                                     className={`appearance-none border rounded-md shadow-sm py-2 px-3 focus:outline-none
                                         ${isDarkMode
                                             ? 'text-white bg-gray-900 border-gray-600 focus:ring-2 focus:ring-white focus:border-black'
-                                            : 'text-[#664C36] bg-white border-gray-300 focus:ring-2 focus:ring-[#A2574F] focus:border-[#A2574F]'
+                                            : 'text-gray-700 bg-white border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                                         }`}
                                 >
                                     <option value="">All Orders</option>
@@ -221,27 +221,27 @@ const OrderPage = () => {
                         </div>
                         <div className="p-4">
                             <table className="min-w-full">
-                                <thead className={isDarkMode ? "bg-gray-600" : "bg-[#e4ccb8]"}>
+                                <thead className={isDarkMode ? "bg-gray-600" : "bg-gray-200"}>
                                     <tr>
-                                        <th className={`px-6 py-3 pr-5 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>Order ID</th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>Customer</th>
-                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>Order Confirmation Date</th>
+                                        <th className={`px-6 py-3 pr-5 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Order ID</th>
+                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Customer</th>
+                                        <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Order Confirmation Date</th>
                                         {filterView === 'delivered' && (
-                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>Delivery Date</th>
+                                            <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Delivery Date</th>
                                         )}
-                                        <th className={`pl-12 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>Status</th>
-                                        <th className={`px-6 py-3 pl-4 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>Total</th>
-                                        <th className={`pl-25 py-3 pr-9 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}`}>Actions</th>
+                                        <th className={`pl-12 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Status</th>
+                                        <th className={`px-6 py-3 pl-4 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Total</th>
+                                        <th className={`pl-25 py-3 pr-9 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className={`divide-y ${isDarkMode ? 'divide-gray-700 bg-gray-900' : 'divide-gray-200 bg-white'}`}>
                                     {getFilteredOrders().map((order) => (
                                         <tr key={order._id}>
-                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-[#664C36]'}`}>{order._id}</td>
-                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-[#664C36]'}`}>{order.userInfo?.name}</td>
-                                            <td className={`px-6 py-4 pr-8 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-[#664C36]'}`}>{new Date(order.createdAt).toLocaleDateString()}</td>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{order._id}</td>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{order.userInfo?.name}</td>
+                                            <td className={`px-6 py-4 pr-8 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{new Date(order.createdAt).toLocaleDateString()}</td>
                                             {filterView === 'delivered' && (
-                                                <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-[#664C36]'}`}>
+                                                <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
                                                     {order.updatedAt ? new Date(order.updatedAt).toLocaleDateString() : 'N/A'}
                                                 </td>
                                             )}
@@ -254,7 +254,7 @@ const OrderPage = () => {
                                                         className={`ml-2 text-xs rounded-md shadow-sm focus:outline-none
                                                         ${isDarkMode
                                                                 ? 'text-white bg-gray-900 border-gray-600 focus:ring-2 focus:ring-white focus:border-black'
-                                                                : 'text-[#664C36] bg-white border-gray-300 focus:ring-2 focus:ring-[#A2574F] focus:border-[#A2574F]'
+                                                                : 'text-gray-700 bg-white border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                                                             }`}
                                                     >
                                                         <option value="Pending">Pending</option>
@@ -269,7 +269,7 @@ const OrderPage = () => {
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-[#664C36]'}`}>${order.totalPoints}</td>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>${order.totalPoints}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <div className="flex gap-2 justify-end">
                                                     <button
@@ -280,7 +280,7 @@ const OrderPage = () => {
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteOrder(order._id)}
-                                                        className="text-[#A2574F] hover:text-[#64332d] px-2 py-1 rounded"
+                                                        className="text-blue-700 hover:text-gray-800 px-2 py-1 rounded"
                                                     >
                                                         <Trash2 className="h-4 w-4" />
                                                     </button>
@@ -300,35 +300,35 @@ const OrderPage = () => {
                                 <div className={`px-4 pt-5 pb-4 sm:p-6 sm:pb-4 ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
                                     <div className="sm:flex sm:items-start">
                                         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                            <h2 className={`text-lg leading-6 font-medium ${isDarkMode ? 'text-white' : 'text-[#A2574F]'}`} id="modal-title">
+                                            <h2 className={`text-lg leading-6 font-medium ${isDarkMode ? 'text-white' : 'text-blue-700'}`} id="modal-title">
                                                 Order Details
                                             </h2>
                                             <div className="mt-2">
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong>Order ID:</strong> {selectedOrderDetails._id}
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong>Customer Name:</strong> {selectedOrderDetails.userInfo?.name}
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong>Phone:</strong> {selectedOrderDetails.userInfo?.phone}
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong>Address:</strong> {selectedOrderDetails.userInfo?.address}
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong>Order Date:</strong> {new Date(selectedOrderDetails.createdAt).toLocaleDateString()}
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong>Status:</strong> {selectedOrderDetails.status}
                                                 </p>
-                                                <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong>Total Points:</strong> {selectedOrderDetails.totalPoints}
                                                 </p>
                                                 {selectedOrderDetails.items && selectedOrderDetails.items.length > 0 && (
                                                     <div>
-                                                        <strong className={isDarkMode ? 'text-white' : 'text-[#A2574F]'}>Items:</strong>
-                                                        <ul className={isDarkMode ? 'text-gray-300 list-disc ml-5' : 'text-[#664C36] list-disc ml-5'}>
+                                                        <strong className={isDarkMode ? 'text-white' : 'text-blue-700'}>Items:</strong>
+                                                        <ul className={isDarkMode ? 'text-gray-300 list-disc ml-5' : 'text-gray-700 list-disc ml-5'}>
                                                             {selectedOrderDetails.items.map((item, index) => (
                                                                 <li key={index}>
                                                                     {item.name} (Qty: {item.quantity}, Price: ${item.sellingPrice})
@@ -338,22 +338,22 @@ const OrderPage = () => {
                                                     </div>
                                                 )}
                                                 {selectedOrderDetails.items && selectedOrderDetails.items.length === 0 && (
-                                                    <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                    <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                         <strong>Items:</strong> No items in this order.
                                                     </p>
                                                 )}
                                                 {selectedOrderDetails.donation > 0 && (
-                                                    <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                    <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                         <strong>Donation:</strong> ${selectedOrderDetails.donation}
                                                     </p>
                                                 )}
                                                 {selectedOrderDetails.userInfo?.promo && (
-                                                    <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                    <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                         <strong>Promo Code:</strong> {selectedOrderDetails.userInfo.promo}
                                                     </p>
                                                 )}
                                                 {selectedOrderDetails.userInfo?.shipping && (
-                                                    <p className={isDarkMode ? 'text-gray-300' : 'text-[#664C36]'}>
+                                                    <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                         <strong>Shipping Method:</strong> {selectedOrderDetails.userInfo.shipping}
                                                     </p>
                                                 )}
@@ -365,7 +365,7 @@ const OrderPage = () => {
                                     <button
                                         type="button"
                                         onClick={closeDetailsModal}
-                                        className={`mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-grey-900 text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#A2574F] sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm ${isDarkMode ? 'bg-gray-700 text-white border-gray-600 hover:bg-gray-600' : ''}`}
+                                        className={`mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-grey-900 text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm ${isDarkMode ? 'bg-gray-700 text-white border-gray-600 hover:bg-gray-600' : ''}`}
                                     >
                                         Close
                                     </button>
