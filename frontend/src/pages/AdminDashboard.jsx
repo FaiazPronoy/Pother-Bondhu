@@ -690,6 +690,12 @@ const AdminDashboard = () => {
                             </button>
                         </div>
                     
+                        {fetchError && (
+                            <div className={`mb-6 rounded-lg border px-4 py-3 text-sm ${isDarkMode ? 'bg-red-900/30 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                                Could not load order data, so the figures below are incomplete. {fetchError}
+                            </div>
+                        )}
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                             <StyledLink to="/adminproducts">
                                 <OverviewCard
