@@ -4,18 +4,11 @@
    has its own toggle, so drive it from a class instead. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* =====================================================================
-   Save Paws: "orange and plum"
-
-   The app was built on Tailwind's stock blue and grey, which is the palette
-   every other project of mine already had. Rather than rewrite forty
-   components, the scales themselves are redefined here: every existing
-   bg-blue-600 is now orange, every purple is plum, and the greys carry a
-   little plum in them so they read as chosen rather than inherited.
-
-   Orange for anything urgent, plum for anything secondary, and a neutral
-   that is warm because a page about hurt animals should not feel clinical.
-   ===================================================================== */
+/* App-wide colours and fonts.
+   Orange with plum as the secondary. This was built on Tailwind's default
+   blue and grey, and rather than edit every component I redefined the
+   scales here instead - so bg-blue-600 comes out orange, purple is plum.
+   Keep that in mind when reading the class names. */
 
 @theme {
   /* --- primary: orange (was blue) ----------------------------------- */
