@@ -99,3 +99,64 @@
     color: #F8EBDD;
   }
 }
+
+/* ------------------------------------------------------------------------
+   The page behind everything.
+
+   Warm bands running across the page like light coming in low, with a
+   scatter of soft rounds over them. Two sizes on two different spacings so
+   the scatter reads as scattered rather than as a grid.
+   ------------------------------------------------------------------------ */
+
+:root {
+  --sky-1: rgba(242, 111, 22, .13);
+  --sky-2: rgba(124, 46, 95, .10);
+  --sky-3: rgba(255, 168, 94, .16);
+  --sky-mid: rgba(242, 111, 22, .04);
+  --sky-4: rgba(184, 74, 9, .06);
+  --spot-a: rgba(184, 74, 9, .09);
+  --spot-b: rgba(124, 46, 95, .07);
+}
+
+.dark {
+  --sky-1: rgba(255, 139, 51, .13);
+  --sky-2: rgba(194, 100, 157, .11);
+  --sky-3: rgba(255, 168, 94, .07);
+  --sky-mid: rgba(255, 139, 51, .045);
+  --sky-4: rgba(194, 100, 157, .07);
+  --spot-a: rgba(255, 169, 94, .07);
+  --spot-b: rgba(218, 144, 189, .06);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(70rem 26rem at 78% -6%, var(--sky-3), transparent 70%),
+    /* one wide round across the middle, so the bands are not separated by a
+       stripe of nothing where most of the reading happens */
+    radial-gradient(72rem 40rem at 40% 48%, var(--sky-4), transparent 76%),
+    /* the light comes in at the top and the colour settles at the bottom,
+       with the band never dropping all the way out in between */
+    linear-gradient(178deg,
+      var(--sky-1) 0%,
+      var(--sky-mid) 40%,
+      var(--sky-mid) 60%,
+      var(--sky-2) 100%),
+    radial-gradient(48rem 34rem at 8% 92%, var(--sky-1), transparent 72%);
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 30% 30%, var(--spot-a) 3.5px, transparent 4px),
+    radial-gradient(circle at 70% 70%, var(--spot-b) 2px, transparent 2.5px);
+  background-size: 118px 118px, 67px 67px;
+}
