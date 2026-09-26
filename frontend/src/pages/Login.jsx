@@ -4,7 +4,16 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import { useLang } from "../context/LangContext";
+import { HandHeart, Heart, LayoutDashboard } from "lucide-react";
 import { Wordmark, PasswordField, LangButton } from "../components/bits";
+
+// the accounts `npm run seed` creates, so anyone looking at the project can
+// get in with one click; they are listed in the README too
+const DEMO = [
+  { key: "volunteer", email: "nabila@straybachao.com", password: "Volunteer@123", icon: HandHeart },
+  { key: "donor", email: "mehedi@straybachao.com", password: "Donor@1234", icon: Heart },
+  { key: "admin", email: "admin@straybachao.com", password: "Admin@1234", icon: LayoutDashboard },
+];
 
 const Login = () => {
   const navigate = useNavigate();
@@ -42,12 +51,16 @@ const Login = () => {
     setRegisterData({ ...registerData, [name]: type === "checkbox" ? checked : value });
   };
 
-  const handleAuthSubmit = async (e, type) => {
-    e.preventDefault();
+  const handleAuthSubmit = async (e, type, demo) => {
+    e?.preventDefault();
     let payload;
     let endpoint;
 
-    if (type === "Login") {
+    if (demo) {
+      setLoginData({ email: demo.email, password: demo.password });
+      payload = { email: demo.email, password: demo.password };
+      endpoint = "/api/auth/login";
+    } else if (type === "Login") {
       payload = { email: loginData.email.trim(), password: loginData.password };
       endpoint = "/api/auth/login";
     } else {
@@ -137,7 +150,25 @@ const Login = () => {
                   {busy ? t("login.signingIn") : t("login.tabIn")}
                 </button>
               </form>
-            ) : (
+            ) : null}
+
+            {state === "Login" && (
+              <section className="mt-8 rounded-2xl border border-dashed border-line-2 bg-card/70 p-4 text-center" aria-labelledby="demo-title">
+                <h2 id="demo-title" className="font-display text-lg">{t("login.demoTitle")}</h2>
+                <p className="text-sm text-ink-2">{t("login.demoText")}</p>
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {DEMO.map((d) => (
+                    <button key={d.key} type="button" disabled={busy} onClick={() => handleAuthSubmit(null, "Login", d)}
+                      className="flex flex-col items-center gap-1 rounded-xl border border-line bg-paper px-2 py-3 text-sm font-semibold hover:border-clay hover:text-clay disabled:opacity-50">
+                      <d.icon size={20} aria-hidden="true" />
+                      {t(`role.${d.key}`)}
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {state === "Sign Up" && (
               <form onSubmit={(e) => handleAuthSubmit(e, "Sign Up")} className="mt-8 space-y-5">
                 <div>
                   <label htmlFor="registerName" className="label">{t("login.name")}</label>

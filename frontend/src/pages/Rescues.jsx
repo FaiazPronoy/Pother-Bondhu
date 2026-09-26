@@ -149,7 +149,7 @@ export default function Rescues() {
       </section>
 
       {areasInUse.length > 1 && (
-        <div className="flex flex-wrap gap-2 mb-8" role="group" aria-label={t("rescues.filter")}>
+        <div className="flex flex-wrap justify-center gap-2 mb-10" role="group" aria-label={t("rescues.filter")}>
           <button type="button" className="chip" aria-pressed={!area} onClick={() => setArea("")}>{t("rescues.everywhere")}</button>
           {areasInUse.map((a) => (
             <button key={a} type="button" className="chip" aria-pressed={area === a} onClick={() => setArea(a)}>{areaName(a)}</button>

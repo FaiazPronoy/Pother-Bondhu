@@ -104,8 +104,9 @@ rescue posts with photos, 12 products and 8 orders. The logins:
 | Volunteer | `nabila@straybachao.com` | `Volunteer@123` |
 | Supporter | `mehedi@straybachao.com` | `Donor@1234` |
 
-Nabila has a team invitation waiting, so the invite flow can be tried straight
-away.
+The sign-in page also has one-tap buttons for these three, so nobody has to
+type them. Nabila has a team invitation waiting, so the invite flow can be
+tried straight away.
 
 **3. Start the API** (<http://localhost:4000>)
 

@@ -49,15 +49,24 @@ export function Avatar({ name = "", size = "w-10 h-10 text-sm", tone = "clay" })
   );
 }
 
+// every page opens the same way: a small label, the heading, one line under
+// it, all centred and balanced so the lines come out even
 export function PageHeader({ eyebrow, title, children, action }) {
   return (
-    <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-      <div className="max-w-2xl">
-        {eyebrow && <p className="eyebrow mb-2">{eyebrow}</p>}
-        <h1 className="text-3xl sm:text-4xl font-semibold text-balance">{title}</h1>
-        {children && <p className="mt-3 text-ink-2 text-lg text-pretty">{children}</p>}
-      </div>
-      {action && <div className="shrink-0">{action}</div>}
+    <header className="mb-10 text-center">
+      {eyebrow && (
+        <p className="eyebrow inline-flex items-center gap-1.5 rounded-full bg-clay-lo/70 px-3 py-1">
+          <PawPrint size={13} aria-hidden="true" /> {eyebrow}
+        </p>
+      )}
+      <h1 className="mt-3 mx-auto max-w-3xl text-3xl sm:text-[2.6rem] font-semibold text-balance">{title}</h1>
+      {children && <p className="mt-3 mx-auto max-w-2xl text-ink-2 text-lg text-balance">{children}</p>}
+      <span className="mt-5 flex justify-center gap-1.5" aria-hidden="true">
+        <span className="w-1.5 h-1.5 rounded-full bg-clay" />
+        <span className="w-1.5 h-1.5 rounded-full bg-sun" />
+        <span className="w-1.5 h-1.5 rounded-full bg-moss" />
+      </span>
+      {action && <div className="mt-5 flex justify-center">{action}</div>}
     </header>
   );
 }

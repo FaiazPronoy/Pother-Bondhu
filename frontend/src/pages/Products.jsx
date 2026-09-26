@@ -35,13 +35,13 @@ const Products = () => {
     <>
       <PageHeader eyebrow={t('shop.eyebrow')} title={q ? t('shop.results', { q }) : t('shop.title')}>{t('shop.lead')}</PageHeader>
 
-      <div className="flex flex-col lg:flex-row gap-4 lg:items-center mb-8">
-        <form onSubmit={search} className="relative flex-1 max-w-md" role="search">
+      <div className="flex flex-col items-center gap-4 mb-10">
+        <form onSubmit={search} className="relative w-full max-w-lg" role="search">
           <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-2" aria-hidden="true" />
           <input type="search" value={typed} onChange={(e) => setTyped(e.target.value)} className="field pl-10"
             placeholder={t('shop.search')} aria-label={t('shop.searchLabel')} />
         </form>
-        <div className="flex flex-wrap gap-2" role="group" aria-label={t('shop.cats')}>
+        <div className="flex flex-wrap justify-center gap-2" role="group" aria-label={t('shop.cats')}>
           {CATEGORIES.map((key) => (
             <button key={key} type="button" className="chip" aria-pressed={!q && category === key}
               onClick={() => { setTyped(''); navigate(key === 'all' ? '/products' : `/products/category/${key}`); }}>

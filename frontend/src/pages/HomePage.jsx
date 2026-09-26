@@ -73,10 +73,12 @@ function Hero({ stats, latest, faces }) {
           </figure>
 
           <h1 className={`mt-7 font-semibold sm:w-fit ${size}`}>
-            {t("landing.title1").split("|").map((line) => <span key={line} className="block">{line}</span>)}
-            <span className="block mt-1 italic text-clay"><span className="squiggle">{t("landing.title2a")}</span></span>
-            {/* the last line steps across to the right, so the three lines read like a stair */}
-            <span className="block mt-1 italic text-clay sm:text-right"><span className="squiggle">{t("landing.title2b")}</span></span>
+            {/* four lines that zigzag left, right, left, right, like steps */}
+            {[...t("landing.title1").split("|"), t("landing.title2a"), t("landing.title2b")].map((line, i) => (
+              <span key={line} className={`block ${i > 0 ? "mt-1" : ""} ${i % 2 ? "sm:text-right" : ""} ${i > 1 ? "italic text-clay" : ""}`}>
+                {i > 1 ? <span className="squiggle">{line}</span> : line}
+              </span>
+            ))}
           </h1>
 
           <p className="mt-6 text-lg sm:text-xl text-ink-2 max-w-[34rem] text-pretty">{t("landing.lead")}</p>
@@ -307,10 +309,11 @@ function Desk() {
 
   return (
     <div className="space-y-10">
-      <header className="rise">
-        <p className="font-display italic text-lg text-clay">{t("desk.ask")}</p>
-        <h1 className="mt-1 text-3xl sm:text-4xl font-semibold">{t(greetingKey(), { name: userData.name.split(" ")[0] })}</h1>
-        <p className="mt-2 text-ink-2 text-lg">{t("desk.sub")}</p>
+      <header className="rise relative overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-clay-lo/80 via-card to-sun-lo/70 px-6 py-8 sm:px-10 text-center sm:text-left paw-trail">
+        <p className="font-display italic text-lg text-clay-hi">{t("desk.ask")}</p>
+        <h1 className="mt-1 text-3xl sm:text-[2.6rem] font-semibold text-balance">{t(greetingKey(), { name: userData.name.split(" ")[0] })}</h1>
+        <p className="mt-2 text-ink-2 text-lg text-balance">{t("desk.sub")}</p>
+        <p lang="bn" className="bn mt-4 text-clay-hi hidden sm:block" aria-hidden="true">ওরা কথা বলতে পারে না, আমরা পারি।</p>
       </header>
 
       <nav aria-label={t("desk.quick")} className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 rise-2">

@@ -14,12 +14,12 @@ export default function RescueCard({ post }) {
         loading="lazy"
         className="w-full aspect-[4/3] object-cover"
       />
-      <figcaption className="px-1 pt-3 pb-4">
+      <figcaption className="px-1 pt-3 pb-4 text-center">
         {/* the caption stays in whatever language it was written in */}
-        <p className="font-display italic text-[1.05rem] leading-snug line-clamp-3">
+        <p className="font-display italic text-[1.05rem] leading-snug line-clamp-3 text-balance">
           {post.caption || t("rescue.noNote")}
         </p>
-        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[#6B5646]">
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-[#6B5646]">
           {(post.area || who?.location) && (
             <span className="inline-flex items-center gap-1 font-semibold text-[#8F3416]">
               <MapPin size={14} aria-hidden="true" /> {area(post.area || who.location)}
