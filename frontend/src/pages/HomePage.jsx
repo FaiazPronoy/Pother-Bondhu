@@ -49,22 +49,30 @@ function Hero({ stats, latest, faces }) {
   const { t, lang, area, ago } = useLang();
   // Bangla words run wider and taller, so the headline steps down a size
   const size = lang === "bn"
-    ? "text-[2.3rem] leading-[1.3] sm:text-5xl lg:text-[3.4rem]"
-    : "text-[2.6rem] leading-[1.06] sm:text-6xl lg:text-[4.1rem]";
+    ? "text-[2.3rem] leading-[1.35] sm:text-5xl lg:text-[3.5rem]"
+    : "text-[2.35rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]";
   return (
     <section className="paw-trail relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-16 lg:pt-16 lg:pb-24 grid gap-14 lg:grid-cols-[1.08fr_.92fr] items-center">
         <div className="rise flex flex-col items-center text-center lg:items-start lg:text-left">
-          <p className="inline-flex items-center gap-2 rounded-full border border-line bg-card pl-1.5 pr-4 py-1.5 text-sm font-semibold text-ink-2 shadow-sm">
-            <span className="flex -space-x-1.5" aria-hidden="true">
-              <span className="w-7 h-7 rounded-full bg-clay text-on-clay grid place-items-center ring-2 ring-card"><Dog size={15} /></span>
-              <span className="w-7 h-7 rounded-full bg-moss text-on-clay grid place-items-center ring-2 ring-card"><Cat size={15} /></span>
-              <span className="w-7 h-7 rounded-full bg-sun text-[#2B2019] grid place-items-center ring-2 ring-card"><Bird size={15} /></span>
-            </span>
-            {t("landing.kicker")}
-          </p>
+          {/* the motto stays in Bangla in both languages; it is the name's own voice */}
+          <figure className="flex flex-col items-center lg:items-start">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
+              <span className="flex -space-x-2 shrink-0" aria-hidden="true">
+                <span className="w-9 h-9 rounded-full bg-clay text-on-clay grid place-items-center ring-[3px] ring-paper"><Dog size={18} /></span>
+                <span className="w-9 h-9 rounded-full bg-moss text-on-clay grid place-items-center ring-[3px] ring-paper"><Cat size={18} /></span>
+                <span className="w-9 h-9 rounded-full bg-sun text-[#2B2019] grid place-items-center ring-[3px] ring-paper"><Bird size={18} /></span>
+              </span>
+              <blockquote lang="bn" className="bn text-[1.3rem] sm:text-2xl leading-snug text-clay whitespace-nowrap">
+                ওরা কথা বলতে পারে না, আমরা পারি।
+              </blockquote>
+            </div>
+            {lang === "en" && (
+              <figcaption className="mt-1 text-sm italic text-ink-2 lg:pl-[5.5rem]">{t("landing.mottoGloss")}</figcaption>
+            )}
+          </figure>
 
-          <h1 className={`mt-6 font-semibold text-balance ${size}`}>
+          <h1 className={`mt-7 font-semibold text-balance ${size}`}>
             <span className="block">{t("landing.title1")}</span>
             <span className="block mt-1 italic text-clay">
               <span className="squiggle">{t("landing.title2")}</span>

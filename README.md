@@ -1,6 +1,8 @@
 # StrayBachao: An Animal Rescue Network
 
-*ওরা সাহায্য চাইতে পারে না। তাই আমরা পাশে দাঁড়াই।* They can't ask for help, so we show up.
+*ওরা কথা বলতে পারে না, আমরা পারি।* They can't speak. We can.
+
+*একটু যত্ন, একটু আলো, ওদের জীবন হোক আরও ভালো।*
 
 StrayBachao connects people who spot a street animal in trouble with volunteers
 nearby. Anyone can post a photo to the rescue board; volunteers form teams by

@@ -60,9 +60,9 @@ const en = {
     photos: 'Photos from',
   },
   landing: {
-    kicker: 'For every stray in Dhaka',
-    title1: "They can't ask for help.",
-    title2: 'So we show up.',
+    title1: 'A little care, a little light,',
+    title2: 'can make their world feel right.',
+    mottoGloss: "They can't speak. We can.",
     lead: "Seen a dog, cat or bird that's hurt, hungry or scared? Post a photo. Volunteers nearby see it, and a team close by goes to help.",
     join: 'Join StrayBachao',
     board: 'See the rescue board',

@@ -11,7 +11,7 @@ const Login = () => {
   const location = useLocation();
   const [params] = useSearchParams();
   const { backendUrl, checkAuthStatus, isLoggedIn } = useContext(AppContext);
-  const { t, apiError } = useLang();
+  const { t, lang, apiError } = useLang();
 
   const redirectPath = location.state?.from || "/";
 
@@ -95,8 +95,8 @@ const Login = () => {
         <img src="/img/waiting.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1A1411]/90 via-[#1A1411]/30 to-transparent" />
         <div className="absolute bottom-0 p-12 text-[#FFF8F0] max-w-xl">
-          <p className="font-display text-4xl leading-tight">{t("landing.title1")}<br /><span className="italic text-[#F2B659]">{t("landing.title2")}</span></p>
-          <p className="mt-4 text-lg text-[#EADBC8] text-pretty">{t("login.quote")}</p>
+          <p lang="bn" className="bn text-4xl leading-snug">ওরা কথা বলতে পারে না,<br /><span className="text-[#F2B659]">আমরা পারি।</span></p>
+          <p className="mt-4 text-lg text-[#EADBC8] text-pretty">{lang === "en" && <>{t("landing.mottoGloss")} </>}{t("login.quote")}</p>
         </div>
       </aside>
 

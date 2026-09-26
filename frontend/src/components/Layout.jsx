@@ -243,7 +243,7 @@ function VisitorShell({ children, wide }) {
 }
 
 function Footer({ compact }) {
-  const { t, lang } = useLang();
+  const { t } = useLang();
   return (
     <footer className={`border-t border-line ${compact ? "" : "bg-card"}`}>
       <div className={`max-w-6xl mx-auto px-4 sm:px-6 ${compact ? "py-6" : "py-10"} flex flex-col gap-6 md:flex-row md:items-start md:justify-between`}>
@@ -251,7 +251,7 @@ function Footer({ compact }) {
           <div className="max-w-sm">
             <Wordmark />
             <p className="mt-3 text-ink-2">{t("footer.blurb")}</p>
-            {lang === "bn" && <p className="mt-2 bn text-lg text-ink">ওরা কথা বলতে পারে না, আমরা পারি।</p>}
+            <p lang="bn" className="mt-2 bn text-lg text-clay">ওরা কথা বলতে পারে না, আমরা পারি।</p>
           </div>
         )}
         <nav aria-label={t("nav.footer")} className="flex flex-wrap gap-x-6 gap-y-2 text-ink-2">

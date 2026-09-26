@@ -265,7 +265,7 @@ def main():
         page.click("button[aria-label='বাংলায় দেখুন']")
         page.wait_for_timeout(200)
         check("the language button switches the page to Bangla",
-              page.evaluate("document.documentElement.lang") == "bn" and "ওরা সাহায্য" in page.inner_text("h1"))
+              page.evaluate("document.documentElement.lang") == "bn" and "একটু যত্ন" in page.inner_text("h1"))
         page.evaluate("localStorage.setItem('lang', 'en')")
         page.close()
 
