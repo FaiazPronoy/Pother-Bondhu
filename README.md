@@ -1,6 +1,6 @@
 # StrayBachao: An Animal Rescue Network
 
-*ওরা কথা বলতে পারে না, আমরা পারি।* They can't ask for help, so the rest of us keep an eye out.
+*ওরা সাহায্য চাইতে পারে না। তাই আমরা পাশে দাঁড়াই।* They can't ask for help, so we show up.
 
 StrayBachao connects people who spot a street animal in trouble with volunteers
 nearby. Anyone can post a photo to the rescue board; volunteers form teams by
@@ -13,7 +13,9 @@ It started life as **Save Paws**, a personal project. I came back to it twice:
 once to fix the backend, and once to rename it and rebuild the interface. Both
 passes are written up [below](#what-changed-and-why).
 
-![The landing page](docs/landing.jpg)
+| English | বাংলা |
+|---|---|
+| ![The landing page in English](docs/landing.jpg) | ![The landing page in Bangla](docs/landing-bn.jpg) |
 
 ## Stack
 
@@ -43,6 +45,9 @@ passes are written up [below](#what-changed-and-why).
   cart, and a checkout paid in PetPoints with an optional donation.
 - **Admin.** Product and stock management, order status, the volunteer list
   and revenue, cost and profit charts.
+- **Bangla and English.** One button switches every screen, including numbers,
+  area names and "5 hrs ago". What people write (captions, team names, bios,
+  team updates) is never translated: a post written in Bangla stays in Bangla.
 - **Light and dark themes**, a layout that works down to 390 px, and every text
   colour checked against WCAG AA.
 
@@ -152,7 +157,8 @@ python tools/browser_checks.py
 It signs in as a visitor, a volunteer, a supporter and the admin and follows
 every link: 14 to 18 pages each, with no console errors or failed requests. It
 checks about 2,500 pieces of text against WCAG AA in both themes, checks that
-no page scrolls sideways at 390 px, and saves screenshots to `tools/out/`.
+no page scrolls sideways at 390 px, then does the same again with the site in
+Bangla, and saves screenshots to `tools/out/`.
 
 ## Project layout
 
@@ -169,7 +175,8 @@ backend/
 frontend/
   src/pages/       one file per screen
   src/components/  the layout, shared pieces, and the admin screens
-  src/context/     AppContext, DarkmodeContext
+  src/context/     AppContext, DarkmodeContext, LangContext
+  src/i18n/        en.js and bn.js, every piece of interface text
   public/img/      landing and shop photos
 tools/
   browser_checks.py
@@ -230,6 +237,9 @@ used product photos copied from Amazon listings. So:
   edits to email and role were silently ignored; the login logo linked to
   `localhost:5173`; "Log out" in the admin panel did not log out; and a visitor
   loading any page caused a 401 in the console.
+- **Bangla alongside English**: every label, message and error the site shows
+  lives in `frontend/src/i18n/en.js` and `bn.js`, and the API's English error
+  messages are translated on the way in.
 - **Smaller bundle**: the admin screens load only when an admin opens them,
   which took the main script from 615 kB to 400 kB.
 
@@ -242,6 +252,8 @@ used product photos copied from Amazon listings. So:
 - **`npm run lint` still reports errors in the admin screens**, mostly unused
   variables in the revenue page. The pages I rewrote have none.
 - **Product images are URLs typed into the admin form**, not uploads.
+- The admin screens' tables and charts are still English only; their sidebar
+  switches language with the rest.
 - There are no component tests; the browser check covers the pages end to end
   instead.
 
