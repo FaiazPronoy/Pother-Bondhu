@@ -73,7 +73,7 @@ function Hero({ stats, latest, faces }) {
             )}
           </figure>
 
-          <h1 className={`mt-7 font-semibold sm:w-fit ${size}`}>
+          <h1 className={`mt-7 font-semibold sm:w-fit sm:text-left ${size}`}>
             {/* four lines that zigzag left, right, left, right, like steps */}
             {[...t("landing.title1").split("|"), t("landing.title2a"), t("landing.title2b")].map((line, i) => (
               <span key={line} className={`block ${i > 0 ? "mt-1" : ""} ${i % 2 ? step : ""} ${i > 1 ? "italic text-clay" : ""}`}>
@@ -242,13 +242,24 @@ function Landing() {
       <section className="relative isolate overflow-hidden bg-[#1A1411]">
         <img src="/img/mother.jpg" alt="" className="absolute inset-0 -z-10 w-full h-full object-cover" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#1A1411]/90 via-[#1A1411]/75 to-[#1A1411]/40" />
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24 text-center sm:text-left">
-          <p className="font-display italic text-2xl text-[#FBE9C8]">{t("landing.endKicker")}</p>
-          <h2 className="mt-3 text-4xl sm:text-5xl font-semibold text-[#FFF8F0] max-w-2xl text-balance">{t("landing.endTitle")}</h2>
-          <p className="mt-4 text-lg text-[#EADBC8] max-w-xl text-pretty">{t("landing.endText")}</p>
-          <Link to="/login?mode=signup" className="btn mt-8 bg-[#E9A23B] text-[#2B2019] hover:bg-[#F2B659] text-base px-6">
-            {t("landing.endCta")} <ArrowRight size={18} aria-hidden="true" />
-          </Link>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
+          <div className="max-w-3xl mx-auto sm:mx-0 text-center sm:text-left">
+            <p className="flex items-center justify-center sm:justify-start gap-3 font-display italic text-xl sm:text-2xl text-[#FBE9C8]">
+              <span className="hidden sm:block h-0.5 w-10 rounded-full bg-[#E9A23B]" aria-hidden="true" />
+              {t("landing.endKicker")}
+            </p>
+            <h2 className="mt-5 font-semibold text-[#FFF8F0] text-3xl sm:text-5xl leading-tight text-balance">
+              <span className="block">{t("landing.endTitle1")}</span>
+              <span className="block mt-2 sm:pl-[1.5em] italic text-[#F2B659]">{t("landing.endTitle2")}</span>
+            </h2>
+            {/* the text and the button sit behind a gold line, stepped in under the headline */}
+            <div className="mt-8 sm:ml-[4.5rem] sm:border-l-2 sm:border-[#E9A23B]/70 sm:pl-6">
+              <p className="text-lg text-[#EADBC8] max-w-xl mx-auto sm:mx-0 text-pretty">{t("landing.endText")}</p>
+              <Link to="/login?mode=signup" className="btn mt-6 bg-[#E9A23B] text-[#2B2019] hover:bg-[#F2B659] text-base px-6">
+                {t("landing.endCta")} <ArrowRight size={18} aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
     </>

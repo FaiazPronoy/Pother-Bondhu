@@ -94,9 +94,10 @@ const en = {
     teamsEyebrow: 'Teams',
     teamsTitle: 'Find the team on your street',
     endKicker: 'They never forget a kind hand.',
-    endTitle: 'Be the reason one of them makes it through the monsoon.',
-    endText: 'No car, no clinic, no experience needed. Most rescues start with a bowl of water and someone who decided to stop.',
+    endText: 'You need no car, no clinic and no experience. Most rescues start with a bowl of water and one person who decided to stop.',
     endCta: 'Become a volunteer',
+    endTitle1: 'Speeding wheels, empty stomachs, cruel hands.',
+    endTitle2: 'Every day out there is a fight. Fight it with them.',
   },
   desk: {
     ask: 'Who needs you today?',
