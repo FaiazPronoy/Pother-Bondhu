@@ -258,7 +258,7 @@ function Footer({ compact }) {
           {publicLinks.map((l) => <Link key={l.to} to={l.to} className="hover:text-ink">{t(l.key)}</Link>)}
         </nav>
         <p className="text-sm text-ink-2">
-          © {new Date().getFullYear()} StrayBachao · {t("footer.photos")}{" "}
+          © {new Date().getFullYear()} CholoBachai · {t("footer.photos")}{" "}
           <a href="https://unsplash.com" className="underline underline-offset-2 hover:text-ink" rel="noreferrer" target="_blank">Unsplash</a>
         </p>
       </div>

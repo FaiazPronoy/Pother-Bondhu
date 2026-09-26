@@ -15,8 +15,8 @@ export function Wordmark({ className = "", size = "text-2xl" }) {
     <span className={`inline-flex items-center gap-2 ${className}`} lang="en">
       <img src="/paw-heart.svg" alt="" className="w-9 h-9 shrink-0" />
       <span className={`font-display font-semibold tracking-tight leading-none ${size}`}>
-        <span className="italic font-normal">Stray</span>
-        <span className="text-clay">Bachao</span>
+        <span className="italic font-normal">Cholo</span>
+        <span className="text-clay">Bachai</span>
       </span>
     </span>
   );

@@ -679,7 +679,7 @@ const AdminDashboard = () => {
                         <div className="flex items-center justify-between mb-12">
                             <div>
                                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                                    Orders, stock and the money side of StrayBachao.
+                                    Orders, stock and the money side of CholoBachai.
                                 </p>
                             </div>
                             <button

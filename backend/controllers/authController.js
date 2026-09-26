@@ -59,8 +59,8 @@ export const register = async (req, res) => {
         const mailOptions = {
             from : process.env.SENDER_EMAIL,
             to : email,
-            subject: "Welcome to StrayBachao",
-            text: "Welcome to StrayBachao. Your account is ready, and the strays of your area just got one more friend."
+            subject: "Welcome to CholoBachai",
+            text: "Welcome to CholoBachai. Your account is ready, and the strays of your area just got one more friend."
         }
 
         // account is already saved, don't fail the signup if the mail bounces

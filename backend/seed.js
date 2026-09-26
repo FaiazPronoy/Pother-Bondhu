@@ -41,15 +41,15 @@ const products = [
 ];
 
 const people = [
-  { name: 'Admin', email: 'admin@straybachao.com', password: 'Admin@1234', role: 'admin', points: 0, location: 'Dhanmondi', bio: 'Runs the StrayBachao shop and keeps the board tidy.' },
-  { name: 'Nabila Rahman', email: 'nabila@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 4200, location: 'Dhanmondi', bio: 'Fosters kittens and runs the Dhanmondi lake feeding route most evenings. Ask me about the three-legged one.' },
-  { name: 'Tanvir Hasan', email: 'tanvir@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 3100, location: 'Uttara', bio: 'I have a car and I do not sleep much, so night rescues and clinic runs are mine.' },
-  { name: 'Sadia Islam', email: 'sadia@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 2650, location: 'Mirpur', bio: 'Final year vet student. First aid, deworming and the monthly vaccination camp in Mirpur.' },
-  { name: 'Rafiq Ahmed', email: 'rafiq@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 1800, location: 'Gulshan', bio: 'Weekend volunteer. Mostly cats around Gulshan 2 and adoption day logistics.' },
-  { name: 'Arif Chowdhury', email: 'arif@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 950, location: 'Badda', bio: 'Tea stall on Link Road. The dogs here know the sound of my shutter opening.' },
-  { name: 'Priya Das', email: 'priya@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 1400, location: 'Mohammadpur', bio: 'মায়ের সাথে ২০১৯ থেকে মোহাম্মদপুর বাজারের কুকুরগুলোকে খাওয়াই।' },
-  { name: 'Mehedi Khan', email: 'mehedi@straybachao.com', password: 'Donor@1234', role: 'donor', points: 6000, location: 'Banani', bio: '' },
-  { name: 'Farhana Akter', email: 'farhana@straybachao.com', password: 'Donor@1234', role: 'donor', points: 4500, location: 'Moghbazar', bio: '' },
+  { name: 'Admin', email: 'admin@cholobachai.com', password: 'Admin@1234', role: 'admin', points: 0, location: 'Dhanmondi', bio: 'Runs the CholoBachai shop and keeps the board tidy.' },
+  { name: 'Nabila Rahman', email: 'nabila@cholobachai.com', password: 'Volunteer@123', role: 'volunteer', points: 4200, location: 'Dhanmondi', bio: 'Fosters kittens and runs the Dhanmondi lake feeding route most evenings. Ask me about the three-legged one.' },
+  { name: 'Tanvir Hasan', email: 'tanvir@cholobachai.com', password: 'Volunteer@123', role: 'volunteer', points: 3100, location: 'Uttara', bio: 'I have a car and I do not sleep much, so night rescues and clinic runs are mine.' },
+  { name: 'Sadia Islam', email: 'sadia@cholobachai.com', password: 'Volunteer@123', role: 'volunteer', points: 2650, location: 'Mirpur', bio: 'Final year vet student. First aid, deworming and the monthly vaccination camp in Mirpur.' },
+  { name: 'Rafiq Ahmed', email: 'rafiq@cholobachai.com', password: 'Volunteer@123', role: 'volunteer', points: 1800, location: 'Gulshan', bio: 'Weekend volunteer. Mostly cats around Gulshan 2 and adoption day logistics.' },
+  { name: 'Arif Chowdhury', email: 'arif@cholobachai.com', password: 'Volunteer@123', role: 'volunteer', points: 950, location: 'Badda', bio: 'Tea stall on Link Road. The dogs here know the sound of my shutter opening.' },
+  { name: 'Priya Das', email: 'priya@cholobachai.com', password: 'Volunteer@123', role: 'volunteer', points: 1400, location: 'Mohammadpur', bio: 'মায়ের সাথে ২০১৯ থেকে মোহাম্মদপুর বাজারের কুকুরগুলোকে খাওয়াই।' },
+  { name: 'Mehedi Khan', email: 'mehedi@cholobachai.com', password: 'Donor@1234', role: 'donor', points: 6000, location: 'Banani', bio: '' },
+  { name: 'Farhana Akter', email: 'farhana@cholobachai.com', password: 'Donor@1234', role: 'donor', points: 4500, location: 'Moghbazar', bio: '' },
 ];
 
 // the first in crew leads the team; log entries are [who, message, hours ago]
@@ -94,14 +94,14 @@ function daysAgo(n) {
 }
 
 const orderPlan = [
-  { buyer: 'mehedi@straybachao.com', days: 2,  lines: [['SP-001', 1], ['SP-009', 2]], donation: 200, status: 'Delivered' },
-  { buyer: 'farhana@straybachao.com', days: 4, lines: [['SP-006', 3]], donation: 0, status: 'Delivered' },
-  { buyer: 'mehedi@straybachao.com', days: 6,  lines: [['SP-004', 1], ['SP-007', 2]], donation: 100, status: 'Delivered' },
-  { buyer: 'farhana@straybachao.com', days: 9, lines: [['SP-010', 1]], donation: 0, status: 'Out for Delivery' },
-  { buyer: 'mehedi@straybachao.com', days: 13, lines: [['SP-008', 1], ['SP-012', 1]], donation: 300, status: 'Delivered' },
-  { buyer: 'farhana@straybachao.com', days: 18, lines: [['SP-002', 1]], donation: 0, status: 'Delivered' },
-  { buyer: 'mehedi@straybachao.com', days: 24, lines: [['SP-011', 1], ['SP-009', 1]], donation: 0, status: 'Pending' },
-  { buyer: 'farhana@straybachao.com', days: 30, lines: [['SP-003', 1], ['SP-006', 2]], donation: 500, status: 'Delivered' },
+  { buyer: 'mehedi@cholobachai.com', days: 2,  lines: [['SP-001', 1], ['SP-009', 2]], donation: 200, status: 'Delivered' },
+  { buyer: 'farhana@cholobachai.com', days: 4, lines: [['SP-006', 3]], donation: 0, status: 'Delivered' },
+  { buyer: 'mehedi@cholobachai.com', days: 6,  lines: [['SP-004', 1], ['SP-007', 2]], donation: 100, status: 'Delivered' },
+  { buyer: 'farhana@cholobachai.com', days: 9, lines: [['SP-010', 1]], donation: 0, status: 'Out for Delivery' },
+  { buyer: 'mehedi@cholobachai.com', days: 13, lines: [['SP-008', 1], ['SP-012', 1]], donation: 300, status: 'Delivered' },
+  { buyer: 'farhana@cholobachai.com', days: 18, lines: [['SP-002', 1]], donation: 0, status: 'Delivered' },
+  { buyer: 'mehedi@cholobachai.com', days: 24, lines: [['SP-011', 1], ['SP-009', 1]], donation: 0, status: 'Pending' },
+  { buyer: 'farhana@cholobachai.com', days: 30, lines: [['SP-003', 1], ['SP-006', 2]], donation: 500, status: 'Delivered' },
 ];
 
 async function seed() {
@@ -137,7 +137,7 @@ async function seed() {
   const productById = new Map(createdProducts.map((p) => [p.id, p]));
   console.log(`Inserted ${createdProducts.length} products`);
 
-  const byName = (handle) => userByEmail.get(`${handle}@straybachao.com`);
+  const byName = (handle) => userByEmail.get(`${handle}@cholobachai.com`);
   const hoursAgo = (h) => new Date(Date.now() - h * 3600 * 1000);
 
   const createdTeams = await Team.insertMany(
@@ -198,9 +198,9 @@ async function seed() {
 
   const revenue = orders.reduce((sum, o) => sum + o.totalPoints, 0);
   console.log(`\nDone. Demo revenue across seeded orders: ${revenue} points`);
-  console.log('Admin login:     admin@straybachao.com / Admin@1234');
-  console.log('Volunteer login: nabila@straybachao.com / Volunteer@123');
-  console.log('Donor login:     mehedi@straybachao.com / Donor@1234');
+  console.log('Admin login:     admin@cholobachai.com / Admin@1234');
+  console.log('Volunteer login: nabila@cholobachai.com / Volunteer@123');
+  console.log('Donor login:     mehedi@cholobachai.com / Donor@1234');
 
   await mongoose.disconnect();
 }

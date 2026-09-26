@@ -1,10 +1,10 @@
-# StrayBachao: An Animal Rescue Network
+# CholoBachai: An Animal Rescue Network
 
 *ওরা কথা বলতে পারে না, আমরা পারি।* They can't speak. We can.
 
 *একটু যত্ন, একটু আলো, ওদের জীবন হোক আরও ভালো।*
 
-StrayBachao connects people who spot a street animal in trouble with volunteers
+CholoBachai connects people who spot a street animal in trouble with volunteers
 nearby. Anyone can post a photo to the rescue board; volunteers form teams by
 area (feeding routes, night rescues, vaccination camps) and keep a log of what
 they did. Supporters top up an in-app credit called PetPoints, which they can
@@ -61,7 +61,7 @@ passes are written up [below](#what-changed-and-why).
 
 ## Running it on Windows
 
-The quick way is `RUN-StrayBachao.bat` in the project folder. It checks for
+The quick way is `RUN-CholoBachai.bat` in the project folder. It checks for
 MongoDB on `127.0.0.1:27017`, installs packages, writes `backend/.env` with a
 random JWT secret, loads the demo data the first time, and opens the API and
 the site in two windows (<http://localhost:5175>).
@@ -100,9 +100,9 @@ rescue posts with photos, 12 products and 8 orders. The logins:
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | `admin@straybachao.com` | `Admin@1234` |
-| Volunteer | `nabila@straybachao.com` | `Volunteer@123` |
-| Supporter | `mehedi@straybachao.com` | `Donor@1234` |
+| Admin | `admin@cholobachai.com` | `Admin@1234` |
+| Volunteer | `nabila@cholobachai.com` | `Volunteer@123` |
+| Supporter | `mehedi@cholobachai.com` | `Donor@1234` |
 
 The sign-in page also has one-tap buttons for these three, so nobody has to
 type them. Nabila has a team invitation waiting, so the invite flow can be
@@ -224,7 +224,7 @@ GPS tracking and chat that never existed, and linked to three pages that were
 not there. The banner photo had real, recognisable people in it, and the shop
 used product photos copied from Amazon listings. So:
 
-- **Renamed to StrayBachao** everywhere, from the page title to the seed emails.
+- **Renamed to CholoBachai** everywhere, from the page title to the seed emails.
 - **Rebuilt every screen** on one set of colour tokens: warm paper, clay and
   moss, Fraunces for headings, Figtree for text and Tiro Bangla for the Bangla
   lines. Visitors get a public site; signed-in users get a sidebar and the

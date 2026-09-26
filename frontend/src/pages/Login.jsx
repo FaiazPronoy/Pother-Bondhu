@@ -10,9 +10,9 @@ import { Wordmark, PasswordField, LangButton } from "../components/bits";
 // the accounts `npm run seed` creates, so anyone looking at the project can
 // get in with one click; they are listed in the README too
 const DEMO = [
-  { key: "volunteer", email: "nabila@straybachao.com", password: "Volunteer@123", icon: HandHeart },
-  { key: "donor", email: "mehedi@straybachao.com", password: "Donor@1234", icon: Heart },
-  { key: "admin", email: "admin@straybachao.com", password: "Admin@1234", icon: LayoutDashboard },
+  { key: "volunteer", email: "nabila@cholobachai.com", password: "Volunteer@123", icon: HandHeart },
+  { key: "donor", email: "mehedi@cholobachai.com", password: "Donor@1234", icon: Heart },
+  { key: "admin", email: "admin@cholobachai.com", password: "Admin@1234", icon: LayoutDashboard },
 ];
 
 const Login = () => {
