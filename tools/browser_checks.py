@@ -6,7 +6,8 @@ Browser checks for StrayBachao, run in a real browser through Playwright.
                reach: nothing blank, no console errors, no failed requests
   2. contrast  every piece of text on those pages, light and dark, against WCAG AA
   3. phone     no page scrolls sideways at 390 px
-  4. shots     screenshots of the main pages, desktop and phone
+  4. bangla    the language switch, then 1 to 3 again with the site in Bangla
+  5. shots     screenshots of the main pages, desktop and phone
 
 Run it against a freshly seeded database, with the API on :4000 and the
 frontend on :5175:
@@ -256,6 +257,32 @@ def main():
         for who, ctx in (("visitor", visitor), ("volunteer", volunteer), ("supporter", supporter), ("admin", admin)):
             wide = too_wide(ctx, list(crawled[who]) + ([BASE + "/login"] if who == "visitor" else []))
             check("%s: no page scrolls sideways at 390 px" % who, not wide, wide)
+
+        print("\n=== বাংলা ===")
+        page = visitor.new_page()
+        page.goto(BASE + "/")
+        settle(page)
+        page.click("button[aria-label='বাংলায় দেখুন']")
+        page.wait_for_timeout(200)
+        check("the language button switches the page to Bangla",
+              page.evaluate("document.documentElement.lang") == "bn" and "ওরা সাহায্য" in page.inner_text("h1"))
+        page.evaluate("localStorage.setItem('lang', 'en')")
+        page.close()
+
+        for who, email, password in (("visitor", None, None), ("volunteer", "nabila@straybachao.com", "Volunteer@123")):
+            ctx = browser.new_context()
+            ctx.add_init_script("try { localStorage.setItem('lang', 'bn') } catch (e) {}")
+            if email:
+                sign_in(ctx, email, password)
+            pages = crawl(ctx, BASE + "/")
+            noisy = {urlparse(u).path: e for u, e in pages.items() if e}
+            check("Bangla, %s: %d pages load without errors" % (who, len(pages)), pages and not noisy, noisy)
+            for theme in ("light", "dark"):
+                total, fails = contrast(ctx, list(pages), theme)
+                check("Bangla, %s, %s theme: %d text checks pass AA" % (who, theme, total), not fails, fails[:8])
+            wide = too_wide(ctx, list(pages))
+            check("Bangla, %s: no page scrolls sideways at 390 px" % who, not wide, wide)
+            ctx.close()
 
         print("\n=== screenshots ===")
         shots = [("landing", visitor, "/"), ("login", visitor, "/login"), ("desk", volunteer, "/"),
