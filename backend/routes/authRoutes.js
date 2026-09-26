@@ -9,7 +9,7 @@ authRouter.post('/login', login)
 authRouter.post('/logout', logout)
 authRouter.post('/is-auth', userAuth, isAuthenticated)
 
-authRouter.get('/status', userAuth, authStatus)
+authRouter.get('/status', authStatus)
 
 
 

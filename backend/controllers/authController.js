@@ -158,11 +158,18 @@ export const isAuthenticated = async(req, res) => {
 }
 
 
-// In your authController.js
+// Asked on every page load, signed in or not, so a visitor gets a plain
+// "no" instead of a 401 that shows up as an error in the browser console.
 export const authStatus = async (req, res) => {
-    const {userId} = req
+    const { token } = req.cookies;
     try {
-        if (!userId) {
+        if (!token) {
+            return res.json({ success: false });
+        }
+        let userId;
+        try {
+            userId = jwt.verify(token, process.env.JWT_SECRET).id;
+        } catch {
             return res.json({ success: false });
         }
 

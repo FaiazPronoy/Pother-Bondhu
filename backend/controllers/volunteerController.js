@@ -85,11 +85,8 @@ export const getTopVolunteers = async (req, res) => {
 export const donateToVolunteer = async (req, res) => {
   try {
     const { id } = req.params;
-    const { bkashNumber, amount } = req.body;
-
-    if (!bkashNumber || !amount) {
-      return res.status(400).json({ message: 'Bkash number and amount are required.' });
-    }
+    // this moves PetPoints the donor already holds, so no payment details are needed
+    const { amount } = req.body;
 
     const points = Number(amount);
     if (!Number.isInteger(points) || points < 1) {

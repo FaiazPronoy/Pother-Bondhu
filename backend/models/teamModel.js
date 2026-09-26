@@ -2,7 +2,7 @@
 import mongoose from 'mongoose';
 
 const ActivitySchema = new mongoose.Schema(
-  { message: { type: String, required: true } },
+  { message: { type: String, required: true }, by: { type: String, default: '' } },
   { _id: false, timestamps: { createdAt: true, updatedAt: false } }
 );
 

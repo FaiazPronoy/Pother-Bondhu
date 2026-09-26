@@ -200,3 +200,27 @@ describe('signing in', () => {
     expect(res.body.success).toBe(false);
   });
 });
+
+describe('landing page numbers', () => {
+  it('are counted from the database', async () => {
+    const before = (await api('GET', '/api/stats')).body;
+    const v = await createUser({ role: 'volunteer' });
+    await postPhoto(v.cookie, PNG, 'image/png');
+    const p = await createProduct({ sellingPrice: 100 });
+    const buyer = await createUser({ points: 1000 });
+    await order(buyer.cookie, [{ id: p.id, quantity: 1 }], { donation: 40 });
+
+    const after = (await api('GET', '/api/stats')).body;
+    expect(after.volunteers).toBe(before.volunteers + 1);
+    expect(after.rescues).toBe(before.rescues + 1);
+    expect(after.donated).toBe(before.donated + 40);
+  });
+});
+
+describe('status check for a visitor', () => {
+  it('is a plain no, not an error', async () => {
+    const res = await api('GET', '/api/auth/status');
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(false);
+  });
+});

@@ -55,7 +55,8 @@ export const postTeamActivity = async (req, res) => {
       return res.status(403).json({ error: "Only team members can post updates" });
     }
 
-    team.activities.push({ message: text });
+    const me = await userModel.findById(req.userId).select('name');
+    team.activities.push({ message: text, by: me?.name || '' });
     await team.save();
 
     res.json(team.activities);

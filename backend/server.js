@@ -14,6 +14,7 @@ import cartRoutes from "./routes/cartRoutes.js";
 
 import teamRouter from "./routes/teamRoutes.js";
 import inviteRoutes from "./routes/inviteRoutes.js";
+import { publicStats } from "./controllers/statsController.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -42,6 +43,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/teams", teamRouter);
 app.use("/api", inviteRoutes);
 app.use("/api/orders", orderRoutes);
+app.get("/api/stats", publicStats);
 
 // ✅ Start server
 app.listen(port, () => console.log(`🚀 Server started on PORT: ${port}`));

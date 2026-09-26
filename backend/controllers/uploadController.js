@@ -44,10 +44,10 @@ export const recentRescues = async (req, res) => {
   const posts = await RescueImage.find()
     .sort({ createdAt: -1 })
     .limit(limit)
-    .populate('userId', 'name location')
+    .populate('userId', 'name location role')
     .lean();
   res.json(posts.map((p) => ({
     _id: p._id, imageUrl: p.imageUrl, caption: p.caption, area: p.area, createdAt: p.createdAt,
-    volunteer: p.userId ? { _id: p.userId._id, name: p.userId.name, location: p.userId.location } : null,
+    volunteer: p.userId ? { _id: p.userId._id, name: p.userId.name, location: p.userId.location, role: p.userId.role } : null,
   })));
 };
