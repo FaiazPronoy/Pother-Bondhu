@@ -1,97 +1,83 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import { backendUrl } from '../config';
+import { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { AppContext } from "../context/AppContext";
+import { AREAS, PageHeader, SignInPrompt } from "../components/bits";
+
 const CreateTeamPage = () => {
+  const { backendUrl, isLoggedIn, userData } = useContext(AppContext);
   const [teamName, setTeamName] = useState("");
-  const [location, setLocation] = useState("");
-  const [teamType, setTeamType] = useState("Rescue"); // NEW
+  const [location, setLocation] = useState(AREAS.includes(userData?.location) ? userData.location : "");
+  const [teamType, setTeamType] = useState("Rescue");
+  const [description, setDescription] = useState("");
+  const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
+
+  if (!isLoggedIn) return <SignInPrompt>Sign in as a volunteer to start a team.</SignInPrompt>;
+
+  if (userData.role !== "volunteer") {
+    return (
+      <div className="card p-8 max-w-xl">
+        <h1 className="text-2xl font-semibold">Teams are started by volunteers</h1>
+        <p className="mt-2 text-ink-2">Switch your account to volunteer in your profile, then come back here.</p>
+        <Link to="/profile" className="btn btn-clay mt-5">Go to my profile</Link>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setSaving(true);
     try {
-      const res = await fetch(`${backendUrl}/api/teams`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ teamName, location, teamType }), // NEW
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to create team");
-
-      console.log("Team created:", data);
-      // go back to Teams so you can immediately see filters working
-      navigate("/teams");
+      const { data } = await axios.post(`${backendUrl}/api/teams`, { teamName, location, teamType, description });
+      toast.success(`${data.name} is up. Invite a few people next.`);
+      navigate(`/teams/${data._id}`);
     } catch (err) {
-      console.error("Error:", err.message);
-      alert(err.message || "Failed to create team");
+      toast.error(err?.response?.data?.message || "Could not create the team");
+    } finally {
+      setSaving(false);
     }
   };
 
   return (
     <>
-      <Navbar />
-      <div className="h-[20vh]" />
-      <form
-        onSubmit={handleSubmit}
-        className="max-w-md mx-auto p-4 bg-white rounded-xl shadow-xl border"
-      >
-        <h2 className="text-xl font-bold mb-4">Create a Team</h2>
+      <PageHeader eyebrow="New team" title="Start a team">
+        Pick an area you can actually get to. You'll be the lead, and you can invite other volunteers afterwards.
+      </PageHeader>
 
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Team Name</label>
-          <input
-            type="text"
-            value={teamName}
-            onChange={(e) => setTeamName(e.target.value)}
-            className="w-full p-2 border rounded-xl focus:outline-none focus:ring focus:ring-blue-400"
-            required
-          />
+      <form onSubmit={handleSubmit} className="card p-6 sm:p-8 max-w-2xl space-y-5">
+        <div>
+          <label htmlFor="teamName" className="label">Team name</label>
+          <input id="teamName" type="text" value={teamName} maxLength={60} required
+            onChange={(e) => setTeamName(e.target.value)} className="field" placeholder="e.g. Banani Night Feeders" />
         </div>
 
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Location</label>
-          <select
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className="w-full p-2 border rounded-xl focus:outline-none focus:ring focus:ring-blue-400"
-            required
-          >
-            <option value="" disabled>Select a location</option>
-            <option value="Gulshan">Gulshan</option>
-            <option value="Badda">Badda</option>
-            <option value="Mirpur">Mirpur</option>
-            <option value="Uttara">Uttara</option>
-            <option value="Banani">Banani</option>
-            <option value="Dhanmondi">Dhanmondi</option>
-            <option value="Mohammadpur">Mohammadpur</option>
-            <option value="Puran Dhaka">Puran Dhaka</option>
-            <option value="Moghbazar">Moghbazar</option>
-          </select>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label htmlFor="area" className="label">Area</label>
+            <select id="area" value={location} onChange={(e) => setLocation(e.target.value)} className="field" required>
+              <option value="" disabled>Choose an area</option>
+              {AREAS.map((a) => <option key={a}>{a}</option>)}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="type" className="label">What the team does</label>
+            <select id="type" value={teamType} onChange={(e) => setTeamType(e.target.value)} className="field">
+              <option value="Rescue">Rescue and feeding</option>
+              <option value="Medical">Medical and first aid</option>
+              <option value="Other">Something else</option>
+            </select>
+          </div>
         </div>
 
-        {/* NEW: Team Type */}
-        <div className="mb-4">
-          <label className="block mb-1 font-medium">Team Type</label>
-          <select
-            value={teamType}
-            onChange={(e) => setTeamType(e.target.value)}
-            className="w-full p-2 border rounded-xl focus:outline-none focus:ring focus:ring-blue-400 bg-white"
-          >
-            <option value="Rescue">Rescue</option>
-            <option value="Medical">Medical</option>
-          </select>
+        <div>
+          <label htmlFor="desc" className="label">A line about the team <span className="font-normal text-ink-2">(optional)</span></label>
+          <textarea id="desc" value={description} maxLength={500} onChange={(e) => setDescription(e.target.value)} className="field"
+            placeholder="When you meet, what you do, what help you need." />
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition"
-        >
-          Create Team
-        </button>
+        <button type="submit" disabled={saving} className="btn btn-clay">{saving ? "Creating…" : "Create team"}</button>
       </form>
     </>
   );

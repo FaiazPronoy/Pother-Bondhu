@@ -11,7 +11,7 @@ const Card = ({ title, children, className, onClick }) => {
     const { isDarkMode } = useContext(DarkmodeContext);
     return (
         <motion.div
-            className={`rounded-xl shadow-md border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${className} cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.01]`}
+            className={`rounded-xl shadow-md border overflow-hidden ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${className} cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.01]`}
             whileHover={{ scale: 1.01, boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" }}
             onClick={onClick}
         >
@@ -30,7 +30,7 @@ const StyledLink = ({ to, children, className }) => {
     return (
         <Link
             to={to}
-            className={`transition-colors duration-200 ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-700 hover:text-blue-700'} ${className}`}
+            className={`transition-colors duration-200 ${isDarkMode ? 'text-blue-300 hover:text-blue-200' : 'text-blue-700 hover:text-blue-800'} ${className}`}
         >
             {children}
         </Link>
@@ -128,7 +128,8 @@ const DraggablePanel = ({ title, children }) => {
 };
 
 const AdminDashboard = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    // start folded on a phone, where the open sidebar takes most of the screen
+    const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 768);
     const [activeTab, setActiveTab] = useState('Dashboard');
     const [showDraggablePanel, setShowDraggablePanel] = useState(false);
     const chartRef = useRef(null);
@@ -645,7 +646,7 @@ const AdminDashboard = () => {
                 setActiveTab={setActiveTab}
             />
 
-            <div className="flex-1 p-6">
+            <div className="flex-1 min-w-0 p-4 sm:p-6">
                 <AnimatePresence>
                     {showDraggablePanel && (
                         <DraggablePanel title="Dashboard Notes">
@@ -678,7 +679,7 @@ const AdminDashboard = () => {
                         <div className="flex items-center justify-between mb-12">
                             <div>
                                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                                    Welcome to your e-commerce management hub.
+                                    Orders, stock and the money side of StrayBachao.
                                 </p>
                             </div>
                             <button
@@ -794,7 +795,7 @@ const AdminDashboard = () => {
                                         </span>
                                     </li>
                                 </ul>
-                                <StyledLink to="/adminrevenue" className="mt-4 inline-flex items-center text-sm font-medium text-gray-700 hover:underline">
+                                <StyledLink to="/adminrevenue" className="mt-4 inline-flex items-center text-sm font-medium hover:underline">
                                     View Detailed Revenue <ArrowRight className="w-4 h-4 ml-1" />
                                 </StyledLink>
                             </Card>

@@ -6,49 +6,84 @@ import userModel from './models/userModel.js';
 import Product from './models/ProductModel.js';
 import Order from './models/Order.js';
 import Team from './models/teamModel.js';
+import RescueImage from './models/imageModel.js';
+import TeamInvite from './models/inviteModel.js';
+import Cart from './models/CartModel.js';
+import { readFileSync } from 'fs';
 
-// image files that already live in frontend/public
+// photos in frontend/public/img/shop, all from Unsplash (credits in the README)
+const shop = '/img/shop';
 const products = [
-  { id: 'SP-001', name: 'Smart Bowl', category: 'tech', purchaseCost: 900, sellingPrice: 1450, stockQuantity: 24, imageUrl: '/SmartBowl.jpg',
-    description: 'Weighing bowl that tracks how much your pet actually eats.', features: ['Portion tracking', 'App notifications', 'Dishwasher safe'] },
-  { id: 'SP-002', name: 'Smart Collar', category: 'tech', purchaseCost: 1800, sellingPrice: 2700, stockQuantity: 15, imageUrl: '/SmartColler.jpg',
-    description: 'GPS collar with an activity log, sized for cats and small dogs.', features: ['GPS', '5 day battery', 'Water resistant'] },
-  { id: 'SP-003', name: 'Quantum Feeder', category: 'tech', purchaseCost: 2400, sellingPrice: 3600, stockQuantity: 8, imageUrl: '/QuantumFeeder.jpg',
-    description: 'Automatic feeder with six programmable meals a day.', features: ['6 meals', 'Voice recorder', 'Backup battery'] },
-  { id: 'SP-004', name: 'Veken Water Fountain', category: 'tech', purchaseCost: 1100, sellingPrice: 1750, stockQuantity: 19, imageUrl: '/VekenFountain.jpg',
-    description: 'Circulating fountain that keeps water fresh for cats who ignore still bowls.', features: ['2.5L', 'Quiet pump', 'Carbon filter'] },
-  { id: 'SP-005', name: 'Air Purifier', category: 'tech', purchaseCost: 3200, sellingPrice: 4800, stockQuantity: 6, imageUrl: '/AirPurifier.jpg',
-    description: 'HEPA purifier aimed at pet dander and litter dust.', features: ['HEPA', 'Odour filter', 'Night mode'] },
-  { id: 'SP-006', name: 'Super Food', category: 'food', purchaseCost: 650, sellingPrice: 990, stockQuantity: 60, imageUrl: '/SuperFood.jpg',
-    description: 'Grain free dry food with salmon as the first ingredient.', features: ['2kg', 'Grain free', 'Omega 3'] },
-  { id: 'SP-007', name: 'Pet Feeding Mat', category: 'accessories', purchaseCost: 220, sellingPrice: 390, stockQuantity: 45, imageUrl: '/PetFeedingMat.jpg',
-    description: 'Silicone mat with a raised lip, so spilled water stays put.', features: ['Non slip', 'Waterproof', 'Rolls up'] },
-  { id: 'SP-008', name: 'Comfort Bed', category: 'accessories', purchaseCost: 1400, sellingPrice: 2200, stockQuantity: 12, imageUrl: '/ComfortBed.jpg',
-    description: 'Padded donut bed with a removable, washable cover.', features: ['Washable cover', 'Medium size', 'Anti slip base'] },
-  { id: 'SP-009', name: 'Pet Toy Set', category: 'toys', purchaseCost: 300, sellingPrice: 550, stockQuantity: 38, imageUrl: '/PetToy.jpg',
-    description: 'Five piece set of rope and squeaky toys.', features: ['5 pieces', 'Non toxic', 'Machine washable'] },
-  { id: 'SP-010', name: 'Grooming Kit', category: 'health', purchaseCost: 750, sellingPrice: 1250, stockQuantity: 21, imageUrl: '/GroomingKit.jpg',
-    description: 'Brush, comb, scissors and nail clippers in one case.', features: ['7 tools', 'Storage case', 'Stainless steel'] },
-  { id: 'SP-011', name: 'Dog Nail Grinder Kit', category: 'health', purchaseCost: 850, sellingPrice: 1400, stockQuantity: 4, imageUrl: '/DogNailGrinderKit.jpg',
-    description: 'Rechargeable grinder that is quieter than clippers.', features: ['USB rechargeable', 'Low noise', '3 speeds'] },
-  { id: 'SP-012', name: 'Pee Pads', category: 'health', purchaseCost: 400, sellingPrice: 700, stockQuantity: 52, imageUrl: '/PeePads.jpg',
-    description: 'Absorbent training pads, fifty to a pack.', features: ['50 pack', '5 layers', 'Leak proof'] },
+  { id: 'SP-001', name: 'Dry Dog Food, 3 kg', category: 'food', purchaseCost: 950, sellingPrice: 1350, stockQuantity: 40, imageUrl: `${shop}/dry-food.jpg`,
+    description: 'Chicken and rice kibble that street dogs take to quickly. One bag feeds a small pack for about a week.', features: ['3 kg bag', 'Chicken and rice', 'Resealable'] },
+  { id: 'SP-002', name: 'Bone Biscuits, 500 g', category: 'food', purchaseCost: 260, sellingPrice: 390, stockQuantity: 65, imageUrl: `${shop}/biscuits.jpg`,
+    description: 'Crunchy biscuits for pockets. Good for earning trust with a nervous dog before a vet visit.', features: ['500 g', 'Baked, not fried', 'No added salt'] },
+  { id: 'SP-003', name: 'Steel Paw Bowl', category: 'accessories', purchaseCost: 180, sellingPrice: 290, stockQuantity: 55, imageUrl: `${shop}/paw-bowl.jpg`,
+    description: 'Heavy steel bowl with a rubber base. Leave it outside a shop for a water point that does not get kicked over.', features: ['1 litre', 'Rubber base', 'Rust resistant'] },
+  { id: 'SP-004', name: 'Ceramic Food Bowl', category: 'accessories', purchaseCost: 240, sellingPrice: 380, stockQuantity: 30, imageUrl: `${shop}/ceramic-bowl.jpg`,
+    description: 'Deep ceramic bowl for fosters at home. Easy to wash, too heavy to push around the floor.', features: ['Dishwasher safe', '800 ml', 'Glazed inside'] },
+  { id: 'SP-005', name: 'Wicker Puppy Bed', category: 'accessories', purchaseCost: 900, sellingPrice: 1400, stockQuantity: 9, imageUrl: `${shop}/wicker-bed.jpg`,
+    description: 'Small woven bed with a cushion, sized for puppies and cats recovering after treatment.', features: ['Removable cushion', '45 cm across', 'Hand woven'] },
+  { id: 'SP-006', name: 'Round Cushion Bed', category: 'accessories', purchaseCost: 1200, sellingPrice: 1850, stockQuantity: 12, imageUrl: `${shop}/cushion-bed.jpg`,
+    description: 'Soft donut bed with raised sides. Most fosters say this is the first thing a rescued dog sleeps properly in.', features: ['Washable cover', 'Medium size', 'Anti slip base'] },
+  { id: 'SP-007', name: 'Polka Dot Bed', category: 'accessories', purchaseCost: 1100, sellingPrice: 1650, stockQuantity: 4, imageUrl: `${shop}/dot-bed.jpg`,
+    description: 'Padded round bed with a bright cover, for small and medium dogs.', features: ['Machine washable', 'Small to medium', 'Thick base'] },
+  { id: 'SP-008', name: 'Red Leash, 1.5 m', category: 'accessories', purchaseCost: 280, sellingPrice: 450, stockQuantity: 34, imageUrl: `${shop}/leash.jpg`,
+    description: 'Waterproof coated webbing that does not smell after the rains. For clinic trips and adoption days.', features: ['1.5 m', 'Waterproof', 'Steel clip'] },
+  { id: 'SP-009', name: 'Rubber Chew Bone', category: 'toys', purchaseCost: 220, sellingPrice: 350, stockQuantity: 28, imageUrl: `${shop}/chew-bone.jpg`,
+    description: 'Tough rubber bone for teething puppies. Takes a treat in the ends to keep them busy.', features: ['Natural rubber', 'Treat holder', 'Floats'] },
+  { id: 'SP-010', name: 'Plush Squeaky Toy', category: 'toys', purchaseCost: 190, sellingPrice: 320, stockQuantity: 22, imageUrl: `${shop}/plush-toy.jpg`,
+    description: 'Soft toy with a squeaker. Popular with fosters who have just learned how to play.', features: ['Squeaker inside', 'Double stitched', 'Machine washable'] },
+  { id: 'SP-011', name: 'Slicker Brush', category: 'health', purchaseCost: 260, sellingPrice: 420, stockQuantity: 25, imageUrl: `${shop}/slicker-brush.jpg`,
+    description: 'Wooden brush with fine pins for knots, and for a tick check after a rescue.', features: ['Wooden handle', 'Fine steel pins', 'Cats and dogs'] },
+  { id: 'SP-012', name: 'Deshedding Tool', category: 'health', purchaseCost: 700, sellingPrice: 1100, stockQuantity: 3, imageUrl: `${shop}/deshedding.jpg`,
+    description: 'Takes out loose undercoat before summer. Also handy for checking the skin for mange and wounds.', features: ['Stainless blade', 'Push button clean', 'Rubber grip'] },
 ];
 
 const people = [
-  { name: 'Admin', email: 'admin@straybachao.com', password: 'Admin@1234', role: 'admin', points: 0, location: 'Dhaka', bio: 'Runs the StrayBachao shop and rescue network.' },
-  { name: 'Nabila Rahman', email: 'nabila@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 4200, location: 'Dhanmondi', bio: 'Fosters kittens and runs the Dhanmondi feeding route.' },
-  { name: 'Tanvir Hasan', email: 'tanvir@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 3100, location: 'Uttara', bio: 'Handles night rescues and transport to the clinic.' },
-  { name: 'Sadia Islam', email: 'sadia@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 2650, location: 'Mirpur', bio: 'Vet student, does first aid and vaccination drives.' },
-  { name: 'Rafiq Ahmed', email: 'rafiq@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 1800, location: 'Gulshan', bio: 'Weekend volunteer, mostly adoption day logistics.' },
+  { name: 'Admin', email: 'admin@straybachao.com', password: 'Admin@1234', role: 'admin', points: 0, location: 'Dhanmondi', bio: 'Runs the StrayBachao shop and keeps the board tidy.' },
+  { name: 'Nabila Rahman', email: 'nabila@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 4200, location: 'Dhanmondi', bio: 'Fosters kittens and runs the Dhanmondi lake feeding route most evenings. Ask me about the three-legged one.' },
+  { name: 'Tanvir Hasan', email: 'tanvir@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 3100, location: 'Uttara', bio: 'I have a car and I do not sleep much, so night rescues and clinic runs are mine.' },
+  { name: 'Sadia Islam', email: 'sadia@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 2650, location: 'Mirpur', bio: 'Final year vet student. First aid, deworming and the monthly vaccination camp in Mirpur.' },
+  { name: 'Rafiq Ahmed', email: 'rafiq@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 1800, location: 'Gulshan', bio: 'Weekend volunteer. Mostly cats around Gulshan 2 and adoption day logistics.' },
+  { name: 'Arif Chowdhury', email: 'arif@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 950, location: 'Badda', bio: 'Tea stall on Link Road. The dogs here know the sound of my shutter opening.' },
+  { name: 'Priya Das', email: 'priya@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 1400, location: 'Mohammadpur', bio: 'Feeding the bazaar dogs with my mother since 2019.' },
   { name: 'Mehedi Khan', email: 'mehedi@straybachao.com', password: 'Donor@1234', role: 'donor', points: 6000, location: 'Banani', bio: '' },
-  { name: 'Farhana Akter', email: 'farhana@straybachao.com', password: 'Donor@1234', role: 'donor', points: 4500, location: 'Bashundhara', bio: '' },
+  { name: 'Farhana Akter', email: 'farhana@straybachao.com', password: 'Donor@1234', role: 'donor', points: 4500, location: 'Moghbazar', bio: '' },
 ];
 
+// the first in crew leads the team; log entries are [who, message, hours ago]
 const teams = [
-  { id: 'TEAM-01', name: 'Dhanmondi Street Feeders', area: 'Dhanmondi', category: 'Rescue', description: 'Daily feeding route around Dhanmondi lake.' },
-  { id: 'TEAM-02', name: 'Night Rescue Unit', area: 'Uttara', category: 'Rescue', description: 'On call for injured animals after dark.' },
-  { id: 'TEAM-03', name: 'Mirpur Vaccination Drive', area: 'Mirpur', category: 'Medical', description: 'Monthly vaccination and deworming camp.' },
+  { id: 'TEAM-01', name: 'Dhanmondi Street Feeders', area: 'Dhanmondi', category: 'Rescue', crew: ['nabila', 'sadia', 'priya'],
+    description: 'Evening feeding route around Dhanmondi lake and Road 27. We meet at 8 pm by the Rabindra Sarobar steps.',
+    log: [['nabila', 'Fed 11 at the lake tonight. The brown mother is back with four pups.', 52], ['priya', 'Bought two bags of kibble with the PetPoints Mehedi sent. Thank you!', 30], ['nabila', 'Road 27 boy with the sore eye is going to the clinic tomorrow with Tanvir.', 6]] },
+  { id: 'TEAM-02', name: 'Night Rescue Unit', area: 'Uttara', category: 'Rescue', crew: ['tanvir', 'rafiq', 'arif'],
+    description: 'On call after dark for injured animals and road accidents. Message the lead first if it is urgent.',
+    log: [['tanvir', 'Picked up a hit-and-run puppy near Sector 7 at 1 am. Stable at the clinic.', 70], ['arif', 'Can cover the Badda side on Thursdays now.', 20]] },
+  { id: 'TEAM-03', name: 'Mirpur Vaccination Drive', area: 'Mirpur', category: 'Medical', crew: ['sadia', 'tanvir'],
+    description: 'Monthly rabies vaccination and deworming camp, first Friday of the month at Mirpur 10.',
+    log: [['sadia', '32 dogs vaccinated at the camp. We ran out of collars for marking, need more.', 96], ['tanvir', 'Collected the new vaccine batch.', 10]] },
+  { id: 'TEAM-04', name: 'Gulshan Cat Watch', area: 'Gulshan', category: 'Other', crew: ['rafiq'],
+    description: 'Keeping count of the cat colonies around the Gulshan and Banani markets, and finding fosters for kittens.',
+    log: [['rafiq', 'Started this so the cat people have their own corner.', 40]] },
+  { id: 'TEAM-05', name: 'Badda Link Road Patrol', area: 'Badda', category: 'Rescue', crew: ['arif', 'tanvir'],
+    description: 'Water points and a daily check on the dogs along Link Road and the rail crossing.',
+    log: [['arif', 'Filled all six water bowls. The heat is bad this week.', 18]] },
+];
+
+// photos in backend/seed-photos, stored in the database the same way an upload is
+// [who, file, area, caption, hours ago]
+const rescues = [
+  ['nabila', 'injured-eye.jpg', 'Dhanmondi', 'Eye looks swollen and cloudy. Found him near Road 27. Friendly, let me sit next to him. Needs a clinic trip.', 5],
+  ['sadia', 'street-dinner.jpg', 'Mirpur', 'Night round done. 14 dogs fed between Mirpur 10 and 11. The black one ate twice, she is nursing somewhere close.', 9],
+  ['tanvir', 'white-kitten.jpg', 'Uttara', 'Tiny white kitten crying under a parked CNG in Sector 7. No mother in two hours. Taking her home for tonight.', 20],
+  ['farhana', 'cat-colony.jpg', 'Moghbazar', 'The cat colony behind the Moghbazar flyover is up to five now. Two look young enough for the next camp.', 28],
+  ['arif', 'road-dog.jpg', 'Badda', 'Lying in the middle of the lane off Link Road and not moving much in this heat. Gave water. Can someone check tonight?', 34],
+  ['mehedi', 'bowl-dog.jpg', 'Banani', 'Water bowl is back outside the Banani 11 tea stall. The owner says we can refill it every morning.', 47],
+  ['rafiq', 'ledge-cat.jpg', 'Gulshan', 'On the wall behind Gulshan 2 market. Eating fine but her ear is torn. Flagging it for the cat team.', 60],
+  ['priya', 'mohammadpur-dog.jpg', 'Mohammadpur', 'This girl sleeps outside the Town Hall bazaar every afternoon. Very thin. Left rice and an egg.', 75],
+  ['tanvir', 'pack.jpg', 'Uttara', 'Pack of four near the Sector 13 park, one limping on his front leg. They know us now, so we can get close.', 100],
+  ['sadia', 'calico.jpg', 'Mirpur', 'Vaccinated this one at the Mirpur camp. Sat through it like a champion.', 130],
 ];
 
 // spread the demo orders over the last few weeks so the revenue charts have a shape
@@ -84,8 +119,11 @@ async function seed() {
     Product.deleteMany({}),
     Order.deleteMany({}),
     Team.deleteMany({}),
+    RescueImage.deleteMany({}),
+    TeamInvite.deleteMany({}),
+    Cart.deleteMany({}),
   ]);
-  console.log('Cleared users, products, orders and teams');
+  console.log('Cleared users, products, orders, teams, rescues and invitations');
 
   const createdUsers = await userModel.insertMany(
     people.map((p) => ({ ...p, password: bcrypt.hashSync(p.password, 10) }))
@@ -99,16 +137,33 @@ async function seed() {
   const productById = new Map(createdProducts.map((p) => [p.id, p]));
   console.log(`Inserted ${createdProducts.length} products`);
 
-  const volunteers = createdUsers.filter((u) => u.role === 'volunteer');
-  await Team.insertMany(
-    teams.map((t, i) => ({
+  const byName = (handle) => userByEmail.get(`${handle}@straybachao.com`);
+  const hoursAgo = (h) => new Date(Date.now() - h * 3600 * 1000);
+
+  const createdTeams = await Team.insertMany(
+    teams.map(({ crew, log, ...t }) => ({
       ...t,
-      creator: volunteers[i % volunteers.length]._id,
-      members: [volunteers[i % volunteers.length]._id, volunteers[(i + 1) % volunteers.length]._id],
-      activities: [{ message: `${t.name} was created.` }],
+      creator: byName(crew[0])._id,
+      members: crew.map((c) => byName(c)._id),
+      activities: log.map(([who, message, h]) => ({ message, by: byName(who).name, createdAt: hoursAgo(h) })),
     }))
   );
-  console.log(`Inserted ${teams.length} teams`);
+  console.log(`Inserted ${createdTeams.length} teams`);
+
+  // Nabila has an invitation waiting, so the invite flow can be tried straight away
+  const catWatch = createdTeams.find((t) => t.id === 'TEAM-04');
+  await TeamInvite.create({ team: catWatch._id, from: byName('rafiq')._id, to: byName('nabila')._id, status: 'pending', createdAt: hoursAgo(3) });
+
+  const dir = new URL('./seed-photos/', import.meta.url);
+  for (const [who, file, area, caption, h] of rescues) {
+    const _id = new mongoose.Types.ObjectId();
+    await RescueImage.create([{
+      _id, userId: byName(who)._id, imageUrl: `/api/upload/rescue/${_id}`, caption, area,
+      data: readFileSync(new URL(file, dir)), contentType: 'image/jpeg',
+      createdAt: hoursAgo(h), updatedAt: hoursAgo(h),
+    }], { timestamps: false });
+  }
+  console.log(`Inserted ${rescues.length} rescue posts with photos`);
 
   const orders = orderPlan.map((plan) => {
     const buyer = userByEmail.get(plan.buyer);

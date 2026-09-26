@@ -1,9 +1,13 @@
+import { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
+import { AppContext } from '../context/AppContext';
 
+// the role comes from the server's status check, not from anything the
+// browser stored, so it cannot be edited into "admin" from dev tools
 const ProtectedAdminRoute = ({ children }) => {
-  const user = JSON.parse(localStorage.getItem('user'));
+  const { isLoggedIn, userData } = useContext(AppContext);
 
-  if (!user || user.role !== 'admin') {
+  if (!isLoggedIn || userData?.role !== 'admin') {
     return <Navigate to="/login" replace />;
   }
 

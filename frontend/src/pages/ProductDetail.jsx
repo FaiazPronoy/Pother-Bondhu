@@ -1,55 +1,43 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import ProductNavbar from '../components/ProductNavbar';
-import Footer from '../components/Footer';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
+import { ArrowLeft, Check, Minus, Plus } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
-import { getProductById } from '../services/ProductService';
 import { AppContext } from '../context/AppContext';
-import '../index.css';
+import { Empty, Loading, Points } from '../components/bits';
 
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const { addToCart, productData, isLoggedIn } = useContext(AppContext);
+  const { addToCart, productData, isLoggedIn, backendUrl } = useContext(AppContext);
 
   const [product, setProduct] = useState(null);
+  const [missing, setMissing] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
-    const cachedProduct = productData.find(p => String(p.id || p._id) === String(id));
-    if (cachedProduct) {
-      setProduct(cachedProduct);
-    } else {
-      getProductById(id).then(data => setProduct(data.product));
+    setQuantity(1);
+    const cached = productData.find((p) => String(p.id) === String(id) || String(p._id) === String(id));
+    if (cached) {
+      setProduct(cached);
+      return;
     }
-  }, [id, productData]);
+    axios.get(`${backendUrl}/api/products/${encodeURIComponent(id)}`)
+      .then((r) => setProduct(r.data.product))
+      .catch(() => setMissing(true));
+  }, [id, productData, backendUrl]);
 
-  useEffect(() => {
-    if (!product) return;
+  if (missing) return <Empty title="That item isn't in the shop" action={<Link to="/products" className="btn btn-clay">Back to the shop</Link>} />;
+  if (!product) return <Loading />;
 
-    const currentId = String(product.id || product._id);
+  const related = productData
+    .filter((p) => p.id !== product.id)
+    .sort((a, b) => (b.category === product.category) - (a.category === product.category))
+    .slice(0, 4);
 
-    const related = productData
-      .filter(p => String(p.id || p._id) !== currentId && p.category === product.category)
-      .slice(0, 4);
-
-    if (related.length < 4) {
-      const extra = productData
-        .filter(p => String(p.id || p._id) !== currentId && !related.includes(p))
-        .slice(0, 4 - related.length);
-      setRelatedProducts([...related, ...extra]);
-    } else {
-      setRelatedProducts(related);
-    }
-  }, [product, productData]);
-
-  if (!product) return <div className="p-8 text-center text-gray-500">Loading...</div>;
-
-  const discountedPrice = product.discount
-    ? (product.sellingPrice * (1 - product.discount / 100)).toFixed(2)
-    : product.sellingPrice.toFixed(2);
+  const inStock = product.stockQuantity > 0;
+  const maxQty = Math.min(product.stockQuantity || 0, 10);
 
   const handleBuyNow = () => {
     if (!isLoggedIn) {
@@ -59,94 +47,58 @@ const ProductDetail = () => {
     }
   };
 
-  const maxQty = Math.min(product.stockQuantity || 0, 5);
-
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <ProductNavbar />
-      <div className="bg-[AliceBlue] text-black text-center py-2 font-bold">
-        ⚡ 20% OFF SMART PRODUCTS - USE CODE: PETTECH20 ⚡
-      </div>
+    <>
+      <Link to="/products" className="inline-flex items-center gap-1 text-ink-2 hover:text-ink font-medium mb-6">
+        <ArrowLeft size={17} aria-hidden="true" /> Shop
+      </Link>
 
-      <div className="container mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-2 gap-12">
-        <div>
-          <img src={product.imageUrl} alt={product.name} className="w-full h-98 object-contain rounded-lg shadow" />
-          <div className="flex gap-2 mt-4">
-            <img
-              src={product.imageUrl}
-              alt="Thumb 1"
-              loading="lazy"
-              className="w-20 h-20 object-contain rounded border"
-            />
-          </div>
-        </div>
+      <div className="grid gap-8 lg:gap-12 md:grid-cols-2">
+        <img src={product.imageUrl} alt={product.name} className="w-full aspect-square object-cover rounded-3xl bg-sunken" />
 
-        <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col justify-between">
-          <div>
-            <h2 className="text-3xl font-bold mb-2">{product.name}</h2>
-            <p className="text-gray-600 mb-4">{product.description}</p>
-            <div className="mb-4">
-              <div className="flex items-center gap-2 text-purple-600 font-semibold text-xl">
-                <img src="/petpoints.png" alt="PetPoints" className="w-6 h-6" />
-                <span>{discountedPrice}</span>
-                <span>PetPoints</span>
-              </div>
-            </div>
+        <div className="flex flex-col">
+          <p className="eyebrow">{product.category}</p>
+          <h1 className="mt-2 text-3xl sm:text-4xl font-semibold">{product.name}</h1>
+          <p className="mt-4 text-3xl font-display text-clay"><Points value={product.sellingPrice} /></p>
+          <p className="mt-4 text-lg text-ink-2">{product.description}</p>
 
-            <div className={`font-medium mb-4 ${product.stockQuantity > 0 ? 'text-green-600' : 'text-red-500'}`}>
-              {product.stockQuantity > 0
-                ? `In Stock (${product.stockQuantity} available)`
-                : 'Out of Stock'}
-            </div>
-
-            <label htmlFor="quantity" className="block mb-1 font-medium">Quantity</label>
-            <select
-              id="quantity"
-              value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-              className="mb-6 border rounded px-3 py-1 w-24"
-              disabled={product.stockQuantity === 0}
-            >
-              {[...Array(maxQty).keys()].map(n => (
-                <option key={n + 1} value={n + 1}>{n + 1}</option>
+          {product.features?.length > 0 && (
+            <ul className="mt-5 space-y-2">
+              {product.features.map((f) => (
+                <li key={f} className="flex items-center gap-2"><Check size={18} className="text-moss" aria-hidden="true" /> {f}</li>
               ))}
-            </select>
+            </ul>
+          )}
 
-            <div className="space-y-3">
-              <button
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded"
-                onClick={() => addToCart(product, quantity)}
-                disabled={product.stockQuantity === 0}
-              >
-                Add to Cart
-              </button>
-              <button
-                className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded"
-                onClick={handleBuyNow}
-                disabled={product.stockQuantity === 0}
-              >
-                Buy Now
-              </button>
+          <p className={`mt-6 font-semibold ${inStock ? 'text-moss' : 'text-danger'}`}>
+            {inStock ? `${product.stockQuantity} in stock` : 'Out of stock for now'}
+          </p>
+
+          {inStock && (
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <div className="inline-flex items-center rounded-full border-[1.5px] border-line-2 bg-card">
+                <button type="button" onClick={() => setQuantity((q) => Math.max(1, q - 1))} disabled={quantity <= 1}
+                  className="w-11 h-11 grid place-items-center rounded-full disabled:opacity-40" aria-label="One fewer"><Minus size={18} /></button>
+                <span className="w-10 text-center font-semibold tabular-nums" aria-live="polite" aria-label={`Quantity ${quantity}`}>{quantity}</span>
+                <button type="button" onClick={() => setQuantity((q) => Math.min(maxQty, q + 1))} disabled={quantity >= maxQty}
+                  className="w-11 h-11 grid place-items-center rounded-full disabled:opacity-40" aria-label="One more"><Plus size={18} /></button>
+              </div>
+              <button className="btn btn-line flex-1 min-w-36" onClick={() => addToCart(product, quantity)}>Add to cart</button>
+              <button className="btn btn-clay flex-1 min-w-36" onClick={handleBuyNow}>Buy now</button>
             </div>
-          </div>
-
-          <p className="text-xs text-gray-500 mt-6">Ships from SavePaws: Animal Rescue Network | 30-day return policy</p>
+          )}
         </div>
       </div>
 
-      {relatedProducts.length > 0 && (
-        <div className="container mx-auto px-4 py-10">
-          <h3 className="text-2xl font-bold text-gray-800 mb-6">Related Products</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {relatedProducts.map(p => (
-              <ProductCard key={p.id || p._id} product={p} />
-            ))}
+      {related.length > 0 && (
+        <section className="mt-16" aria-labelledby="more-title">
+          <h2 id="more-title" className="text-2xl font-semibold mb-6">You might also need</h2>
+          <div className="grid gap-4 sm:gap-5 grid-cols-2 lg:grid-cols-4">
+            {related.map((p) => <ProductCard key={p.id} product={p} />)}
           </div>
-        </div>
+        </section>
       )}
-
-      <Footer />
-    </div>
+    </>
   );
 };
 

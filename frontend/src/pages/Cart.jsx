@@ -1,38 +1,53 @@
 import { useContext, useEffect, useState } from 'react';
-import { AppContext } from '../context/AppContext';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import ProductNavbar from '../components/ProductNavbar';
-import Footer from '../components/Footer';
-import { toast } from 'react-toastify';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import { Minus, Plus, Trash2, Heart } from 'lucide-react';
+import { AppContext } from '../context/AppContext';
+import { Empty, PageHeader, Points } from '../components/bits';
+
+export const DONATIONS = [0, 20, 50, 100];
 
 const Cart = () => {
-  const {
-    cart,
-    updateCartItemQuantity,
-    removeFromCart,
-    isLoggedIn,
-    setCart,
-    backendUrl
-  } = useContext(AppContext);
-
+  const { cart, updateCartItemQuantity, removeFromCart, isLoggedIn, setCart, backendUrl } = useContext(AppContext);
   const [stockMap, setStockMap] = useState({});
   const [donation, setDonation] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
 
-  const subtotal = cart.reduce(
-    (sum, item) => sum + item.sellingPrice * item.quantity,
-    0
-  );
+  const subtotal = cart.reduce((sum, item) => sum + item.sellingPrice * item.quantity, 0);
   const total = subtotal + donation;
 
-  const handleProceed = () => {
-    if (cart.length === 0) {
-      toast.error("🛒 Your cart is empty. Please add items before proceeding.");
-      return;
-    }
+  // stock may have changed since things went into the cart, so check once on arrival
+  useEffect(() => {
+    if (cart.length === 0) return;
+    (async () => {
+      const stock = {};
+      const adjusted = [];
+      await Promise.all(cart.map(async (item) => {
+        try {
+          const res = await axios.get(`${backendUrl}/api/products/${item.id}`);
+          const p = res.data.product;
+          stock[item.id] = p.stockQuantity;
+          if (p.stockQuantity === 0) {
+            toast.info(`${item.name} ran out and was taken out of your cart.`);
+          } else {
+            const quantity = Math.min(item.quantity, p.stockQuantity);
+            if (quantity < item.quantity) toast.info(`Only ${quantity} of ${item.name} left, so the cart was changed.`);
+            adjusted.push({ ...item, sellingPrice: p.sellingPrice, stockQuantity: p.stockQuantity, quantity });
+          }
+        } catch {
+          adjusted.push(item);
+        }
+      }));
+      setStockMap(stock);
+      // keep the cart's order
+      setCart(cart.map((c) => adjusted.find((a) => a.id === c.id)).filter(Boolean));
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  const handleProceed = () => {
     if (!isLoggedIn) {
       navigate('/login', { state: { from: location.pathname } });
     } else {
@@ -40,166 +55,76 @@ const Cart = () => {
     }
   };
 
-  // ✅ Realtime stock fetch on mount
-  useEffect(() => {
-    const fetchLiveStock = async () => {
-      const stockData = {};
-      const adjustedCart = [];
-
-      await Promise.all(cart.map(async (item) => {
-        try {
-          const res = await axios.get(`${backendUrl}/api/products/${item.id}`);
-          const stockQty = res.data.product?.stockQuantity ?? 0;
-          stockData[item.id] = stockQty;
-
-          if (stockQty === 0) {
-            toast.info(`${item.name} is out of stock and removed from cart.`);
-          } else if (item.quantity > stockQty) {
-            toast.info(`Adjusted ${item.name} quantity to ${stockQty}.`);
-            adjustedCart.push({ ...item, quantity: stockQty });
-          } else {
-            adjustedCart.push(item);
-          }
-        } catch (err) {
-          console.error(`Error fetching stock for ${item.name}`, err);
-          // keep item as is if stock fetch fails
-          adjustedCart.push(item);
-        }
-      }));
-
-      setStockMap(stockData);
-
-      // 🛠 Prevent wiping cart accidentally
-      if (adjustedCart.length > 0) {
-        setCart(adjustedCart);
-      }
-    };
-
-    if (cart.length > 0) {
-      fetchLiveStock();
-    }
-  }, []); 
-// only on mount
+  if (cart.length === 0) {
+    return (
+      <>
+        <PageHeader eyebrow="Cart" title="Your cart" />
+        <Empty title="Your cart is empty" action={<Link to="/products" className="btn btn-clay">Go to the shop</Link>}>
+          Food, bowls and bedding for the animals you look after are in the shop.
+        </Empty>
+      </>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <ProductNavbar />
-
-      <div className="container mx-auto py-10 flex flex-col lg:flex-row gap-6">
-        <div className="flex-1 bg-white p-6 rounded-lg shadow">
-          <h2 className="text-2xl font-bold mb-4">Shopping Cart</h2>
-
-          {cart.length === 0 ? (
-            <div className="text-gray-600 text-center py-20">
-              <p>Your cart is empty.</p>
-              <Link to="/products" className="text-purple-600 hover:underline">
-                Browse products
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {cart.map((item) => {
-                const stock = stockMap[item.id] ?? item.stockQuantity ?? 0;
-                return (
-                  <div key={item.id} className="flex gap-4 border-b pb-4">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="w-28 h-28 object-cover rounded-lg"
-                    />
-                    <div className="flex flex-col justify-between flex-grow">
-                      <div>
-                        <h3 className="font-bold text-lg">{item.name}</h3>
-                        <p className="text-sm text-gray-600">{item.description}</p>
-                        <p className={`text-sm mt-1 ${stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {stock > 0 ? `In Stock (${stock})` : 'Out of Stock'}
-                        </p>
-
-                        <div className="flex items-center gap-2 text-purple-700 font-semibold mt-1">
-                          <img src="/petpoints.png" alt="PetPoints" className="w-5 h-5" />
-                          <span>{(item.sellingPrice * item.quantity).toFixed(2)}</span>
-                          <span>PetPoints</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 mt-2">
-                        <label>Qty:</label>
-                        <select
-                          value={item.quantity}
-                          onChange={(e) => updateCartItemQuantity(item.id, parseInt(e.target.value))}
-                          className="border px-2 py-1 rounded"
-                          disabled={stock === 0}
-                        >
-                          {[...Array(Math.min(stock, 5)).keys()].map((_, i) => (
-                            <option key={i + 1} value={i + 1}>{i + 1}</option>
-                          ))}
-                        </select>
-                        <button
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-sm text-red-500 hover:underline"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
+    <>
+      <PageHeader eyebrow="Cart" title="Your cart" />
+      <div className="grid gap-8 lg:grid-cols-[1fr_360px]">
+        <ul className="card divide-y divide-line">
+          {cart.map((item) => {
+            const stock = stockMap[item.id] ?? item.stockQuantity ?? 0;
+            return (
+              <li key={item.id} className="p-4 sm:p-5 flex gap-4">
+                <img src={item.imageUrl} alt="" className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover bg-sunken shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <Link to={`/products/${item.id}`} className="font-semibold text-lg leading-snug hover:text-clay">{item.name}</Link>
+                    <button onClick={() => removeFromCart(item.id)} aria-label={`Remove ${item.name}`}
+                      className="w-10 h-10 -mr-2 -mt-1 grid place-items-center rounded-full text-ink-2 hover:text-danger hover:bg-sunken shrink-0">
+                      <Trash2 size={18} />
+                    </button>
                   </div>
-                );
-              })}
+                  <p className="text-sm text-ink-2">{item.sellingPrice.toLocaleString('en-IN')} each</p>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+                    <div className="inline-flex items-center rounded-full border-[1.5px] border-line-2">
+                      <button type="button" onClick={() => updateCartItemQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}
+                        className="w-10 h-10 grid place-items-center disabled:opacity-40" aria-label={`One fewer ${item.name}`}><Minus size={16} /></button>
+                      <span className="w-8 text-center font-semibold tabular-nums">{item.quantity}</span>
+                      <button type="button" onClick={() => updateCartItemQuantity(item.id, item.quantity + 1)} disabled={item.quantity >= stock}
+                        className="w-10 h-10 grid place-items-center disabled:opacity-40" aria-label={`One more ${item.name}`}><Plus size={16} /></button>
+                    </div>
+                    <Points value={item.sellingPrice * item.quantity} />
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+
+        <aside className="card p-5 h-fit lg:sticky lg:top-6 space-y-5">
+          <div className="flex justify-between"><span className="text-ink-2">Items</span><Points value={subtotal} /></div>
+
+          <fieldset>
+            <legend className="label inline-flex items-center gap-2"><Heart size={16} className="text-clay" aria-hidden="true" /> Add something for rescues?</legend>
+            <div className="grid grid-cols-4 gap-2">
+              {DONATIONS.map((d) => (
+                <button key={d} type="button" className="chip justify-center !px-0" aria-pressed={donation === d} onClick={() => setDonation(d)}>
+                  {d === 0 ? 'No' : `+${d}`}
+                </button>
+              ))}
             </div>
-          )}
-        </div>
+          </fieldset>
 
-        <div className="w-full lg:w-1/3 flex flex-col gap-6">
-          <div className="bg-white p-6 rounded-lg shadow h-fit">
-            <h3 className="text-xl font-semibold mb-4">
-              Subtotal ({cart.length} item{cart.length !== 1 && 's'})
-            </h3>
-
-            <p className="text-md mb-2 text-gray-700 flex items-center gap-2">
-              Subtotal:
-              <img src="/petpoints.png" alt="PetPoints" className="w-5 h-5" />
-              <strong>{subtotal.toFixed(2)} PetPoints</strong>
-            </p>
-
-            <div className="mt-4">
-              <label htmlFor="donation" className="block text-sm font-medium mb-1">
-                Optional Donation to Animal Rescues:
-              </label>
-              <select
-                id="donation"
-                value={donation}
-                onChange={(e) => setDonation(parseFloat(e.target.value))}
-                className="w-full border rounded px-3 py-2"
-              >
-                <option value={0}>None</option>
-                <option value={10}>10 PetPoints</option>
-                <option value={20}>20 PetPoints</option>
-                <option value={50}>50 PetPoints</option>
-              </select>
-            </div>
-
-            <hr className="my-4" />
-
-            <div className="flex justify-between font-bold text-lg mb-2 items-center">
-              <span>Total:</span>
-              <div className="flex items-center gap-2">
-                <img src="/petpoints.png" alt="PetPoints" className="w-5 h-5" />
-                <span>{total.toFixed(2)} PetPoints</span>
-              </div>
-            </div>
-
-            <button
-              onClick={handleProceed}
-              className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold"
-            >
-              Proceed to Checkout
-            </button>
+          <div className="flex justify-between items-baseline border-t border-line pt-4">
+            <span className="font-semibold">Total</span>
+            <Points value={total} className="text-2xl font-display text-clay" />
           </div>
-        </div>
+          <button onClick={handleProceed} className="btn btn-clay w-full text-base">
+            {isLoggedIn ? 'Go to checkout' : 'Sign in to check out'}
+          </button>
+        </aside>
       </div>
-
-      <Footer />
-    </div>
+    </>
   );
 };
 

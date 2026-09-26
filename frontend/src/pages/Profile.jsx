@@ -1,582 +1,198 @@
-import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
-import { useNavigate } from "react-router-dom";
-import { backendUrl } from '../config';
+import { useContext, useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { HandHeart, Heart, Wallet, UserRound } from "lucide-react";
+import { AppContext } from "../context/AppContext";
+import { AREAS, Avatar, Loading, Points, SignInPrompt } from "../components/bits";
+
+const TOPUPS = [500, 1000, 2000];
+
+function AccountForm({ user, onSaved }) {
+  const { backendUrl } = useContext(AppContext);
+  const [form, setForm] = useState({ name: user.name, location: user.location || "", bio: user.bio || "", role: user.role });
+  const [saving, setSaving] = useState(false);
+  const change = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const save = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      const body = { name: form.name, location: form.location, bio: form.bio };
+      if (user.role !== "admin") body.role = form.role;
+      const { data } = await axios.put(`${backendUrl}/api/user/profile`, body);
+      onSaved(data);
+      toast.success(data.role !== user.role && data.role === "volunteer"
+        ? "Saved. You're a volunteer now, so you can start and join teams."
+        : "Saved");
+    } catch (err) {
+      toast.error(err?.response?.data?.error || "Could not save your profile");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // keep an area that was typed before the list existed
+  const areas = form.location && !AREAS.includes(form.location) ? [form.location, ...AREAS] : AREAS;
+
+  return (
+    <form onSubmit={save} className="card p-5 sm:p-6 space-y-5">
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label htmlFor="name" className="label">Name</label>
+          <input id="name" name="name" required maxLength={60} value={form.name} onChange={change} className="field" />
+        </div>
+        <div>
+          <label htmlFor="location" className="label">Your area</label>
+          <select id="location" name="location" value={form.location} onChange={change} className="field">
+            <option value="">Not set</option>
+            {areas.map((a) => <option key={a}>{a}</option>)}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label htmlFor="email" className="label">Email</label>
+        <input id="email" value={user.email} readOnly className="field bg-sunken text-ink-2" aria-describedby="email-note" />
+        <p id="email-note" className="mt-1 text-sm text-ink-2">Your email is how you sign in, so it can't be changed here.</p>
+      </div>
+      <div>
+        <label htmlFor="bio" className="label">About you</label>
+        <textarea id="bio" name="bio" maxLength={500} value={form.bio} onChange={change} className="field"
+          placeholder="What you do for the animals near you. Volunteers show this on their public profile." />
+      </div>
+
+      {user.role !== "admin" && (
+        <fieldset>
+          <legend className="label">How you help</legend>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              ["donor", Heart, "Supporter", "Post rescues, buy supplies and send PetPoints."],
+              ["volunteer", HandHeart, "Volunteer", "All of that, plus start and join teams. Your profile becomes public."],
+            ].map(([value, Icon, label, note]) => (
+              <label key={value} className={`flex items-start gap-3 rounded-xl border-[1.5px] p-4 cursor-pointer ${form.role === value ? "border-clay bg-clay-lo/40" : "border-line-2"}`}>
+                <input type="radio" name="role" value={value} checked={form.role === value} onChange={change} className="mt-1 w-4 h-4 accent-[var(--sb-clay)]" />
+                <span>
+                  <span className="font-semibold inline-flex items-center gap-1.5"><Icon size={16} aria-hidden="true" /> {label}</span>
+                  <span className="block text-sm text-ink-2 mt-0.5">{note}</span>
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+
+      <button type="submit" disabled={saving} className="btn btn-clay">{saving ? "Saving…" : "Save changes"}</button>
+    </form>
+  );
+}
+
+function WalletPanel({ user, onToppedUp }) {
+  const { backendUrl } = useContext(AppContext);
+  const [bkashNumber, setBkashNumber] = useState("");
+  const [amount, setAmount] = useState(1000);
+  const [busy, setBusy] = useState(false);
+
+  const topUp = async (e) => {
+    e.preventDefault();
+    if (!/^01[3-9]\d{8}$/.test(bkashNumber.trim())) return toast.error("Enter your 11 digit bKash number.");
+    const points = Number(amount);
+    if (!Number.isInteger(points) || points < 1 || points > 10000) return toast.error("Top up between 1 and 10,000 PetPoints at a time.");
+    setBusy(true);
+    try {
+      const { data } = await axios.put(`${backendUrl}/api/user/add-points`, { bkashNumber: bkashNumber.trim(), amount: points });
+      onToppedUp(data.user.points);
+      setBkashNumber("");
+      toast.success(`${points.toLocaleString("en-IN")} PetPoints added`);
+    } catch (err) {
+      toast.error(err?.response?.data?.message || "Top up failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="grid gap-6 md:grid-cols-[1fr_1.2fr]">
+      <div className="rounded-3xl bg-moss text-on-clay p-6 relative overflow-hidden">
+        <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/10" aria-hidden="true" />
+        <p className="inline-flex items-center gap-2 opacity-90"><Wallet size={18} aria-hidden="true" /> Balance</p>
+        <p className="mt-2 text-4xl font-display"><Points value={user.points} /></p>
+        <p className="mt-4 text-sm opacity-90 max-w-xs">
+          Spend them in the shop, add them to an order for rescues, or send them to a volunteer.
+        </p>
+        <Link to="/volunteers" className="mt-5 inline-flex font-semibold underline underline-offset-4">Support a volunteer</Link>
+      </div>
+
+      <form onSubmit={topUp} className="card p-5 sm:p-6 space-y-4">
+        <h2 className="text-xl font-semibold">Top up</h2>
+        <div className="grid grid-cols-3 gap-2" role="group" aria-label="Amount">
+          {TOPUPS.map((t) => (
+            <button key={t} type="button" className="chip justify-center" aria-pressed={Number(amount) === t} onClick={() => setAmount(t)}>
+              {t.toLocaleString("en-IN")}
+            </button>
+          ))}
+        </div>
+        <div>
+          <label htmlFor="amount" className="label">PetPoints</label>
+          <input id="amount" type="number" min="1" max="10000" step="1" inputMode="numeric" value={amount}
+            onChange={(e) => setAmount(e.target.value)} className="field" />
+        </div>
+        <div>
+          <label htmlFor="bkash" className="label">bKash number</label>
+          <input id="bkash" type="tel" inputMode="numeric" placeholder="017XXXXXXXX" value={bkashNumber}
+            onChange={(e) => setBkashNumber(e.target.value)} className="field" />
+        </div>
+        <button type="submit" disabled={busy} className="btn btn-moss w-full">{busy ? "Adding…" : "Add PetPoints"}</button>
+      </form>
+    </div>
+  );
+}
 
 const ProfilePage = () => {
-  const navigate = useNavigate();
+  const { backendUrl, isLoggedIn, checkAuthStatus } = useContext(AppContext);
+  const [params, setParams] = useSearchParams();
+  const tab = params.get("tab") === "wallet" ? "wallet" : "account";
   const [user, setUser] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    location: "",
-    bio: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
-  const [showAddPoints, setShowAddPoints] = useState(false);
-  const [bkashNumber, setBkashNumber] = useState("");
-  const [amount, setAmount] = useState("");
-  const [showImageUpload, setShowImageUpload] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [imageCaption, setImageCaption] = useState("");
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`${backendUrl}/api/user/profile`, {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Failed to fetch user data");
-        }
+    if (!isLoggedIn) return;
+    axios.get(`${backendUrl}/api/user/profile`).then((r) => setUser(r.data.user)).catch(() => {});
+  }, [backendUrl, isLoggedIn]);
 
-        const data = await response.json();
-        const { name, email, location, bio, role, points } = data.user;
-        setUser(data.user);
-        setFormData({
-          name,
-          email,
-          location: location || "Not Selected Yet",
-          bio: bio || "",
-          role: role,
-        });
-      } catch (err) {
-        setError(err.message || "Failed to fetch user data");
-      } finally {
-        setLoading(false);
-      }
-    };
+  if (!isLoggedIn) return <SignInPrompt>Sign in to see your profile.</SignInPrompt>;
+  if (!user) return <Loading />;
 
-    fetchUserData();
-  }, []);
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleUpdate = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch(`${backendUrl}/api/user/profile`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update profile");
-      }
-
-      const data = await response.json();
-      setUser(data);
-      setSuccess(true);
-      setEditMode(false);
-
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setFormData({
-      name: user.name,
-      email: user.email,
-      location: user.location || "",
-      bio: user.bio || "",
-      role: user.role,
-    });
-    setEditMode(false);
-    setError(null);
-  };
-
-  const handleLoadPoints = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      if (!bkashNumber || !amount) {
-        setError("Please fill all fields");
-        return;
-      }
-
-      const response = await fetch(
-        `${backendUrl}/api/user/add-points`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ bkashNumber, amount }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to add points");
-      }
-
-      const data = await response.json();
-      setUser(data.user); // Update the user with new points
-
-      setBkashNumber("");
-      setAmount("");
-      setSuccess(true);
-
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      setError(err.message || "Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
-  const handleImageUpload = async () => {
-    if (!selectedImage) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-
-      const formData = new FormData();
-      formData.append("image", selectedImage); // 'image' must match Multer field name
-      formData.append("caption", imageCaption);
-
-      const response = await fetch(`${backendUrl}/api/upload/rescue`, {
-        method: "POST",
-        credentials: "include", // for cookies if using session auth
-        body: formData, // No Content-Type header - browser sets it automatically
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Upload failed");
-      }
-
-      const data = await response.json();
-      setSuccess(true);
-      setSelectedImage(null);
-      setImageCaption("");
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      setError(err.message || "Upload failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading && !user) {
-    return <div className="text-center p-4">Loading...</div>;
-  }
-
-  if (!user) {
-    return (
-      <div className="text-center p-4 text-red-500">
-        {error || "User not found"}
-      </div>
-    );
-  }
+  const tabs = [["account", "Profile", UserRound], ["wallet", "Wallet", Wallet]];
 
   return (
     <>
-      <Navbar />
-      <div className="flex min-h-screen bg-gray-100">
-        <div className="w-1/4 bg-white p-6 shadow-md">
-          <h2 className="text-xl font-bold mb-6">Settings</h2>
-          <ul className="space-y-4 text-gray-700">
-            <li
-              className={`font-semibold cursor-pointer ${
-                !showAddPoints && !showImageUpload ? "text-blue-600" : ""
-              }`}
-              onClick={() => {
-                setShowAddPoints(false);
-                setShowImageUpload(false);
-              }}
-            >
-              Account Information
-            </li>
-            <li
-              className={`cursor-pointer ${
-                showAddPoints === true ? "text-blue-600 font-semibold" : ""
-              }`}
-              onClick={() => {
-                setShowAddPoints(true);
-                setShowImageUpload(false);
-              }}
-            >
-              Add Points
-            </li>
-            <li
-              className={`cursor-pointer ${
-                showImageUpload ? "text-blue-600 font-semibold" : ""
-              }`}
-              onClick={() => {
-                setShowAddPoints(false);
-                setShowImageUpload(true);
-              }}
-            >
-              Upload Rescue Image
-            </li>
-            {user.role === "volunteer" && (
-              <>
-                <li
-                  className={`cursor-pointer ${
-                    showAddPoints === "createTeam"
-                      ? "text-blue-600 font-semibold"
-                      : ""
-                  }`}
-                  onClick={() => {
-                    setShowAddPoints("createTeam");
-                    setShowImageUpload(false);
-                    navigate("/createteam");
-                  }}
-                >
-                  Create Team
-                </li>
-                <li
-                  className="cursor-pointer hover:text-blue-600"
-                  onClick={() => navigate("/my-team")}
-                >
-                  My Team
-                </li>
-                <li
-                  className="cursor-pointer hover:text-blue-600"
-                  onClick={() => navigate("/team-invitations")}
-                >
-                  My Invitations
-                </li>
-              </>
-            )}
-          </ul>
+      <header className="flex flex-col sm:flex-row sm:items-center gap-5 mb-8">
+        <Avatar name={user.name} size="w-20 h-20 text-2xl" />
+        <div className="flex-1 min-w-0">
+          <h1 className="text-3xl sm:text-4xl font-semibold truncate">{user.name}</h1>
+          <p className="text-ink-2 mt-1">
+            <span className={`tag ${user.role === "volunteer" ? "tag-moss" : user.role === "admin" ? "tag-sun" : "tag-clay"} mr-2 capitalize`}>
+              {user.role === "donor" ? "Supporter" : user.role}
+            </span>
+            {user.location || "Area not set"}
+          </p>
         </div>
+        {user.role === "volunteer" && <Link to={`/volunteers/${user._id}`} className="btn btn-line">See my public profile</Link>}
+      </header>
 
-        <div className="w-3/4 p-10">
-          <div className="bg-white p-8 rounded-xl shadow-md">
-            {showAddPoints ? (
-              <div>
-                <h1 className="text-2xl font-bold mb-6">Add Points</h1>
-
-                {error && (
-                  <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
-                    {error}
-                  </div>
-                )}
-
-                {success && (
-                  <div className="mb-4 p-2 bg-green-100 text-green-700 rounded">
-                    Points added successfully!
-                  </div>
-                )}
-
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Bkash Number
-                    </label>
-                    <input
-                      type="text"
-                      value={bkashNumber}
-                      onChange={(e) => setBkashNumber(e.target.value)}
-                      className="w-full p-2 border rounded-md"
-                      placeholder="Enter your Bkash number"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">
-                      Amount
-                    </label>
-                    <input
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="w-full p-2 border rounded-md"
-                      placeholder="Enter amount"
-                    />
-                  </div>
-
-                  <div className="flex justify-end">
-                    <button
-                      onClick={handleLoadPoints}
-                      disabled={loading}
-                      className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
-                    >
-                      {loading ? "Loading..." : "Load Points"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <>
-                <h1 className="text-2xl font-bold mb-6">User Details</h1>
-
-                {error && (
-                  <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
-                    {error}
-                  </div>
-                )}
-
-                {success && (
-                  <div className="mb-4 p-2 bg-green-100 text-green-700 rounded">
-                    Profile updated successfully!
-                  </div>
-                )}
-
-                <div className="flex items-center space-x-6 mb-6">
-                  <img
-                    src="profilePhoto.jpeg"
-                    alt="Profile"
-                    className="w-20 h-20 rounded-full object-cover"
-                  />
-                  <div>
-                    <button className="block mb-2 text-sm font-semibold text-blue-600 hover:underline">
-                      Change
-                    </button>
-                    <button className="block text-sm font-semibold text-red-600 hover:underline">
-                      Remove
-                    </button>
-                  </div>
-                </div>
-                {showImageUpload && (
-                  <div className="space-y-4">
-                    {/* File Upload Field */}
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Upload Rescue Pictures
-                      </label>
-                      <div className="flex items-center">
-                        <label className="flex flex-col items-center justify-center w-full px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-white hover:border-blue-500 hover:bg-blue-50 transition duration-150 ease-in-out">
-                          <div className="flex flex-col items-center justify-center">
-                            <svg
-                              className="w-10 h-10 text-gray-400 mb-2"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                              ></path>
-                            </svg>
-                            <p className="text-sm text-gray-600">
-                              <span className="font-semibold text-blue-600">
-                                Click to upload
-                              </span>{" "}
-                              or drag and drop
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              PNG, JPG, GIF (MAX. 5MB)
-                            </p>
-                          </div>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) =>
-                              setSelectedImage(e.target.files[0])
-                            }
-                            className="hidden"
-                          />
-                        </label>
-                      </div>
-                      {selectedImage && (
-                        <div className="mt-3 flex items-center">
-                          <span className="text-sm text-gray-600 mr-3">
-                            Selected: {selectedImage.name}
-                          </span>
-                          <button
-                            onClick={() => setSelectedImage(null)}
-                            className="text-sm text-red-600 hover:text-red-800"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Caption Text Field */}
-                    <div>
-                      <label
-                        htmlFor="image-caption"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                      >
-                        Share your rescue details
-                      </label>
-                      <div className="mt-1 relative rounded-md shadow-sm">
-                        <textarea
-                          id="image-caption"
-                          rows={3}
-                          className="block w-full rounded-lg border-gray-300 p-3 border focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-                          placeholder="Add a description for your image..."
-                          value={imageCaption}
-                          onChange={(e) => setImageCaption(e.target.value)}
-                        />
-                        <div className="absolute bottom-3 right-3 flex items-center">
-                          <span
-                            className={`text-xs ${
-                              imageCaption.length > 120
-                                ? "text-red-500"
-                                : "text-gray-400"
-                            }`}
-                          >
-                            {imageCaption.length}/120
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Submit Button */}
-                    <div className="pt-2">
-                      <button
-                        onClick={handleImageUpload}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
-                        disabled={!selectedImage || loading}
-                      >
-                        {loading ? "Uploading..." : "Upload Image"}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Form */}
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium mb-1">Name</label>
-                <input
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                  className="w-full p-2 border rounded-md disabled:bg-gray-100"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
-                <input
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                  className="w-full p-2 border rounded-md disabled:bg-gray-100"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Location
-                </label>
-                <select
-                  name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                  className="w-full p-2 border rounded-md disabled:bg-gray-100"
-                >
-                  <option value="Gulshan">Gulshan</option>
-                  <option value="Badda">Badda</option>
-                  <option value="Mirpur">Mirpur</option>
-                  <option value="Uttara">Uttara</option>
-                  <option value="Banani">Banani</option>
-                  <option value="Dhanmondi">Dhanmondi</option>
-                  <option value="Mohammadpur">Mohammadpur</option>
-                  <option value="Puran Dhaka">Puran Dhaka</option>
-                  <option value="Moghbazar">Moghbazar</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-1">Role</label>
-                <select
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                  className="w-full p-2 border rounded-md disabled:bg-gray-100"
-                >
-                  <option value="donor">Donor</option>
-                  <option value="volunteer">Volunteer</option>
-                </select>
-              </div>
-
-              <div className="col-span-2">
-                <label className="block text-sm font-medium mb-1">Bio</label>
-                <textarea
-                  name="bio"
-                  value={formData.bio}
-                  onChange={handleChange}
-                  disabled={!editMode}
-                  rows={4}
-                  className="w-full p-2 border rounded-md disabled:bg-gray-100"
-                />
-              </div>
-
-              {user.points !== undefined && (
-                <div className="col-span-2">
-                  <label className="block text-sm font-medium mb-1">
-                    Points
-                  </label>
-                  <div className="p-2 w-full bg-gray-100 rounded-md">
-                    {user.points}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="flex justify-end space-x-4 mt-6">
-              {editMode ? (
-                <>
-                  <button
-                    onClick={handleCancel}
-                    className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleUpdate}
-                    disabled={loading}
-                    className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
-                  >
-                    {loading ? "Updating..." : "Update"}
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => setEditMode(true)}
-                  className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
-                >
-                  Edit Profile
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+      <div className="flex gap-2 mb-6 border-b border-line" role="tablist" aria-label="Profile sections">
+        {tabs.map(([key, label, Icon]) => (
+          <button key={key} type="button" role="tab" aria-selected={tab === key} onClick={() => setParams(key === "wallet" ? { tab: "wallet" } : {})}
+            className={`inline-flex items-center gap-2 px-4 min-h-11 -mb-px border-b-[3px] font-semibold ${tab === key ? "border-clay text-ink" : "border-transparent text-ink-2 hover:text-ink"}`}>
+            <Icon size={17} aria-hidden="true" /> {label}
+          </button>
+        ))}
       </div>
+
+      {tab === "account" ? (
+        <AccountForm user={user} onSaved={async (u) => { setUser(u); await checkAuthStatus(); }} />
+      ) : (
+        <WalletPanel user={user} onToppedUp={async (points) => { setUser({ ...user, points }); await checkAuthStatus(); }} />
+      )}
     </>
   );
 };

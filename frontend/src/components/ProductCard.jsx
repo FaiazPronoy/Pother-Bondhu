@@ -1,94 +1,40 @@
 import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { FiStar } from "react-icons/fi";
+import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 
 const ProductCard = ({ product }) => {
-  const navigate = useNavigate();
   const { addToCart } = useContext(AppContext);
-
-  const handleCardClick = () => {
-    if (product.id || product._id) {
-      navigate(`/products/${product.id || product._id}`);
-    } else {
-      console.warn("Product ID missing for:", product.name);
-    }
-  };
-
-  const handleAddToCart = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    if (product.stockQuantity > 0) {
-      addToCart(product, 1);
-    }
-  };
-
   const inStock = product.stockQuantity > 0;
+  const few = inStock && product.stockQuantity <= 5;
 
   return (
-    <div
-      onClick={handleCardClick}
-      className="cursor-pointer bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition-shadow flex flex-col h-full"
-    >
-      <div className="relative">
-        <img
-          src={product.imageUrl}
-          alt={product.name}
-          className="w-full h-70 p-2"
-          loading="lazy"
-        />
-        {product.discount > 0 && (
-          <div className="absolute top-3 right-3 bg-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full">
-            {product.discount}% OFF
-          </div>
-        )}
-      </div>
-
-      <div className="p-4 flex flex-col justify-between flex-grow">
-        <div>
-          <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
-
-          {product.rating > 0 && (
-            <div className="flex items-center mb-2">
-              <div className="flex text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <FiStar
-                    key={i}
-                    className={`${i < Math.floor(product.rating) ? "fill-current" : ""}`}
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-gray-500 ml-1">({product.rating})</span>
-            </div>
-          )}
-
-          <p className="text-sm text-gray-600 mb-2">{product.description}</p>
-
-          {typeof product.sellingPrice === 'number' && product.sellingPrice > 0 && (
-            <div className="flex items-center gap-2 text-purple-700 font-semibold mt-1">
-              <img src="/petpoints.png" alt="PetPoints" className="w-5 h-5" />
-              <span>{product.sellingPrice.toFixed(2)}</span>
-              <span>PetPoints</span>
-            </div>
-          )}
-
-          <p className={`text-sm mt-2 ${inStock ? "text-green-600" : "text-red-600"}`}>
-            {inStock ? `In Stock (${product.stockQuantity})` : "Out of Stock"}
+    <article className="card overflow-hidden flex flex-col h-full group">
+      <Link to={`/products/${product.id || product._id}`} className="block relative">
+        <img src={product.imageUrl} alt="" loading="lazy"
+          className="w-full aspect-square object-cover bg-sunken group-hover:scale-[1.02] transition-transform duration-300" />
+        {!inStock && <span className="absolute top-3 left-3 tag bg-ink text-paper">Out of stock</span>}
+        {few && <span className="absolute top-3 left-3 tag tag-sun">Only {product.stockQuantity} left</span>}
+      </Link>
+      <div className="p-4 flex flex-col flex-1">
+        <p className="text-xs font-bold uppercase tracking-wider text-ink-2">{product.category}</p>
+        <h3 className="mt-1 text-lg font-semibold leading-snug">
+          <Link to={`/products/${product.id || product._id}`} className="hover:text-clay">{product.name}</Link>
+        </h3>
+        <p className="mt-1 text-sm text-ink-2 line-clamp-2 flex-1">{product.description}</p>
+        <div className="mt-4 flex items-center justify-between gap-2">
+          <p className="leading-tight">
+            <span className="block text-lg font-semibold text-clay tabular-nums">{Number(product.sellingPrice).toLocaleString("en-IN")}</span>
+            <span className="block text-xs text-ink-2">PetPoints</span>
           </p>
+          <button type="button" onClick={() => addToCart(product, 1)} disabled={!inStock}
+            className="w-11 h-11 rounded-full bg-ink text-paper grid place-items-center hover:bg-clay disabled:opacity-40 disabled:hover:bg-ink"
+            aria-label={`Add ${product.name} to cart`}>
+            <Plus size={20} />
+          </button>
         </div>
-
-        <button
-          type="button"
-          onClick={handleAddToCart}
-          disabled={!inStock}
-          className={`mt-4 w-full text-white py-2 rounded-lg font-medium transition ${
-            inStock ? "bg-gray-900 hover:bg-gray-800" : "bg-gray-400 cursor-not-allowed"
-          }`}
-        >
-          Add to Cart
-        </button>
       </div>
-    </div>
+    </article>
   );
 };
 

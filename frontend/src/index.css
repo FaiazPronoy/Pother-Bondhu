@@ -1,162 +1,333 @@
 @import "tailwindcss";
 
-/* Tailwind v4 ties dark: to the OS setting unless you say otherwise. The app
-   has its own toggle, so drive it from a class instead. */
+/* dark mode follows the toggle in the sidebar, not the OS */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* App-wide colours and fonts.
-   Orange with plum as the secondary. This was built on Tailwind's default
-   blue and grey, and rather than edit every component I redefined the
-   scales here instead - so bg-blue-600 comes out orange, purple is plum.
-   Keep that in mind when reading the class names. */
-
-@theme {
-  /* --- primary: orange (was blue) ----------------------------------- */
-  --color-blue-50:  #FFF4E8;
-  --color-blue-100: #FFE3C6;
-  --color-blue-200: #FFC894;
-  --color-blue-300: #FFA95E;
-  --color-blue-400: #FB8B33;
-  --color-blue-500: #F26F16;
-  --color-blue-600: #E25E0B;
-  --color-blue-700: #B84A09;
-  --color-blue-800: #8D390B;
-  --color-blue-900: #6A2C0B;
-
-  /* --- secondary: plum (was purple and indigo) ---------------------- */
-  --color-purple-50:  #FBF1F7;
-  --color-purple-100: #F5DCEB;
-  --color-purple-200: #EBB9D7;
-  --color-purple-300: #DA90BD;
-  --color-purple-400: #C2649D;
-  --color-purple-500: #A2437E;
-  --color-purple-600: #7C2E5F;
-  --color-purple-700: #64254C;
-  --color-purple-800: #4B1C3A;
-  --color-purple-900: #331327;
-
-  --color-indigo-50:  #FBF1F7;
-  --color-indigo-100: #F5DCEB;
-  --color-indigo-200: #EBB9D7;
-  --color-indigo-300: #DA90BD;
-  --color-indigo-400: #C2649D;
-  --color-indigo-500: #A2437E;
-  --color-indigo-600: #7C2E5F;
-  --color-indigo-700: #64254C;
-  --color-indigo-800: #4B1C3A;
-  --color-indigo-900: #331327;
-
-  /* --- neutral: warmed towards peach, so the page is never clinical -- */
-  --color-gray-50:  #FFF5EA;
-  --color-gray-100: #FBE8D4;
-  --color-gray-200: #F1D6BC;
-  --color-gray-300: #DCBB9C;
-  --color-gray-400: #AB9483;
-  --color-gray-500: #877263;
-  --color-gray-600: #6C5A4D;
-  --color-gray-700: #53443A;
-  --color-gray-800: #362A22;
-  --color-gray-900: #261D17;
-
-  /* --- semantic colours, warmed to sit with the rest ---------------- */
-  --color-green-50:  #EEF7F1;
-  --color-green-100: #D6ECDE;
-  --color-green-500: #3E9268;
-  --color-green-600: #2F7A55;
-  --color-green-700: #256244;
-  /* pushed to a true red: the primary is orange now, and a delete button
-     must not read as another call to action */
-  --color-red-50:  #FDEFEF;
-  --color-red-100: #F9D7D7;
-  --color-red-500: #CE2F35;
-  --color-red-600: #AF2129;
-  --color-red-700: #8C1B22;
-  --color-yellow-50:  #FDF6E9;
-  --color-yellow-100: #F8E8C6;
-  --color-yellow-500: #C98B23;
-  --color-yellow-600: #A8721B;
-
-  /* --- type --------------------------------------------------------- */
-  --font-sans: "Nunito Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
-  --font-display: "Baloo 2", "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
-}
-
-@layer base {
-  /* Headings pick up the rounded display face without a single className
-     change in the components. */
-  h1, h2, h3, h4 {
-    font-family: var(--font-display);
-    letter-spacing: -0.01em;
-  }
-
-  body {
-    background-color: var(--color-gray-50);
-    color: var(--color-gray-800);
-  }
-
-  .dark body {
-    background-color: #180F08;
-    color: #F8EBDD;
-  }
-}
-
 /* ------------------------------------------------------------------------
-   The page behind everything.
+   StrayBachao colours.
 
-   Warm bands running across the page like light coming in low, with a
-   scatter of soft rounds over them. Two sizes on two different spacings so
-   the scatter reads as scattered rather than as a grid.
+   Warm paper, clay and moss - the colours of a Dhaka street after rain
+   rather than a pet shop. Everything reads from these variables, so the
+   dark theme is just a second set of values below and the components do
+   not need a dark: class each.
    ------------------------------------------------------------------------ */
 
 :root {
-  --sky-1: rgba(242, 111, 22, .13);
-  --sky-2: rgba(124, 46, 95, .10);
-  --sky-3: rgba(255, 168, 94, .16);
-  --sky-mid: rgba(242, 111, 22, .04);
-  --sky-4: rgba(184, 74, 9, .06);
-  --spot-a: rgba(184, 74, 9, .09);
-  --spot-b: rgba(124, 46, 95, .07);
+  --sb-paper:   #F6EFE4;
+  --sb-card:    #FFFDF8;
+  --sb-sunken:  #EFE5D6;
+  --sb-line:    #E2D3BE;
+  --sb-line-2:  #C9B497;
+  --sb-ink:     #2B2019;
+  --sb-ink-2:   #6B5646;
+  --sb-clay:    #B4441F;
+  --sb-clay-hi: #8F3416;
+  --sb-clay-lo: #F7DCCD;
+  --sb-moss:    #3F6B4E;
+  --sb-moss-hi: #2F5540;
+  --sb-moss-lo: #DCE8DD;
+  --sb-sun:     #E9A23B;
+  --sb-sun-lo:  #FBE9C8;
+  --sb-on-clay: #FFF8F0;
+  --sb-danger:  #A52A2A;
+  --sb-shadow:  43 32 25;
 }
 
 .dark {
-  --sky-1: rgba(255, 139, 51, .13);
-  --sky-2: rgba(194, 100, 157, .11);
-  --sky-3: rgba(255, 168, 94, .07);
-  --sky-mid: rgba(255, 139, 51, .045);
-  --sky-4: rgba(194, 100, 157, .07);
-  --spot-a: rgba(255, 169, 94, .07);
-  --spot-b: rgba(218, 144, 189, .06);
+  --sb-paper:   #1A1411;
+  --sb-card:    #241C17;
+  --sb-sunken:  #2E241E;
+  --sb-line:    #3E3129;
+  --sb-line-2:  #5A4839;
+  --sb-ink:     #F3E9DC;
+  --sb-ink-2:   #C4B09C;
+  --sb-clay:    #E0754F;
+  --sb-clay-hi: #EE8C69;
+  --sb-clay-lo: #4A2618;
+  --sb-moss:    #8DBF9A;
+  --sb-moss-hi: #A6D2B1;
+  --sb-moss-lo: #22362A;
+  --sb-sun:     #E9A23B;
+  --sb-sun-lo:  #3D2E14;
+  --sb-on-clay: #1A1411;
+  --sb-danger:  #F08A80;
+  --sb-shadow:  0 0 0;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  pointer-events: none;
-  background:
-    radial-gradient(70rem 26rem at 78% -6%, var(--sky-3), transparent 70%),
-    /* one wide round across the middle, so the bands are not separated by a
-       stripe of nothing where most of the reading happens */
-    radial-gradient(72rem 40rem at 40% 48%, var(--sky-4), transparent 76%),
-    /* the light comes in at the top and the colour settles at the bottom,
-       with the band never dropping all the way out in between */
-    linear-gradient(178deg,
-      var(--sky-1) 0%,
-      var(--sky-mid) 40%,
-      var(--sky-mid) 60%,
-      var(--sky-2) 100%),
-    radial-gradient(48rem 34rem at 8% 92%, var(--sky-1), transparent 72%);
+@theme inline {
+  --color-paper:   var(--sb-paper);
+  --color-card:    var(--sb-card);
+  --color-sunken:  var(--sb-sunken);
+  --color-line:    var(--sb-line);
+  --color-line-2:  var(--sb-line-2);
+  --color-ink:     var(--sb-ink);
+  --color-ink-2:   var(--sb-ink-2);
+  --color-clay:    var(--sb-clay);
+  --color-clay-hi: var(--sb-clay-hi);
+  --color-clay-lo: var(--sb-clay-lo);
+  --color-moss:    var(--sb-moss);
+  --color-moss-hi: var(--sb-moss-hi);
+  --color-moss-lo: var(--sb-moss-lo);
+  --color-sun:     var(--sb-sun);
+  --color-sun-lo:  var(--sb-sun-lo);
+  --color-on-clay: var(--sb-on-clay);
+  --color-danger:  var(--sb-danger);
 }
 
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image:
-    radial-gradient(circle at 30% 30%, var(--spot-a) 3.5px, transparent 4px),
-    radial-gradient(circle at 70% 70%, var(--spot-b) 2px, transparent 2.5px);
-  background-size: 118px 118px, 67px 67px;
+@theme {
+  --font-sans: "Figtree", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-bangla: "Tiro Bangla", "Noto Serif Bengali", serif;
+
+  /* The admin screens were written against Tailwind's blue, purple and
+     gray. Rather than rewrite 3000 lines of tables I pointed those scales
+     at clay, moss and the paper neutrals, so they sit in the same family. */
+  --color-blue-50:  #FBEEE7;
+  --color-blue-100: #F7DCCD;
+  --color-blue-200: #EDB9A0;
+  --color-blue-300: #E09372;
+  --color-blue-400: #CF6A45;
+  --color-blue-500: #C2542C;
+  --color-blue-600: #B4441F;
+  --color-blue-700: #8F3416;
+  --color-blue-800: #6E2912;
+  --color-blue-900: #4F1E0E;
+
+  --color-purple-50:  #EEF4EF;
+  --color-purple-100: #DCE8DD;
+  --color-purple-200: #B7D0BC;
+  --color-purple-300: #8DB597;
+  --color-purple-400: #64967A;
+  --color-purple-500: #4C7E5F;
+  --color-purple-600: #3F6B4E;
+  --color-purple-700: #2F5540;
+  --color-purple-800: #243F30;
+  --color-purple-900: #182A20;
+  --color-indigo-50:  #EEF4EF;
+  --color-indigo-100: #DCE8DD;
+  --color-indigo-500: #4C7E5F;
+  --color-indigo-600: #3F6B4E;
+  --color-indigo-700: #2F5540;
+
+  --color-gray-50:  #FAF5EE;
+  --color-gray-100: #F3EADD;
+  --color-gray-200: #E2D3BE;
+  --color-gray-300: #C9B497;
+  --color-gray-400: #AC9681;
+  --color-gray-500: #7F6A57;
+  --color-gray-600: #6B5646;
+  --color-gray-700: #4F3F33;
+  --color-gray-800: #362A22;
+  --color-gray-900: #2B2019;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    background-color: var(--sb-paper);
+    color: var(--sb-ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 50;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+    color: var(--sb-ink);
+  }
+
+  ::selection { background: var(--sb-clay-lo); color: var(--sb-ink); }
+
+  :focus-visible {
+    outline: 3px solid var(--sb-sun);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  a { color: inherit; }
+}
+
+/* ------------------------------------------------------------------------
+   Pieces used across the pages
+   ------------------------------------------------------------------------ */
+
+@layer components {
+  .bn { font-family: var(--font-bangla); letter-spacing: 0; }
+
+  .eyebrow {
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--sb-clay);
+  }
+
+  .card {
+    background: var(--sb-card);
+    border: 1px solid var(--sb-line);
+    border-radius: 18px;
+    box-shadow: 0 1px 0 rgb(var(--sb-shadow) / .04), 0 8px 24px -16px rgb(var(--sb-shadow) / .18);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .5rem;
+    min-height: 44px;
+    padding: .6rem 1.15rem;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: .95rem;
+    line-height: 1.2;
+    text-align: center;
+    transition: background-color .15s, color .15s, border-color .15s, transform .15s;
+    cursor: pointer;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+  .btn-clay { background: var(--sb-clay); color: var(--sb-on-clay); }
+  .btn-clay:hover:not(:disabled) { background: var(--sb-clay-hi); }
+
+  .btn-moss { background: var(--sb-moss); color: var(--sb-on-clay); }
+  .btn-moss:hover:not(:disabled) { background: var(--sb-moss-hi); }
+
+  .btn-line { background: transparent; color: var(--sb-ink); border: 1.5px solid var(--sb-line-2); }
+  .btn-line:hover:not(:disabled) { border-color: var(--sb-ink); background: var(--sb-card); }
+
+  .btn-quiet { background: transparent; color: var(--sb-ink-2); }
+  .btn-quiet:hover:not(:disabled) { color: var(--sb-ink); background: var(--sb-sunken); }
+
+  .label {
+    display: block;
+    margin-bottom: .35rem;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--sb-ink);
+  }
+
+  .field {
+    width: 100%;
+    min-height: 46px;
+    padding: .65rem .9rem;
+    border-radius: 12px;
+    border: 1.5px solid var(--sb-line-2);
+    background: var(--sb-card);
+    color: var(--sb-ink);
+    font-size: 1rem;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .field::placeholder { color: var(--sb-ink-2); opacity: .75; }
+  .field:focus { outline: none; border-color: var(--sb-clay); box-shadow: 0 0 0 4px var(--sb-clay-lo); }
+  textarea.field { min-height: 110px; resize: vertical; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    min-height: 36px;
+    padding: .35rem .85rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--sb-line-2);
+    font-size: .88rem;
+    font-weight: 600;
+    color: var(--sb-ink-2);
+    background: var(--sb-card);
+    cursor: pointer;
+  }
+  .chip:hover { color: var(--sb-ink); border-color: var(--sb-ink-2); }
+  .chip[aria-pressed="true"] { background: var(--sb-ink); border-color: var(--sb-ink); color: var(--sb-paper); }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    padding: .15rem .6rem;
+    border-radius: 999px;
+    font-size: .78rem;
+    font-weight: 700;
+  }
+  .tag-clay { background: var(--sb-clay-lo); color: var(--sb-clay-hi); }
+  .tag-moss { background: var(--sb-moss-lo); color: var(--sb-moss-hi); }
+  .tag-sun  { background: var(--sb-sun-lo); color: var(--sb-ink); }
+  .dark .tag-clay { color: var(--sb-clay-hi); }
+
+  /* rescue photos are shown like prints pinned to a board, a little crooked */
+  .polaroid {
+    background: #FFFDF8;
+    padding: .6rem .6rem 0;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgb(43 32 25 / .12), 0 14px 30px -18px rgb(43 32 25 / .45);
+    color: #2B2019;
+    transition: transform .25s ease;
+  }
+  .dark .polaroid { background: #F3E9DC; }
+  .polaroid img { border-radius: 2px; background: #EFE5D6; }
+  .polaroid:nth-child(3n+1) { transform: rotate(-1.2deg); }
+  .polaroid:nth-child(3n+2) { transform: rotate(.9deg); }
+  .polaroid:nth-child(3n)   { transform: rotate(-.4deg); }
+  .polaroid:hover { transform: rotate(0) translateY(-3px); }
+
+  .tape::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    width: 84px;
+    height: 22px;
+    transform: translateX(-50%) rotate(-3deg);
+    background: rgb(233 162 59 / .55);
+    border-radius: 2px;
+  }
+
+  /* a hand-drawn line under the word that matters in a heading */
+  .squiggle {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 10' preserveAspectRatio='none'%3E%3Cpath d='M1 7 C 20 1, 35 1, 50 6 S 85 10, 119 3' fill='none' stroke='%23E9A23B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 100% .32em;
+    padding-bottom: .08em;
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--sb-sunken), var(--sb-line), var(--sb-sunken));
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+    border-radius: 10px;
+  }
+}
+
+/* faint paw prints walking across the page background */
+.paw-trail {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='%23B4441F' fill-opacity='.05'%3E%3Cg transform='translate(30 120) rotate(-25)'%3E%3Cellipse cx='0' cy='0' rx='7' ry='6'/%3E%3Ccircle cx='-8' cy='-9' r='2.6'/%3E%3Ccircle cx='-2.5' cy='-12' r='2.6'/%3E%3Ccircle cx='3.5' cy='-12' r='2.6'/%3E%3Ccircle cx='8.5' cy='-8' r='2.6'/%3E%3C/g%3E%3Cg transform='translate(120 50) rotate(-25)'%3E%3Cellipse cx='0' cy='0' rx='7' ry='6'/%3E%3Ccircle cx='-8' cy='-9' r='2.6'/%3E%3Ccircle cx='-2.5' cy='-12' r='2.6'/%3E%3Ccircle cx='3.5' cy='-12' r='2.6'/%3E%3Ccircle cx='8.5' cy='-8' r='2.6'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+.rise { animation: rise .5s ease both; }
+.rise-2 { animation: rise .5s .08s ease both; }
+.rise-3 { animation: rise .5s .16s ease both; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .polaroid, .polaroid:hover { transform: none !important; }
+}
+
+/* toasts in the same warm palette */
+.Toastify__toast {
+  font-family: var(--font-sans);
+  border-radius: 14px;
+  background: var(--sb-card);
+  color: var(--sb-ink);
+  border: 1px solid var(--sb-line);
 }

@@ -1,68 +1,78 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import Login from './pages/Login';
+import Rescues from './pages/Rescues';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
-import SearchPage from './pages/SearchPage';
-import CategoryPage from './pages/CategoryPage';
 import Cart from './pages/Cart';
 import ProfilePage from './pages/Profile';
 import VolunteersPage from './pages/VolunteersPage';
-import OrderPage from './components/OrderPage';
-import ProductPage from './components/ProductPage';
-import VolunteerPage from './components/VolunteerPage';
-import AdminDashboard from './pages/AdminDashboard';
-import RevenuePage from './components/RevenuePage';
 import VolunteerProfile from './pages/VolunteerProfile';
 import CheckoutPage from './pages/CheckoutPage';
-import 'react-toastify/dist/ReactToastify.css';
 import CreateTeam from './pages/CreateTeam';
 import MyTeam from './pages/MyTeam';
 import TeamInvitations from './pages/TeamInvitation';
 import Teams from './pages/Teams';
+import TeamDetails from './pages/TeamDetails';
 import NotFound from './pages/NotFound';
 import ProtectedAdminRoute from './components/ProtectAdminRoute';
-import TeamDetails from "./pages/TeamDetails";
+
+// the admin screens carry the charts and animation code; visitors never need it
+const OrderPage = lazy(() => import('./components/OrderPage'));
+const ProductPage = lazy(() => import('./components/ProductPage'));
+const VolunteerPage = lazy(() => import('./components/VolunteerPage'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const RevenuePage = lazy(() => import('./components/RevenuePage'));
+const admin = (page) => (
+  <ProtectedAdminRoute>
+    <Suspense fallback={<p className="p-10 text-center text-ink-2">Loading…</p>}>{page}</Suspense>
+  </ProtectedAdminRoute>
+);
 
 const App = () => {
   return (
-    <div>
-      <ToastContainer position="top-right" autoClose={3000} />
+    <>
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] btn btn-clay">
+        Skip to content
+      </a>
+      <ToastContainer position="top-center" autoClose={3000} />
       <Routes>
-        <Route path="/" element={<HomePage />} /> 
         <Route path="/login" element={<Login />} />
-        <Route path="/profile" element={<ProfilePage />} />
 
-        <Route path="/adminorders" element={<ProtectedAdminRoute><OrderPage /></ProtectedAdminRoute>}/>
-        <Route path="/adminproducts" element={<ProtectedAdminRoute><ProductPage /></ProtectedAdminRoute>}/>
-        <Route path="/adminvolunteers" element={<ProtectedAdminRoute><VolunteerPage/></ProtectedAdminRoute>}/>
-        <Route path="/admindashboard" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>}/>
-        <Route path="/adminrevenue" element={<ProtectedAdminRoute><RevenuePage /></ProtectedAdminRoute>}/>
+        <Route path="/adminorders" element={admin(<OrderPage />)} />
+        <Route path="/adminproducts" element={admin(<ProductPage />)} />
+        <Route path="/adminvolunteers" element={admin(<VolunteerPage />)} />
+        <Route path="/admindashboard" element={admin(<AdminDashboard />)} />
+        <Route path="/adminrevenue" element={admin(<RevenuePage />)} />
 
-        <Route path="/products" element={<Products />} />
-        <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path="/products/category/:category" element={<CategoryPage />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route element={<Layout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/rescues" element={<Rescues />} />
+          <Route path="/profile" element={<ProfilePage />} />
 
-        <Route path="/volunteers" element={<VolunteersPage />} />
-        <Route path="/volunteers/:id" element={<VolunteerProfile />} />
-        <Route path="/createteam" element={<CreateTeam />} />
-        <Route path="/my-team" element={<MyTeam />} />
-        <Route path='/team-invitations' element={<TeamInvitations />} />
-        <Route path='/teams' element={<Teams />} />
-        <Route path="/teams/:key" element={<TeamDetails />} />
-        <Route path="*" element={<NotFound />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/category/:category" element={<Products />} />
+          <Route path="/search" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+
+          <Route path="/volunteers" element={<VolunteersPage />} />
+          <Route path="/volunteers/:id" element={<VolunteerProfile />} />
+          <Route path="/teams" element={<Teams />} />
+          <Route path="/teams/:key" element={<TeamDetails />} />
+          <Route path="/createteam" element={<CreateTeam />} />
+          <Route path="/my-team" element={<MyTeam />} />
+          <Route path="/team-invitations" element={<TeamInvitations />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
       </Routes>
-    </div>
+    </>
   );
 };
-
-
-
 
 export default App;

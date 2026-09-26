@@ -1,18 +1,21 @@
 import React, { useState, useContext } from 'react';
 import { Package, Menu, ClipboardList, Wallet, LayoutDashboard, Users, LogOut, Sun, Moon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '/logoImage.jpg';
 import { DarkmodeContext } from '../context/DarkmodeContext';
+import { AppContext } from '../context/AppContext';
+import { Wordmark } from './bits';
 
 const AdminNavbar = ({ isSidebarOpen, toggleSidebar, activeTab, setActiveTab }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { isDarkMode, toggleDarkMode } = useContext(DarkmodeContext);
+  const { logout } = useContext(AppContext);
   const SidebarItem = ({ icon, label, showLabel, onClick, isActive }) => {
     let baseClasses = 'flex items-center gap-2 cursor-pointer transition-colors duration-200';
+    const activeColour = isDarkMode ? 'text-blue-300' : 'text-blue-800';
     let activeClasses = isSidebarOpen
-      ? 'text-blue-800 font-bold rounded-md px-2 py-1 shadow-md'
-      : 'text-blue-800 font-semibold rounded-md';
+      ? `${activeColour} font-bold rounded-md px-2 py-1 shadow-md`
+      : `${activeColour} font-semibold rounded-md`;
     let hoverClasses = isSidebarOpen
       ? isDarkMode
         ? 'text-gray-300 hover:text-white hover:bg-white/10 rounded-md px-2 py-1'
@@ -37,27 +40,23 @@ const AdminNavbar = ({ isSidebarOpen, toggleSidebar, activeTab, setActiveTab }) 
     );
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setIsDialogOpen(false);
+    await logout();
     navigate('/login');
     setActiveTab('Dashboard');
   };
 
   return (
     <aside
-      className={`transition-all duration-300 ${isSidebarOpen ? "w-64 border-r" : "w-16"
-        } ${isDarkMode ? 'bg-black border-r-white/20' : 'bg-gray-200 border-r-transparent'} text-white p-4 relative`}
+      className={`shrink-0 transition-all duration-300 ${isSidebarOpen ? "w-64 border-r" : "w-16"
+        } ${isDarkMode ? 'bg-black border-r-white/20' : 'bg-gray-100 border-r-transparent'} text-white p-4 relative`}
     >
       <div className="flex items-center justify-between mb-6">
         {isSidebarOpen ? (
-          <div className="flex items-center gap-2">
-            <img
-              src={logo}
-              alt="Logo"
-              className="h-15 w-15 rounded-full object-cover border-2 border-blue-700 shadow-md"
-            />
-            <h1 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-blue-800'}`}>SavePaws: Animal Rescue Network</h1>
-          </div>
+          <Link to="/" aria-label="Back to the site" className={isDarkMode ? 'text-white' : 'text-gray-900'}>
+            <Wordmark size="text-xl" />
+          </Link>
         ) : (
           <div />
         )}

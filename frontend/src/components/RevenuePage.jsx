@@ -169,7 +169,7 @@ const TotalRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, erro
     const modalBg = isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200';
     const titleColor = isDarkMode ? 'text-gray-200' : '#A2574F';
     const closeButtonColor = isDarkMode ? 'text-white hover:text-gray-300' : 'text-gray-700 hover:text-gray-900';
-    const headerBgColor = isDarkMode ? 'bg-gray-600' : '#A2574F';
+    const headerBgColor = isDarkMode ? 'bg-gray-800' : '#A2574F';
     if (!isOpen) {
         return null;
     }
@@ -242,7 +242,7 @@ const MonthlyRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, er
     const modalBg = isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200';
     const titleColor = isDarkMode ? 'text-gray-200' : '#A2574F';
     const closeButtonColor = isDarkMode ? 'text-white hover:text-gray-300' : 'text-gray-700 hover:text-gray-900';
-    const headerBgColor = isDarkMode ? 'bg-gray-600' : '#A2574F';
+    const headerBgColor = isDarkMode ? 'bg-gray-800' : '#A2574F';
     if (!isOpen) return null;
     if (loading) {
         return (
@@ -322,7 +322,7 @@ const WeeklyRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, err
     const modalBg = isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200';
     const titleColor = isDarkMode ? 'text-gray-200' : '#A2574F'; 
     const closeButtonColor = isDarkMode ? 'text-white hover:text-gray-300' : 'text-gray-700 hover:text-gray-900';
-    const headerBgColor = isDarkMode ? 'bg-gray-600' : '#A2574F'; 
+    const headerBgColor = isDarkMode ? 'bg-gray-800' : '#A2574F'; 
     if (!isOpen) return null;
     if (loading) {
         return (
@@ -399,7 +399,8 @@ const WeeklyRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, err
 
 const RevenuePage = () => {
     const { isDarkMode } = useContext(DarkmodeContext);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    // start folded on a phone, where the open sidebar takes most of the screen
+    const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 768);
     const [activeTab, setActiveTab] = useState('Revenue');
     const [orders, setOrders] = useState([]);
     const [showTotalRevenueDetails, setShowTotalRevenueDetails] = useState(false);
@@ -723,7 +724,7 @@ const RevenuePage = () => {
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
             />
-            <div className="flex-1 p-6">
+            <div className="flex-1 min-w-0 p-4 sm:p-6">
                 <h2 className={`text-3xl font-bold text-center ${isDarkMode ? 'text-white' : 'text-gray-800'} mb-8`}><u>Revenue & Profit Overview</u></h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
 

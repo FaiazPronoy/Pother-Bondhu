@@ -1,25 +1,19 @@
 import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
+import { PawPrint } from 'lucide-react';
 
 const NotFound = () => {
   return (
-    <div className="bg-blue-50 text-gray-800 min-h-screen flex flex-col">
-      <Navbar />
-      <div className="flex-1 max-w-2xl mx-auto py-24 px-6 text-center">
-        <p className="text-6xl font-bold text-blue-600 mb-4">404</p>
-        <h1 className="text-2xl font-bold mb-3">We couldn't find that page</h1>
-        <p className="text-gray-600 mb-8">
-          The link may be out of date, or the page may have moved.
-        </p>
-        <Link
-          to="/"
-          className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-        >
-          Back to home
-        </Link>
+    <div className="py-16 text-center max-w-lg mx-auto">
+      <div className="flex justify-center gap-3 text-line-2 mb-6" aria-hidden="true">
+        <PawPrint size={28} className="-rotate-12 translate-y-3" />
+        <PawPrint size={28} className="rotate-6" />
+        <PawPrint size={28} className="-rotate-12 translate-y-3 opacity-60" />
+        <PawPrint size={28} className="rotate-6 opacity-30" />
       </div>
-      <Footer />
+      <p className="font-display text-7xl font-semibold text-clay">404</p>
+      <h1 className="mt-3 text-3xl font-semibold">The trail goes cold here</h1>
+      <p className="mt-3 text-ink-2 text-lg">This page doesn't exist, or it moved. The rest of the site is right where you left it.</p>
+      <Link to="/" className="btn btn-clay mt-8">Back home</Link>
     </div>
   );
 };

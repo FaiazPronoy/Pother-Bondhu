@@ -11,7 +11,8 @@ const VolunteerPage = () => {
     const [error, setError] = useState(null);
     const [locationFilter, setLocationFilter] = useState('');
     const [selectedVolunteer, setSelectedVolunteer] = useState(null);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    // start folded on a phone, where the open sidebar takes most of the screen
+    const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 768);
     const [activeTab, setActiveTab] = useState('Volunteers');
     const { isDarkMode } = useContext(DarkmodeContext);
     useEffect(() => {
@@ -55,7 +56,7 @@ const VolunteerPage = () => {
                 setActiveTab={setActiveTab}
             />
 
-            <main className="flex-1 p-6 overflow-x-hidden">
+            <main className="flex-1 min-w-0 p-4 sm:p-6 overflow-x-hidden">
                 <div className="flex flex-wrap gap-4 items-center justify-between mb-6">
                     <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-blue-700'}`}>
                         Volunteers

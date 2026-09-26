@@ -27,7 +27,8 @@ const OrderPage = () => {
         deliveryDate: '',
     });
     const [error, setError] = useState('');
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    // start folded on a phone, where the open sidebar takes most of the screen
+    const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 768);
     const [activeTab, setActiveTab] = useState('Orders');
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [orderToDelete, setOrderToDelete] = useState(null);
@@ -179,7 +180,7 @@ const OrderPage = () => {
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
             />
-            <div className="flex-1 p-6">
+            <div className="flex-1 min-w-0 p-4 sm:p-6">
                 <h1 className={`text-3xl font-bold text-center mb-6 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}><u>Orders Details</u></h1>
                 <div className="mt-8"></div>
                 <div className={`shadow-md rounded-md flex justify-center ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
@@ -219,9 +220,9 @@ const OrderPage = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className="p-4">
+                        <div className="p-4 overflow-x-auto">
                             <table className="min-w-full">
-                                <thead className={isDarkMode ? "bg-gray-600" : "bg-gray-200"}>
+                                <thead className={isDarkMode ? "bg-gray-800" : "bg-gray-200"}>
                                     <tr>
                                         <th className={`px-6 py-3 pr-5 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Order ID</th>
                                         <th className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>Customer</th>

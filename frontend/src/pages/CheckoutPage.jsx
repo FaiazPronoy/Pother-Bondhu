@@ -1,17 +1,16 @@
-// CheckoutPage.jsx
 import React, { useContext, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { AppContext } from '../context/AppContext';
-import ProductNavbar from '../components/ProductNavbar';
-import Footer from '../components/Footer';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-
+import { Heart, Wallet } from 'lucide-react';
+import { AppContext } from '../context/AppContext';
+import { DONATIONS } from './Cart';
+import { Empty, PageHeader, Points } from '../components/bits';
 
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { cart, userData, backendUrl, setCart } = useContext(AppContext);
+  const { cart, userData, isLoggedIn, backendUrl, setCart, checkAuthStatus } = useContext(AppContext);
   const { from, product, donation = 0 } = location.state || {};
 
   const [includeCart, setIncludeCart] = useState(false);
@@ -19,67 +18,63 @@ const CheckoutPage = () => {
   const [donationInput, setDonationInput] = useState(0);
   const [placingOrder, setPlacingOrder] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
+    name: userData?.name || '',
     phone: '',
     address: '',
-    promo: '',
     shipping: 'standard',
   });
 
+  if (!isLoggedIn) return <Navigate to="/login" state={{ from: '/cart' }} replace />;
+
   const mergedProducts = () => {
     const productMap = {};
-    const allItems = from === 'cart'
-      ? cart
-      : includeCart && cart.length > 0
-        ? [product, ...cart]
-        : [product];
-
-    for (let item of allItems.filter(Boolean)) {
-      const id = item.id;
+    const allItems = from === 'cart' ? cart : includeCart ? [product, ...cart] : [product];
+    for (const item of allItems.filter(Boolean)) {
       const qty = item.quantity || 1;
-      if (productMap[id]) {
-        productMap[id].quantity += qty;
-      } else {
-        productMap[id] = { ...item, quantity: qty };
-      }
+      if (productMap[item.id]) productMap[item.id].quantity += qty;
+      else productMap[item.id] = { ...item, quantity: qty };
     }
-
     return Object.values(productMap);
   };
 
   const handleIncludeCart = () => {
-    const cartItem = cart.find(c => c.id === product.id);
-    if (cartItem && (cartItem.quantity + (product.quantity || 1)) > product.stockQuantity) {
-      toast.error(`Cannot add cart items. Total quantity of "${product.name}" exceeds available stock.`);
-      setShowCartBox(false);
+    const inCart = cart.find((c) => c.id === product.id);
+    if (inCart && inCart.quantity + (product.quantity || 1) > product.stockQuantity) {
+      toast.error(`There isn't enough ${product.name} in stock for both.`);
     } else {
       setIncludeCart(true);
-      setShowCartBox(false);
     }
+    setShowCartBox(false);
   };
 
   const products = mergedProducts();
 
-  const effectiveDonation = from === 'buyNow' ? donationInput : donation;
+  // reaching /checkout directly, or refreshing it, loses what was being bought
+  if (products.length === 0) {
+    return (
+      <Empty title="Nothing to check out" action={<Link to="/cart" className="btn btn-clay">Go to your cart</Link>}>
+        This page lost track of your order, which happens after a refresh. Your cart is still there.
+      </Empty>
+    );
+  }
 
-  const totalPoints = products.reduce(
-    (sum, item) => sum + item.sellingPrice * item.quantity,
-    0
-  ) + effectiveDonation;
+  const effectiveDonation = from === 'buyNow' ? donationInput : donation;
+  const itemsTotal = products.reduce((sum, item) => sum + item.sellingPrice * item.quantity, 0);
+  const totalPoints = itemsTotal + effectiveDonation;
+  const short = totalPoints - (userData?.points || 0);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handlePlaceOrder = async () => {
-    if (!formData.name || !formData.phone || !formData.address) {
-      toast.error('Please fill out all required fields.');
+  const handlePlaceOrder = async (e) => {
+    e.preventDefault();
+    if (!/^01[3-9]\d{8}$/.test(formData.phone.trim())) {
+      toast.error('Enter an 11 digit mobile number, like 017XXXXXXXX.');
       return;
     }
-
-    if (!userData || userData.points < totalPoints) {
-      toast.error('Not enough PetPoints to complete this order.');
+    if (short > 0) {
+      toast.error(`You need ${short} more PetPoints for this order.`);
       return;
     }
 
@@ -87,185 +82,126 @@ const CheckoutPage = () => {
     try {
       const response = await axios.post(`${backendUrl}/api/orders/place`, {
         items: products,
-        name: formData.name,
-        phone: formData.phone,
-        address: formData.address,
+        name: formData.name.trim(),
+        phone: formData.phone.trim(),
+        address: formData.address.trim(),
         shipping: formData.shipping,
-        promo: formData.promo,
         donation: effectiveDonation,
-      }, { withCredentials: true });
+      });
 
       if (response.data.success) {
-        toast.success('Order placed successfully!');
-        setCart([]);
-        navigate('/products');
+        await checkAuthStatus();
+        toast.success(effectiveDonation > 0
+          ? `Order placed, and ${effectiveDonation} PetPoints went to rescues. Thank you.`
+          : 'Order placed. We will call before delivery.');
+        // leave first and empty the cart in the same render, or this page
+        // flashes its "nothing to check out" state on the way out.
+        // A buy-now order leaves the cart alone unless the cart was added to it.
+        navigate('/products', { replace: true });
+        if (from === 'cart' || includeCart) setCart([]);
       } else {
-        toast.error(response.data.message || 'Order failed. Try again.');
+        toast.error(response.data.message || 'The order did not go through. Try again.');
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'Something went wrong.');
+      toast.error(err?.response?.data?.message || 'The order did not go through. Try again.');
     } finally {
       setPlacingOrder(false);
     }
   };
 
-  // reaching /checkout directly, or refreshing it, loses the navigation state
-  // that says what is being bought
-  if (products.length === 0) {
-    return (
-      <div className="bg-blue-50 text-gray-800 min-h-screen">
-        <ProductNavbar />
-        <div className="max-w-2xl mx-auto py-20 px-6 text-center">
-          <h2 className="text-2xl font-bold text-blue-700 mb-3">Nothing to check out</h2>
-          <p className="text-gray-600 mb-8">
-            Your checkout session has expired. Add something to your cart and try again.
-          </p>
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={() => navigate('/cart')}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Go to cart
-            </button>
-            <button
-              onClick={() => navigate('/products')}
-              className="border border-blue-600 text-blue-600 px-6 py-2 rounded-lg hover:bg-blue-100"
-            >
-              Browse products
-            </button>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
   return (
-    <div className="bg-blue-50 text-gray-800 min-h-screen">
-      <ProductNavbar />
-      <div className="max-w-7xl mx-auto py-10 px-6 grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-10">
-          <h2 className="text-3xl font-bold text-blue-700 text-center">
-            Confirm Your Order 🧾
-          </h2>
+    <>
+      <PageHeader eyebrow="Checkout" title="Where should it go?" />
 
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <h3 className="text-xl font-semibold mb-4">🛍️ Your Items</h3>
-            {products.map((item, idx) => (
-              <div key={idx} className="flex items-center gap-6 border-b border-blue-200 py-4">
-                <img src={item.imageUrl} alt={item.name} className="w-20 h-20 rounded-lg object-cover" />
-                <div>
-                  <h4 className="font-semibold">{item.name}</h4>
-                  <div className="flex items-center gap-2 text-purple-700 font-medium">
-                    <span>{item.quantity} x</span>
-                    <img src="/petpoints.png" alt="PetPoints" className="w-5 h-5" />
-                    <span>{item.sellingPrice.toFixed(2)} PetPoints</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-            {effectiveDonation > 0 && (
-              <div className="text-right text-sm text-gray-600 mt-2 italic">
-                Includes <span className="font-semibold text-purple-700">{effectiveDonation}</span> PetPoints donation 🐾
-              </div>
-            )}
-            <div className="text-right text-lg font-semibold text-purple-700 mt-4 flex items-center justify-end gap-2">
-              <img src="/petpoints.png" alt="PetPoints" className="w-5 h-5" />
-              <span>{totalPoints.toFixed(2)} PetPoints</span>
-            </div>
-          </div>
-
-          {/* Shipping Info */}
-          <div className="bg-white p-6 rounded-xl shadow-md space-y-5">
-            <h3 className="text-lg font-semibold mb-3">📋 Shipping Information</h3>
-            {['name', 'phone', 'address', 'promo'].map(field => (
-              <input
-                key={field}
-                type={field === 'address' ? 'textarea' : 'text'}
-                name={field}
-                placeholder={field[0].toUpperCase() + field.slice(1)}
-                value={formData[field]}
-                onChange={handleChange}
-                className="w-full p-3 bg-blue-100 border border-blue-300 rounded"
-              />
-            ))}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block mb-1 font-medium">Shipping Method</label>
-                <select name="shipping" value={formData.shipping} onChange={handleChange}
-                  className="w-full p-3 bg-blue-100 border border-blue-300 rounded">
-                  <option value="standard">Standard Shipping</option>
-                  <option value="express">Express Shipping</option>
-                </select>
-              </div>
-              <div>
-                <label className="block mb-1 font-medium">Payment Method</label>
-                <div className="p-3 bg-blue-100 border border-blue-300 rounded flex items-center gap-2 font-semibold">
-                  <img src="/petpoints.png" alt="PetPoints" className="w-6 h-6" /> PetPoints Only
-                </div>
+      <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+        <div className="space-y-6">
+          {showCartBox && (
+            <div className="card p-5 border-sun">
+              <p className="font-semibold">You also have {cart.length} thing{cart.length === 1 ? '' : 's'} in your cart. Order them together?</p>
+              <div className="mt-3 flex gap-2">
+                <button type="button" onClick={handleIncludeCart} className="btn btn-moss">Yes, add them</button>
+                <button type="button" onClick={() => setShowCartBox(false)} className="btn btn-line">Just this one</button>
               </div>
             </div>
+          )}
 
+          <form id="checkout" onSubmit={handlePlaceOrder} className="card p-5 sm:p-6 space-y-5">
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label htmlFor="name" className="label">Name</label>
+                <input id="name" name="name" autoComplete="name" required maxLength={60} value={formData.name} onChange={handleChange} className="field" />
+              </div>
+              <div>
+                <label htmlFor="phone" className="label">Mobile number</label>
+                <input id="phone" name="phone" type="tel" inputMode="numeric" autoComplete="tel" required placeholder="017XXXXXXXX"
+                  value={formData.phone} onChange={handleChange} className="field" />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="address" className="label">Address</label>
+              <textarea id="address" name="address" autoComplete="street-address" required maxLength={300}
+                placeholder="House, road, area" value={formData.address} onChange={handleChange} className="field !min-h-24" />
+            </div>
+            <fieldset>
+              <legend className="label">Delivery</legend>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {[['standard', 'Standard', '3 to 5 days'], ['express', 'Express', 'Next day inside Dhaka']].map(([value, label, note]) => (
+                  <label key={value} className={`flex items-start gap-3 rounded-xl border-[1.5px] p-4 cursor-pointer ${formData.shipping === value ? 'border-clay bg-clay-lo/40' : 'border-line-2'}`}>
+                    <input type="radio" name="shipping" value={value} checked={formData.shipping === value} onChange={handleChange}
+                      className="mt-1 w-4 h-4 accent-[var(--sb-clay)]" />
+                    <span><span className="block font-semibold">{label}</span><span className="text-sm text-ink-2">{note}</span></span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
             {from === 'buyNow' && (
-              <div>
-                <label className="block mb-1 font-medium">Optional Donation 🐾</label>
-                <select value={donationInput} onChange={(e) => setDonationInput(parseFloat(e.target.value))}
-                  className="w-full p-3 bg-blue-100 border border-blue-300 rounded">
-                  <option value={0}>None</option>
-                  <option value={10}>10 PetPoints</option>
-                  <option value={20}>20 PetPoints</option>
-                  <option value={50}>50 PetPoints</option>
-                </select>
-              </div>
+              <fieldset>
+                <legend className="label inline-flex items-center gap-2"><Heart size={16} className="text-clay" aria-hidden="true" /> Add something for rescues?</legend>
+                <div className="grid grid-cols-4 gap-2 max-w-sm">
+                  {DONATIONS.map((d) => (
+                    <button key={d} type="button" className="chip justify-center !px-0" aria-pressed={donationInput === d} onClick={() => setDonationInput(d)}>
+                      {d === 0 ? 'No' : `+${d}`}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
             )}
-
-            <button
-              onClick={handlePlaceOrder}
-              disabled={placingOrder}
-              className="w-full mt-4 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold transition"
-            >
-              🚀 {placingOrder ? 'Placing Order...' : 'Place Order'}
-            </button>
-          </div>
+          </form>
         </div>
 
-        {/* Cart Merge Prompt */}
-        {showCartBox && (
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <h3 className="text-lg font-bold mb-4 text-blue-700">🛒 Items in Your Cart</h3>
-            {cart.map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between border-b border-gray-200 py-3">
-                <img src={item.imageUrl} alt={item.name} className="w-14 h-14 rounded-md object-cover" />
-                <div className="flex-1 ml-3">
-                  <p className="font-medium">{item.name}</p>
-                  <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                </div>
-                <div className="flex items-center gap-1 text-purple-700 font-medium">
-                  <img src="/petpoints.png" alt="PetPoints" className="w-4 h-4" />
-                  <span>{item.sellingPrice.toFixed(2)}</span>
-                </div>
-              </div>
+        <aside className="card p-5 h-fit lg:sticky lg:top-6">
+          <h2 className="text-xl font-semibold">Your order</h2>
+          <ul className="mt-4 divide-y divide-line">
+            {products.map((item) => (
+              <li key={item.id} className="py-3 flex items-center gap-3">
+                <img src={item.imageUrl} alt="" className="w-14 h-14 rounded-lg object-cover bg-sunken" />
+                <span className="flex-1 min-w-0">
+                  <span className="block font-medium truncate">{item.name}</span>
+                  <span className="text-sm text-ink-2">× {item.quantity}</span>
+                </span>
+                <span className="tabular-nums">{(item.sellingPrice * item.quantity).toLocaleString('en-IN')}</span>
+              </li>
             ))}
-            <div className="mt-4 flex gap-4">
-              <button
-                onClick={handleIncludeCart}
-                className="flex-1 bg-green-500 text-white py-2 rounded-lg font-semibold hover:bg-green-600"
-              >
-                ✅ Yes, Add
-              </button>
-              <button
-                onClick={() => setShowCartBox(false)}
-                className="flex-1 bg-red-500 text-white py-2 rounded-lg font-semibold hover:bg-red-600"
-              >
-                ❌ No, Skip
-              </button>
-            </div>
-          </div>
-        )}
+          </ul>
+          {effectiveDonation > 0 && (
+            <p className="flex justify-between py-2 text-clay"><span>For rescues</span><span className="tabular-nums">{effectiveDonation}</span></p>
+          )}
+          <p className="flex justify-between items-baseline border-t border-line pt-4 mt-2">
+            <span className="font-semibold">Total</span>
+            <Points value={totalPoints} className="text-2xl font-display text-clay" />
+          </p>
+          <p className={`mt-3 text-sm rounded-xl p-3 flex items-center gap-2 ${short > 0 ? 'bg-clay-lo text-ink' : 'bg-moss-lo text-ink'}`}>
+            <Wallet size={16} aria-hidden="true" />
+            {short > 0
+              ? <span>You have {userData.points.toLocaleString('en-IN')}. <Link to="/profile?tab=wallet" className="font-semibold underline">Top up {short} more</Link></span>
+              : <span>Paid from your {userData.points.toLocaleString('en-IN')} PetPoints</span>}
+          </p>
+          <button type="submit" form="checkout" disabled={placingOrder || short > 0} className="btn btn-clay w-full mt-4 text-base">
+            {placingOrder ? 'Placing your order…' : 'Place order'}
+          </button>
+        </aside>
       </div>
-      <Footer />
-    </div>
+    </>
   );
 };
 

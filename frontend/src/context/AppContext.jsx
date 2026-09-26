@@ -1,21 +1,32 @@
-import React, { useState, useEffect, createContext } from "react";
+import React, { useState, useEffect, useRef, createContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { backendUrl as configBackendUrl } from "../config";
 
 export const AppContext = createContext();
 
+const readLocalCart = () => {
+  try {
+    return JSON.parse(localStorage.getItem("cart")) || [];
+  } catch {
+    return [];
+  }
+};
+
 export const AppContextProvider = (props) => {
   const backendUrl = configBackendUrl;
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(readLocalCart);
   const [authChecked, setAuthChecked] = useState(false);
-  const [showCartRestorePrompt, setShowCartRestorePrompt] = useState(false);
 
   const [productData, setProductData] = useState([]);
   const [productLoading, setProductLoading] = useState(true);
+
+  // true once the saved cart has been fetched after sign in, so the first
+  // render does not overwrite the saved one with an empty list
+  const cartSynced = useRef(false);
 
   axios.defaults.withCredentials = true;
 
@@ -29,177 +40,109 @@ export const AppContextProvider = (props) => {
         setIsLoggedIn(false);
         setUserData(null);
       }
-    } catch (error) {
-      console.error("Auth check failed:", error);
+    } catch {
+      setIsLoggedIn(false);
+      setUserData(null);
     } finally {
       setAuthChecked(true);
     }
   };
 
-  const fetchProducts = async (forceRefresh = false) => {
+  // Products used to be cached in localStorage with no expiry, so prices and
+  // stock stayed wrong until the cache was cleared. They are small enough to
+  // just fetch each visit.
+  const fetchProducts = async () => {
     setProductLoading(true);
-
-    if (!forceRefresh) {
-      const cached = localStorage.getItem("productData");
-      if (cached) {
-        console.log("✅ Loaded products from localStorage");
-        setProductData(JSON.parse(cached));
-        setProductLoading(false);
-        return;
-      }
-    }
-
     try {
       const res = await axios.get(`${backendUrl}/api/products`);
-
-      const slimmedProducts = res.data.map(p => ({
-        id: p.id,
-        _id: p._id,
-        name: p.name,
-        sellingPrice: p.sellingPrice,
-        stockQuantity: p.stockQuantity,
-        category: p.category,
-        imageUrl: p.imageUrl, 
-        discount: p.discount || 0,
-        description: p.description || "",
-        rating: p.rating || 0
-      }));
-
-      setProductData(slimmedProducts);
-      localStorage.setItem("productData", JSON.stringify(slimmedProducts));
-    } catch (error) {
-      console.error("❌ Error fetching products:", error);
+      setProductData(res.data);
+    } catch {
+      toast.error("Could not load the shop. Is the server running?");
     } finally {
       setProductLoading(false);
     }
   };
 
-
   useEffect(() => {
     checkAuthStatus();
-
-    const savedCart = localStorage.getItem("cart");
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (err) {
-        console.error("Failed to parse local cart:", err);
-      }
-    fetchProducts(true);
-    }
-
-    const cachedProducts = localStorage.getItem("productData");
-    if (cachedProducts) {
-      setProductData(JSON.parse(cachedProducts));
-      setProductLoading(false);
-    } else {
-      fetchProducts();
-    }
+    fetchProducts();
   }, []);
 
-  //  Save slimmed cart to localStorage
   useEffect(() => {
-    const slimmedCart = cart.map(item => ({
-      id: item.id,
-      quantity: item.quantity,
-      name: item.name,
-      sellingPrice: item.sellingPrice,
-      imageUrl: item.imageUrl,
-      stockQuantity: item.stockQuantity
-    }));
-
+    const slim = cart.map(({ id, _id, name, sellingPrice, imageUrl, stockQuantity, quantity }) =>
+      ({ id, _id, name, sellingPrice, imageUrl, stockQuantity, quantity }));
     try {
-      localStorage.setItem("cart", JSON.stringify(slimmedCart));
-    } catch (err) {
-      console.error("Failed to save cart:", err);
+      localStorage.setItem("cart", JSON.stringify(slim));
+    } catch {
+      // private mode or full storage; the cart still works for this visit
     }
   }, [cart]);
 
+  // after sign in: an empty cart picks up the one saved on the account,
+  // anything already in the cart is kept and saved to the account instead
   useEffect(() => {
-    const syncCartWithBackend = async () => {
-      if (isLoggedIn && userData) {
-        const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-        if (localCart.length > 0) {
-          setShowCartRestorePrompt(true);
-          return;
-        }
-
-        try {
+    if (!isLoggedIn) {
+      cartSynced.current = false;
+      return;
+    }
+    (async () => {
+      try {
+        if (cart.length === 0) {
           const res = await axios.get(`${backendUrl}/api/user/cart`);
           setCart(res.data.cart || []);
-        } catch (err) {
-          console.error("Failed to load backend cart:", err);
         }
+      } catch {
+        // the local cart is still there
       }
-    };
+      cartSynced.current = true;
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoggedIn]);
 
-    syncCartWithBackend();
-  }, [isLoggedIn, userData, backendUrl]);
+  useEffect(() => {
+    if (!isLoggedIn || !cartSynced.current) return;
+    const t = setTimeout(() => {
+      axios.post(`${backendUrl}/api/user/cart`, { items: cart }).catch(() => {});
+    }, 600);
+    return () => clearTimeout(t);
+  }, [cart, isLoggedIn, backendUrl]);
 
-  const restoreCartFromLocal = async () => {
-    try {
-      const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-      const res = await axios.get(`${backendUrl}/api/user/cart`);
-      const dbCart = res.data.cart || [];
-
-      const mergedCart = [...dbCart];
-
-      localCart.forEach(localItem => {
-        const found = mergedCart.find(i => i.id === localItem.id);
-        if (found) {
-          found.quantity += localItem.quantity;
-        } else {
-          mergedCart.push(localItem);
-        }
-      });
-
-      setCart(mergedCart);
-      await axios.post(`${backendUrl}/api/user/cart`, { items: mergedCart });
-      localStorage.removeItem("cart");
-      setShowCartRestorePrompt(false);
-    } catch (err) {
-      console.error("Failed to restore cart:", err);
+  const addToCart = (product, quantity = 1) => {
+    const id = product.id || product._id;
+    const inCart = cart.find((item) => item.id === id);
+    const already = inCart ? inCart.quantity : 0;
+    if (already + quantity > product.stockQuantity) {
+      toast.info(`Only ${product.stockQuantity} of ${product.name} left.`);
+      return;
     }
-  };
-
-  const discardLocalCart = () => {
-    localStorage.removeItem("cart");
-    setShowCartRestorePrompt(false);
-  };
-
-const addToCart = (product, quantity = 1) => {
-  // normalize: always keep both id and _id, prefer custom id as canonical
-    const canonicalId = product.id || product._id;     // string in your DB
-    const mongoId = product._id || product.id;         // fallback so both exist
-    const norm = { ...product, id: canonicalId, _id: mongoId };
-
-    const exists = cart.find(item => item.id === canonicalId);
-    if (exists) {
-      setCart(cart.map(item =>
-        item.id === canonicalId ? { ...item, quantity: (item.quantity || 1) + quantity } : item
-       ));
-     } else {
-       setCart([...cart, { ...norm, quantity }]);
-     }
-
-    toast.success(`🛒 ${product.name} added to cart`, {
-      position: "top-right",
-      autoClose: 2000,
-      hideProgressBar: true,
-      pauseOnHover: false,
-    });
+    if (inCart) {
+      setCart(cart.map((item) => (item.id === id ? { ...item, quantity: already + quantity } : item)));
+    } else {
+      setCart([...cart, { ...product, id, _id: product._id || id, quantity }]);
+    }
+    toast.success(`${product.name} is in your cart`, { autoClose: 1800, hideProgressBar: true });
   };
 
   const updateCartItemQuantity = (id, quantity) => {
-    setCart(cart.map(item => item.id === id ? { ...item, quantity } : item));
+    setCart(cart.map((item) => (item.id === id ? { ...item, quantity } : item)));
   };
 
   const removeFromCart = (id) => {
-    setCart(cart.filter(item => item.id !== id));
+    setCart(cart.filter((item) => item.id !== id));
   };
 
-  const resetCart = () => {
+  const resetCart = () => setCart([]);
+
+  const logout = async () => {
+    try {
+      await axios.post(`${backendUrl}/api/auth/logout`);
+    } catch {
+      // the cookie is gone either way once it expires
+    }
+    setIsLoggedIn(false);
+    setUserData(null);
     setCart([]);
+    localStorage.removeItem("cart");
   };
 
   const value = {
@@ -209,6 +152,7 @@ const addToCart = (product, quantity = 1) => {
     userData,
     setUserData,
     checkAuthStatus,
+    logout,
     cart,
     setCart,
     addToCart,
@@ -218,15 +162,18 @@ const addToCart = (product, quantity = 1) => {
     productData,
     productLoading,
     fetchProducts,
-    showCartRestorePrompt,
-    restoreCartFromLocal,
-    discardLocalCart
   };
-  
 
   return (
     <AppContext.Provider value={value}>
-      {authChecked ? props.children : <div className="text-center py-10 text-gray-500">Loading...</div>}
+      {authChecked ? (
+        props.children
+      ) : (
+        <div className="min-h-screen grid place-items-center text-ink-2" role="status">
+          <img src="/paw-heart.svg" alt="" className="w-12 h-12 animate-pulse" />
+          <span className="sr-only">Loading StrayBachao</span>
+        </div>
+      )}
     </AppContext.Provider>
   );
 };
