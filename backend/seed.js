@@ -47,7 +47,7 @@ const people = [
   { name: 'Sadia Islam', email: 'sadia@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 2650, location: 'Mirpur', bio: 'Final year vet student. First aid, deworming and the monthly vaccination camp in Mirpur.' },
   { name: 'Rafiq Ahmed', email: 'rafiq@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 1800, location: 'Gulshan', bio: 'Weekend volunteer. Mostly cats around Gulshan 2 and adoption day logistics.' },
   { name: 'Arif Chowdhury', email: 'arif@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 950, location: 'Badda', bio: 'Tea stall on Link Road. The dogs here know the sound of my shutter opening.' },
-  { name: 'Priya Das', email: 'priya@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 1400, location: 'Mohammadpur', bio: 'Feeding the bazaar dogs with my mother since 2019.' },
+  { name: 'Priya Das', email: 'priya@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 1400, location: 'Mohammadpur', bio: 'মায়ের সাথে ২০১৯ থেকে মোহাম্মদপুর বাজারের কুকুরগুলোকে খাওয়াই।' },
   { name: 'Mehedi Khan', email: 'mehedi@straybachao.com', password: 'Donor@1234', role: 'donor', points: 6000, location: 'Banani', bio: '' },
   { name: 'Farhana Akter', email: 'farhana@straybachao.com', password: 'Donor@1234', role: 'donor', points: 4500, location: 'Moghbazar', bio: '' },
 ];
@@ -56,7 +56,7 @@ const people = [
 const teams = [
   { id: 'TEAM-01', name: 'Dhanmondi Street Feeders', area: 'Dhanmondi', category: 'Rescue', crew: ['nabila', 'sadia', 'priya'],
     description: 'Evening feeding route around Dhanmondi lake and Road 27. We meet at 8 pm by the Rabindra Sarobar steps.',
-    log: [['nabila', 'Fed 11 at the lake tonight. The brown mother is back with four pups.', 52], ['priya', 'Bought two bags of kibble with the PetPoints Mehedi sent. Thank you!', 30], ['nabila', 'Road 27 boy with the sore eye is going to the clinic tomorrow with Tanvir.', 6]] },
+    log: [['nabila', 'Fed 11 at the lake tonight. The brown mother is back with four pups.', 52], ['priya', 'মেহেদি ভাইয়ের পাঠানো পেটপয়েন্ট দিয়ে দুই ব্যাগ খাবার কিনলাম। অনেক ধন্যবাদ!', 30], ['nabila', 'Road 27 boy with the sore eye is going to the clinic tomorrow with Tanvir.', 6]] },
   { id: 'TEAM-02', name: 'Night Rescue Unit', area: 'Uttara', category: 'Rescue', crew: ['tanvir', 'rafiq', 'arif'],
     description: 'On call after dark for injured animals and road accidents. Message the lead first if it is urgent.',
     log: [['tanvir', 'Picked up a hit-and-run puppy near Sector 7 at 1 am. Stable at the clinic.', 70], ['arif', 'Can cover the Badda side on Thursdays now.', 20]] },
@@ -67,8 +67,8 @@ const teams = [
     description: 'Keeping count of the cat colonies around the Gulshan and Banani markets, and finding fosters for kittens.',
     log: [['rafiq', 'Started this so the cat people have their own corner.', 40]] },
   { id: 'TEAM-05', name: 'Badda Link Road Patrol', area: 'Badda', category: 'Rescue', crew: ['arif', 'tanvir'],
-    description: 'Water points and a daily check on the dogs along Link Road and the rail crossing.',
-    log: [['arif', 'Filled all six water bowls. The heat is bad this week.', 18]] },
+    description: 'লিংক রোড আর রেলক্রসিংয়ের পাশের কুকুরগুলোর জন্য পানির পাত্র আর প্রতিদিনের খোঁজখবর।',
+    log: [['arif', 'ছয়টা পানির পাত্রই ভরে দিয়েছি। এই সপ্তাহে গরম খুব বেশি।', 18]] },
 ];
 
 // photos in backend/seed-photos, stored in the database the same way an upload is
@@ -78,10 +78,10 @@ const rescues = [
   ['sadia', 'street-dinner.jpg', 'Mirpur', 'Night round done. 14 dogs fed between Mirpur 10 and 11. The black one ate twice, she is nursing somewhere close.', 9],
   ['tanvir', 'white-kitten.jpg', 'Uttara', 'Tiny white kitten crying under a parked CNG in Sector 7. No mother in two hours. Taking her home for tonight.', 20],
   ['farhana', 'cat-colony.jpg', 'Moghbazar', 'The cat colony behind the Moghbazar flyover is up to five now. Two look young enough for the next camp.', 28],
-  ['arif', 'road-dog.jpg', 'Badda', 'Lying in the middle of the lane off Link Road and not moving much in this heat. Gave water. Can someone check tonight?', 34],
+  ['arif', 'road-dog.jpg', 'Badda', 'লিংক রোডের গলির মাঝখানে শুয়ে আছে, এই গরমে প্রায় নড়ছেই না। পানি দিয়েছি। আজ রাতে কেউ একবার দেখে আসতে পারবেন?', 34],
   ['mehedi', 'bowl-dog.jpg', 'Banani', 'Water bowl is back outside the Banani 11 tea stall. The owner says we can refill it every morning.', 47],
   ['rafiq', 'ledge-cat.jpg', 'Gulshan', 'On the wall behind Gulshan 2 market. Eating fine but her ear is torn. Flagging it for the cat team.', 60],
-  ['priya', 'mohammadpur-dog.jpg', 'Mohammadpur', 'This girl sleeps outside the Town Hall bazaar every afternoon. Very thin. Left rice and an egg.', 75],
+  ['priya', 'mohammadpur-dog.jpg', 'Mohammadpur', 'টাউন হল বাজারের সামনে রোজ দুপুরে এই মেয়েটা ঘুমায়। খুব রোগা। ভাত আর একটা ডিম দিয়ে এসেছি।', 75],
   ['tanvir', 'pack.jpg', 'Uttara', 'Pack of four near the Sector 13 park, one limping on his front leg. They know us now, so we can get close.', 100],
   ['sadia', 'calico.jpg', 'Mirpur', 'Vaccinated this one at the Mirpur camp. Sat through it like a champion.', 130],
 ];
