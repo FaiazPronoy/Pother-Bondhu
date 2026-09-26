@@ -72,11 +72,11 @@ function Hero({ stats, latest, faces }) {
             )}
           </figure>
 
-          <h1 className={`mt-7 font-semibold text-balance ${size}`}>
-            <span className="block">{t("landing.title1")}</span>
-            <span className="block mt-1 italic text-clay">
-              <span className="squiggle">{t("landing.title2")}</span>
-            </span>
+          <h1 className={`mt-7 font-semibold sm:w-fit ${size}`}>
+            {t("landing.title1").split("|").map((line) => <span key={line} className="block">{line}</span>)}
+            <span className="block mt-1 italic text-clay"><span className="squiggle">{t("landing.title2a")}</span></span>
+            {/* the last line steps across to the right, so the three lines read like a stair */}
+            <span className="block mt-1 italic text-clay sm:text-right"><span className="squiggle">{t("landing.title2b")}</span></span>
           </h1>
 
           <p className="mt-6 text-lg sm:text-xl text-ink-2 max-w-[34rem] text-pretty">{t("landing.lead")}</p>

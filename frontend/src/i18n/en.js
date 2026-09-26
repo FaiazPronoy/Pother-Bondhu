@@ -60,8 +60,10 @@ const en = {
     photos: 'Photos from',
   },
   landing: {
-    title1: 'A little care, a little light,',
-    title2: 'can make their world feel right.',
+    // the | marks where the line breaks
+    title1: 'A little care,|a little light,',
+    title2a: 'can make their',
+    title2b: 'world feel right.',
     mottoGloss: "They can't speak. We can.",
     lead: "Seen a dog, cat or bird that's hurt, hungry or scared? Post a photo. Volunteers nearby see it, and a team close by goes to help.",
     join: 'Join StrayBachao',
