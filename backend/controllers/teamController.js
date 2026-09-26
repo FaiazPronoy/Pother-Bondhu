@@ -7,11 +7,23 @@ import userModel from "../models/userModel.js";
 
 export const createTeam = async (req, res) => {
   try {
-    const { teamName, location, teamType } = req.body;
+    const { teamName, location, teamType, description } = req.body;
+    const name = String(teamName || '').trim();
+
+    if (req.user.role !== 'volunteer') {
+      return res.status(403).json({ message: "Only volunteers can start a team" });
+    }
+    if (!name || name.length > 60) {
+      return res.status(400).json({ message: "Give the team a name (up to 60 characters)" });
+    }
+    if (teamType && !['Rescue', 'Medical', 'Other'].includes(teamType)) {
+      return res.status(400).json({ message: "Unknown team type" });
+    }
 
     const team = await Team.create({
-      name: teamName,
-      area: location,
+      name,
+      area: String(location || '').slice(0, 60),
+      description: String(description || '').slice(0, 500),
       creator: req.userId,
       members: [req.userId], 
       category: teamType || 'Rescue',
@@ -29,12 +41,21 @@ export const postTeamActivity = async (req, res) => {
     const { teamId } = req.params;
     const { message } = req.body;
 
-    const team = await Team.findById(teamId);
-    if (!team || team.creator.toString() !== req.userId) {
-      return res.status(403).json({ error: "Only the team creator can post updates" });
+    const text = String(message || '').trim();
+    if (!text || text.length > 280) {
+      return res.status(400).json({ error: "Write an update of up to 280 characters" });
+    }
+    if (!mongoose.Types.ObjectId.isValid(teamId)) {
+      return res.status(404).json({ error: "Team not found" });
     }
 
-    team.activities.push({ message });
+    const team = await Team.findById(teamId);
+    if (!team) return res.status(404).json({ error: "Team not found" });
+    if (!team.members.some((m) => m.toString() === req.userId)) {
+      return res.status(403).json({ error: "Only team members can post updates" });
+    }
+
+    team.activities.push({ message: text });
     await team.save();
 
     res.json(team.activities);
@@ -45,10 +66,8 @@ export const postTeamActivity = async (req, res) => {
 
 export const getMyTeams = async (req, res) => {
   try {
-    console.log('Fetching teams created by user:', req.userId);
-
-    // Get teams where the user is the creator
-    const teams = await Team.find({ creator: req.userId }).lean();
+    // teams the user started or has joined
+    const teams = await Team.find({ members: req.userId }).lean();
 
     if (!teams || teams.length === 0) {
       return res.json([]);
@@ -119,7 +138,6 @@ export const getAllTeams = async (req, res) => {
       .populate('creator', 'name')
       .populate('members', 'name')
       .lean();
-    console.log(teams)
     res.status(200).json(teams);
   } catch (err) {
     console.error('Error fetching teams:', err);
@@ -199,7 +217,6 @@ export const listTeams = async (req, res) => {
 export const getTeamByKey = async (req, res) => {
   try {
     const rawKey = (req.params.key || '').trim();
-    console.log('[getTeamByKey] key=', rawKey);
 
     if (!rawKey) {
       return res.status(400).json({ message: 'Missing team key' });
@@ -239,7 +256,6 @@ export const getTeamByKey = async (req, res) => {
     }
 
     if (!team) {
-      console.warn('[getTeamByKey] not found for key:', rawKey);
       return res.status(404).json({ message: 'Team not found' });
     }
 

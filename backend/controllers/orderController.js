@@ -4,106 +4,98 @@ import User from '../models/userModel.js';
 import Product from '../models/ProductModel.js'; 
 import mongoose from 'mongoose';
 
-// Place an order
+// Place an order.
+// Stock and points are taken with conditional updates ("only if there is
+// enough"), so two orders arriving together cannot both spend the same
+// points or the last item. If a later step fails, the earlier ones are put back.
 export const placeOrder = async (req, res) => {
+  const userId = req.userId;
+  const { items, name, phone, address, shipping, promo, donation } = req.body;
+
+  if (!items || !name || !phone || !address || !shipping) {
+    return res.status(400).json({ success: false, message: "Please fill in all required fields." });
+  }
+  if (!Array.isArray(items) || items.length === 0) {
+    return res.status(400).json({ success: false, message: "Your cart is empty." });
+  }
+
+  const donationPoints = Number(donation) || 0;
+  if (donationPoints < 0 || !Number.isInteger(donationPoints)) {
+    return res.status(400).json({ success: false, message: "Donation must be a whole number of points." });
+  }
+
+  const taken = []; // stock already reserved, so it can be returned on failure
+  let charged = 0;
+  const giveBack = () => Promise.all(taken.map((t) =>
+    Product.updateOne({ _id: t._id }, { $inc: { stockQuantity: t.quantity } })));
+
   try {
-    const userId = req.userId;
-    const { items, name, phone, address, shipping, promo, donation } = req.body;
-
-    if (!items || !name || !phone || !address || !shipping) {
-      return res.status(400).json({ success: false, message: "Please fill in all required fields." });
-    }
-
-    if (!Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ success: false, message: "Your cart is empty." });
-    }
-
-    const donationPoints = Number(donation) || 0;
-    if (donationPoints < 0) {
-      return res.status(400).json({ success: false, message: "Donation cannot be negative." });
-    }
-
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ success: false, message: "User not found." });
-
-    let totalPoints = 0;
-    const resolvedItems = []; // keep the resolved DB products  quantities
-
-
-    // Validate and calculate total points
+    // the same product twice in one order counts as one line
+    const wanted = new Map();
     for (const item of items) {
-      //const product = await Product.findOne({ id: item._id });
-      const key = item.id || item._id;
-      let product = await Product.findOne({ id: key });
-      if (!product && mongoose.Types.ObjectId.isValid(key)) {
-          product = await Product.findById(key);
-      }
-
-      if (!product) {
-        return res.status(400).json({ success: false, message: `Product not found: ${item.name || key}` });
-      }
-
+      const key = String(item.id || item._id || '');
       const quantity = Number(item.quantity);
       if (!Number.isInteger(quantity) || quantity < 1) {
-        return res.status(400).json({ success: false, message: `Invalid quantity for ${product.name}` });
+        return res.status(400).json({ success: false, message: `Invalid quantity for ${item.name || key}` });
       }
-
-      if (product.stockQuantity < quantity) {
-        return res.status(400).json({ success: false, message: `Not enough stock for ${item.name}` });
-      }
-
-      totalPoints += Number(product.sellingPrice) * quantity;
-      resolvedItems.push({
-              id: product.id,
-              _id: product._id,
-              name: product.name,
-              imageUrl: product.imageUrl,
-              quantity,
-              sellingPrice: Number(product.sellingPrice),
-              purchaseCost: Number(product.purchaseCost) || 0
-      });
+      wanted.set(key, (wanted.get(key) || 0) + quantity);
     }
 
+    const lines = [];
+    let totalPoints = 0;
+    for (const [key, quantity] of wanted) {
+      let product = await Product.findOne({ id: key });
+      if (!product && mongoose.Types.ObjectId.isValid(key)) product = await Product.findById(key);
+      if (!product) {
+        return res.status(400).json({ success: false, message: `Product not found: ${key}` });
+      }
+      lines.push({ product, quantity });
+      totalPoints += Number(product.sellingPrice) * quantity;
+    }
     totalPoints += donationPoints;
 
-    if (user.points < totalPoints) {
+    for (const { product, quantity } of lines) {
+      const got = await Product.updateOne(
+        { _id: product._id, stockQuantity: { $gte: quantity } },
+        { $inc: { stockQuantity: -quantity } }
+      );
+      if (got.modifiedCount !== 1) {
+        await giveBack();
+        return res.status(400).json({ success: false, message: `Not enough stock for ${product.name}` });
+      }
+      taken.push({ _id: product._id, quantity });
+    }
+
+    const paid = await User.updateOne(
+      { _id: userId, points: { $gte: totalPoints } },
+      { $inc: { points: -totalPoints } }
+    );
+    if (paid.modifiedCount !== 1) {
+      await giveBack();
       return res.status(400).json({ success: false, message: "Not enough PetPoints." });
     }
+    charged = totalPoints;
 
-    const newOrder = new Order({
+    const newOrder = await Order.create({
       userId,
-      items: resolvedItems.map(({ _id, name, imageUrl, quantity, sellingPrice, purchaseCost }) => ({
-        productId: _id, name, imageUrl, quantity, sellingPrice, purchaseCost
+      items: lines.map(({ product, quantity }) => ({
+        productId: product._id,
+        name: product.name,
+        imageUrl: product.imageUrl,
+        quantity,
+        sellingPrice: Number(product.sellingPrice),
+        purchaseCost: Number(product.purchaseCost) || 0,
       })),
-      userInfo: {
-        name,
-        phone,
-        address,
-        shipping,
-        promo
-      },
-      donation,
-      totalPoints
+      userInfo: { name, phone, address, shipping, promo },
+      donation: donationPoints,
+      totalPoints,
     });
 
-    await newOrder.save();
-
-    // Deduct stock and update products
-    for (const it of resolvedItems) {
-      await Product.updateOne(
-        { id: it.id },
-        { $inc: { stockQuantity: -it.quantity } 
-      });
-    }
-
-    // Deduct PetPoints
-    user.points -= totalPoints;
-    await user.save();
-
-    res.status(200).json({ success: true, message: "Order placed successfully." });
-
+    res.status(200).json({ success: true, message: "Order placed successfully.", orderId: newOrder._id });
   } catch (error) {
     console.error("Order placement error:", error);
+    await giveBack().catch(() => {});
+    if (charged) await User.updateOne({ _id: userId }, { $inc: { points: charged } }).catch(() => {});
     res.status(500).json({ success: false, message: "Internal server error." });
   }
 };

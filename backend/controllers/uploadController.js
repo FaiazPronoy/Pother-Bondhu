@@ -1,50 +1,53 @@
+import mongoose from "mongoose";
 import RescueImage from "../models/imageModel.js";
-import upload  from '../utils/upload.js'; // Uncomment this
-import fs from 'fs';
-import path from 'path';
-
-// Ensure upload directory exists
-const initUploadDir = () => {
-  const uploadDir = path.join(process.cwd(), 'uploads', 'rescue-images');
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
-};
-initUploadDir();
-
+import { looksLikeImage } from "../utils/upload.js";
 
 export const uploadImage = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No image uploaded" });
     }
+    if (!looksLikeImage(req.file.buffer)) {
+      return res.status(400).json({ error: "That file is not a photo" });
+    }
 
-    const imageUrl = `/uploads/rescue-images/${req.file.filename}`;
-    const caption = req.body.caption;
-    const { userId } = req;
+    const caption = String(req.body.caption || '').trim().slice(0, 500);
+    const area = String(req.body.area || '').trim().slice(0, 60);
+    const _id = new mongoose.Types.ObjectId();
+    const imageUrl = `/api/upload/rescue/${_id}`;
 
-    const rescueImage = new RescueImage({
-      userId,
-      imageUrl,
-      caption,
-      createdAt: new Date(),
+    await RescueImage.create({
+      _id, userId: req.userId, imageUrl, caption, area,
+      data: req.file.buffer, contentType: req.file.mimetype,
     });
 
-    await rescueImage.save();
-
-    res.status(201).json({
-      message: "Image uploaded successfully",
-      imageUrl,
-      caption,
-    });
+    res.status(201).json({ message: "Image uploaded successfully", imageUrl, caption, _id });
   } catch (error) {
     console.error("Upload error:", error);
-    
-    // Clean up uploaded file if error occurred
-    if (req.file) {
-      fs.unlinkSync(path.join(process.cwd(), req.file.path));
-    }
-    
     res.status(500).json({ error: "Server error during upload" });
   }
+};
+
+export const serveImage = async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.status(404).end();
+  const image = await RescueImage.findById(req.params.id).select('+data +contentType');
+  if (!image || !image.data) return res.status(404).end();
+  res.set('Content-Type', image.contentType);
+  res.set('Cache-Control', 'public, max-age=604800, immutable');
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.send(image.data);
+};
+
+// the latest rescue posts from everyone, for the home page feed
+export const recentRescues = async (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit, 10) || 9, 24);
+  const posts = await RescueImage.find()
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .populate('userId', 'name location')
+    .lean();
+  res.json(posts.map((p) => ({
+    _id: p._id, imageUrl: p.imageUrl, caption: p.caption, area: p.area, createdAt: p.createdAt,
+    volunteer: p.userId ? { _id: p.userId._id, name: p.userId.name, location: p.userId.location } : null,
+  })));
 };

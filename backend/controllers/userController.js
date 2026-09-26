@@ -31,15 +31,23 @@ export const getUserData = async (req, res) => {
 
 export const setUserData = async (req, res) => {
   const { userId } = req;
-  const { name, location, bio } = req.body;
+  const { name, location, bio, role } = req.body;
 
-  // only name, location and bio are updatable here
+  // only name, location, bio, and switching between donor and volunteer
   const updates = {};
-  if (name !== undefined) updates.name = name;
-  if (location !== undefined) updates.location = location;
-  if (bio !== undefined) updates.bio = bio;
+  if (name !== undefined) updates.name = String(name).trim().slice(0, 60);
+  if (location !== undefined) updates.location = String(location).slice(0, 60);
+  if (bio !== undefined) updates.bio = String(bio).slice(0, 500);
 
   try {
+    if (role === 'donor' || role === 'volunteer') {
+      const current = await userModel.findById(userId).select('role');
+      if (current && current.role !== 'admin') updates.role = role;
+    }
+    if (updates.name === '') {
+      return res.status(400).json({ error: "Name cannot be empty" });
+    }
+
     const updatedUser = await userModel.findByIdAndUpdate(userId, updates, { new: true, runValidators: true }).select("-password");
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });

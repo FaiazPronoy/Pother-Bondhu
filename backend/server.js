@@ -2,8 +2,6 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
-import path from "path";
-import { fileURLToPath } from "url";
 
 import connectDB from "./config/mongodb.js";
 import authRouter from "./routes/authRoutes.js";
@@ -23,8 +21,8 @@ const port = process.env.PORT || 4000;
 // ✅ Database connect
 connectDB();
 
-// ✅ Allowed origins
-const allowedOrigins = ["http://localhost:5173"];
+// the site the API accepts cookies from; a comma separated list in production
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173").split(",").map((s) => s.trim());
 
 // ✅ Middlewares
 app.use(express.json({ limit: "10mb" }));
@@ -32,10 +30,6 @@ app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
-// ✅ Static file serve
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ✅ API Endpoints
 app.get("/", (req, res) => res.send("API Working"));

@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import userModel from '../models/userModel.js';
 import RescueImage from '../models/imageModel.js';
 import escapeRegex from '../utils/escapeRegex.js';
@@ -25,8 +26,10 @@ export const volunteers = async (req, res) => {
 export const getVolunteerProfile = async (req, res) => {
   try {
     const { id } = req.params;
-    
-    // Get volunteer info
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({ message: 'Volunteer not found' });
+    }
+
     const volunteer = await userModel.findById(id)
       .select('-password -email');
     
@@ -93,29 +96,29 @@ export const donateToVolunteer = async (req, res) => {
       return res.status(400).json({ message: 'Amount must be a positive whole number.' });
     }
 
-    const volunteer = await userModel.findById(id);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(404).json({ message: 'Volunteer not found.' });
+    }
+    const volunteer = await userModel.findById(id).select('role');
     if (!volunteer || volunteer.role !== 'volunteer') {
       return res.status(404).json({ message: 'Volunteer not found.' });
     }
-
     if (volunteer._id.toString() === req.userId) {
       return res.status(400).json({ message: 'You cannot donate to yourself.' });
     }
 
-    const donor = await userModel.findById(req.userId);
-    if (!donor) {
-      return res.status(404).json({ message: 'Donor not found.' });
-    }
-    if (donor.points < points) {
+    // take from the donor only if they still have it, then add with $inc, so
+    // two donations landing together are both counted
+    const taken = await userModel.updateOne(
+      { _id: req.userId, points: { $gte: points } },
+      { $inc: { points: -points } }
+    );
+    if (taken.modifiedCount !== 1) {
       return res.status(400).json({ message: 'Not enough PetPoints to donate.' });
     }
+    const updated = await userModel.findByIdAndUpdate(id, { $inc: { points } }, { new: true }).select('points');
 
-    donor.points -= points;
-    volunteer.points += points;
-    await donor.save();
-    await volunteer.save();
-
-    res.status(200).json({ message: 'Donation successful', updatedPoints: volunteer.points });
+    res.status(200).json({ message: 'Donation successful', updatedPoints: updated.points });
   } catch (err) {
     console.error('Donate Error:', err);
     res.status(500).json({ message: 'Server error' });
