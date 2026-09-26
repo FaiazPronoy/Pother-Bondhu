@@ -75,8 +75,8 @@
 }
 
 @theme {
-  --font-sans: "Figtree", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans: "Figtree", "Noto Sans Bengali", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --font-display: "Fraunces", "Tiro Bangla", Georgia, "Times New Roman", serif;
   --font-bangla: "Tiro Bangla", "Noto Serif Bengali", serif;
 
   /* The admin screens were written against Tailwind's blue, purple and
@@ -142,6 +142,15 @@
   }
 
   ::selection { background: var(--sb-clay-lo); color: var(--sb-ink); }
+
+  /* Bangla letters sit taller, with marks above and below the line, so they
+     need more room between lines and no tightened letter spacing */
+  html[lang="bn"] body { line-height: 1.75; }
+  html[lang="bn"] h1, html[lang="bn"] h2, html[lang="bn"] h3, html[lang="bn"] h4 {
+    letter-spacing: 0;
+    line-height: 1.35;
+  }
+  html[lang="bn"] .eyebrow { letter-spacing: .02em; font-size: .85rem; }
 
   :focus-visible {
     outline: 3px solid var(--sb-sun);

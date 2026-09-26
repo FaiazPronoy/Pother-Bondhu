@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Eye, EyeOff, PawPrint } from "lucide-react";
+import { Eye, EyeOff, PawPrint, Languages } from "lucide-react";
+import { useLang } from "../context/LangContext";
 
-// areas the teams and volunteers are spread across; used by every picker
+// areas the teams and volunteers are spread across; used by every picker.
+// Stored in English, shown in the reader's language through area().
 export const AREAS = [
   "Badda", "Banani", "Bashundhara", "Dhanmondi", "Gulshan", "Mirpur",
   "Moghbazar", "Mohammadpur", "Puran Dhaka", "Uttara",
@@ -10,13 +12,25 @@ export const AREAS = [
 
 export function Wordmark({ className = "", size = "text-2xl" }) {
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
+    <span className={`inline-flex items-center gap-2 ${className}`} lang="en">
       <img src="/paw-heart.svg" alt="" className="w-9 h-9 shrink-0" />
       <span className={`font-display font-semibold tracking-tight leading-none ${size}`}>
         <span className="italic font-normal">Stray</span>
         <span className="text-clay">Bachao</span>
       </span>
     </span>
+  );
+}
+
+// switches the whole interface between English and Bangla
+export function LangButton({ className = "" }) {
+  const { t, toggle } = useLang();
+  return (
+    <button type="button" onClick={toggle} aria-label={t("common.toOtherLang")}
+      className={`inline-flex items-center gap-1.5 min-h-11 px-3 rounded-full font-semibold text-ink-2 hover:text-ink hover:bg-sunken ${className}`}>
+      <Languages size={18} aria-hidden="true" />
+      <span>{t("common.otherLang")}</span>
+    </button>
   );
 }
 
@@ -40,8 +54,8 @@ export function PageHeader({ eyebrow, title, children, action }) {
     <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="max-w-2xl">
         {eyebrow && <p className="eyebrow mb-2">{eyebrow}</p>}
-        <h1 className="text-3xl sm:text-4xl font-semibold">{title}</h1>
-        {children && <p className="mt-3 text-ink-2 text-lg">{children}</p>}
+        <h1 className="text-3xl sm:text-4xl font-semibold text-balance">{title}</h1>
+        {children && <p className="mt-3 text-ink-2 text-lg text-pretty">{children}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </header>
@@ -53,15 +67,16 @@ export function Empty({ title, children, action }) {
     <div className="card p-10 text-center">
       <PawPrint className="mx-auto mb-3 text-line-2" size={40} aria-hidden="true" />
       <h3 className="text-xl font-semibold">{title}</h3>
-      {children && <p className="mt-2 text-ink-2 max-w-md mx-auto">{children}</p>}
+      {children && <p className="mt-2 text-ink-2 max-w-md mx-auto text-pretty">{children}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>
   );
 }
 
 export function Loading({ rows = 3 }) {
+  const { t } = useLang();
   return (
-    <div className="space-y-4" role="status" aria-label="Loading">
+    <div className="space-y-4" role="status" aria-label={t("common.loading")}>
       {Array.from({ length: rows }, (_, i) => (
         <div key={i} className="skeleton h-24" />
       ))}
@@ -70,6 +85,7 @@ export function Loading({ rows = 3 }) {
 }
 
 export function PasswordField({ id, label, value, onChange, autoComplete = "current-password", name = "password", hint }) {
+  const { t } = useLang();
   const [shown, setShown] = useState(false);
   return (
     <div>
@@ -89,7 +105,7 @@ export function PasswordField({ id, label, value, onChange, autoComplete = "curr
           type="button"
           onClick={() => setShown((s) => !s)}
           className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 grid place-items-center rounded-full text-ink-2 hover:text-ink hover:bg-sunken"
-          aria-label={shown ? "Hide password" : "Show password"}
+          aria-label={shown ? t("login.hidePw") : t("login.showPw")}
           aria-pressed={shown}
         >
           {shown ? <EyeOff size={19} /> : <Eye size={19} />}
@@ -101,32 +117,22 @@ export function PasswordField({ id, label, value, onChange, autoComplete = "curr
 }
 
 export function Points({ value, className = "" }) {
+  const { t, num } = useLang();
   return (
     <span className={`inline-flex items-baseline gap-1 font-semibold tabular-nums ${className}`}>
-      {Number(value || 0).toLocaleString("en-IN")}
-      <span className="text-[.8em] font-medium opacity-80">PetPoints</span>
+      {num(value)}
+      <span className="text-[.8em] font-medium opacity-80">{t("common.points")}</span>
     </span>
   );
 }
 
-export function timeAgo(date) {
-  const s = Math.max(1, Math.floor((Date.now() - new Date(date)) / 1000));
-  if (s < 60) return "just now";
-  const m = Math.floor(s / 60);
-  if (m < 60) return `${m} min ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h} hr${h > 1 ? "s" : ""} ago`;
-  const d = Math.floor(h / 24);
-  if (d < 30) return `${d} day${d > 1 ? "s" : ""} ago`;
-  return new Date(date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-}
-
-export function SignInPrompt({ children = "Sign in to do this." }) {
+export function SignInPrompt({ children }) {
   const location = useLocation();
+  const { t } = useLang();
   return (
     <div className="card p-6 text-center">
-      <p className="text-ink-2 mb-4">{children}</p>
-      <Link to="/login" state={{ from: location.pathname }} className="btn btn-clay">Sign in</Link>
+      <p className="text-ink-2 mb-4">{children || t("common.signInTo")}</p>
+      <Link to="/login" state={{ from: location.pathname }} className="btn btn-clay">{t("common.signIn")}</Link>
     </div>
   );
 }

@@ -10,19 +10,22 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..800,50;1,9..144,400..700,50&family=Figtree:wght@400;500;600;700&family=Tiro+Bangla:ital@0;1&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..800,50;1,9..144,400..700,50&family=Figtree:wght@400;500;600;700&family=Tiro+Bangla:ital@0;1&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
     />
-    <title>StrayBachao: An Animal Rescue Network</title>
+    <title>StrayBachao | An Animal Rescue Network</title>
     <script>
       // set the theme before first paint so a dark-mode visitor never sees a cream flash
-      try { if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark'); } catch (e) {}
+      try {
+        if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+        if (localStorage.getItem('lang') === 'bn') document.documentElement.lang = 'bn';
+      } catch (e) {}
     </script>
   </head>
   <body>
     <div id="root"></div>
     <noscript>
       <p style="font-family:sans-serif;padding:2rem;text-align:center">
-        StrayBachao needs JavaScript switched on to load rescues and teams.
+        StrayBachao needs JavaScript switched on to load rescues and teams.<br />রেসকিউ আর টিম দেখতে JavaScript চালু করুন।
       </p>
     </noscript>
     <script type="module" src="/src/main.jsx"></script>

@@ -3,13 +3,15 @@ import { Package, Menu, ClipboardList, Wallet, LayoutDashboard, Users, LogOut, S
 import { Link, useNavigate } from 'react-router-dom';
 import { DarkmodeContext } from '../context/DarkmodeContext';
 import { AppContext } from '../context/AppContext';
-import { Wordmark } from './bits';
+import { Wordmark, LangButton } from './bits';
+import { useLang } from '../context/LangContext';
 
 const AdminNavbar = ({ isSidebarOpen, toggleSidebar, activeTab, setActiveTab }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { isDarkMode, toggleDarkMode } = useContext(DarkmodeContext);
   const { logout } = useContext(AppContext);
+  const { t } = useLang();
   const SidebarItem = ({ icon, label, showLabel, onClick, isActive }) => {
     let baseClasses = 'flex items-center gap-2 cursor-pointer transition-colors duration-200';
     const activeColour = isDarkMode ? 'text-blue-300' : 'text-blue-800';
@@ -54,7 +56,7 @@ const AdminNavbar = ({ isSidebarOpen, toggleSidebar, activeTab, setActiveTab }) 
     >
       <div className="flex items-center justify-between mb-6">
         {isSidebarOpen ? (
-          <Link to="/" aria-label="Back to the site" className={isDarkMode ? 'text-white' : 'text-gray-900'}>
+          <Link to="/" aria-label={t("admin.backToSite")} className={isDarkMode ? 'text-white' : 'text-gray-900'}>
             <Wordmark size="text-xl" />
           </Link>
         ) : (
@@ -65,37 +67,39 @@ const AdminNavbar = ({ isSidebarOpen, toggleSidebar, activeTab, setActiveTab }) 
           onClick={toggleSidebar}
           className={`text-white bg-transparent border-none p-0 transition-all duration-300 ${!isSidebarOpen ? 'mr-1' : '' // Add margin-left when sidebar is off
             }`}
-          aria-label={isSidebarOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+          aria-label={isSidebarOpen ? t("admin.collapse") : t("admin.expand")}
         >
           <Menu className={`text-xl font-boldest ${isDarkMode ? 'text-white' : 'text-blue-800'}`} size={isSidebarOpen ? 24 : 30} />
         </button>
       </div>
       <nav className="space-y-4">
         <Link to="/admindashboard" style={{ textDecoration: 'none' }}>
-          <SidebarItem icon={<LayoutDashboard />} label="Dashboard" showLabel={isSidebarOpen} onClick={() => setActiveTab('Dashboard')} isActive={activeTab === 'Dashboard'} />
+          <SidebarItem icon={<LayoutDashboard />} label={t("admin.dashboard")} showLabel={isSidebarOpen} onClick={() => setActiveTab('Dashboard')} isActive={activeTab === 'Dashboard'} />
         </Link>
         <Link to="/adminproducts" style={{ textDecoration: 'none' }}>
-          <SidebarItem icon={<Package />} label="Products" showLabel={isSidebarOpen} onClick={() => setActiveTab('Products')} isActive={activeTab === 'Products'} />
+          <SidebarItem icon={<Package />} label={t("admin.products")} showLabel={isSidebarOpen} onClick={() => setActiveTab('Products')} isActive={activeTab === 'Products'} />
         </Link>
         <Link to="/adminorders" style={{ textDecoration: 'none' }}>
-          <SidebarItem icon={<ClipboardList />} label="Orders" showLabel={isSidebarOpen} onClick={() => setActiveTab('Orders')} isActive={activeTab === 'Orders'} />
+          <SidebarItem icon={<ClipboardList />} label={t("admin.orders")} showLabel={isSidebarOpen} onClick={() => setActiveTab('Orders')} isActive={activeTab === 'Orders'} />
         </Link>
         <Link to="/adminvolunteers" style={{ textDecoration: 'none' }}>
-          <SidebarItem icon={<Users />} label="Volunteers" showLabel={isSidebarOpen} onClick={() => setActiveTab('Volunteers')} isActive={activeTab === 'Volunteers'} />
+          <SidebarItem icon={<Users />} label={t("admin.volunteers")} showLabel={isSidebarOpen} onClick={() => setActiveTab('Volunteers')} isActive={activeTab === 'Volunteers'} />
         </Link>
         <Link to="/adminrevenue" style={{ textDecoration: 'none' }}>
-          <SidebarItem icon={<Wallet />} label="Revenue & Profit" showLabel={isSidebarOpen} onClick={() => setActiveTab('Revenue & Profit')} isActive={activeTab === 'Revenue & Profit'} />
+          <SidebarItem icon={<Wallet />} label={t("admin.revenue")} showLabel={isSidebarOpen} onClick={() => setActiveTab('Revenue & Profit')} isActive={activeTab === 'Revenue & Profit'} />
         </Link>
         <div style={{ textDecoration: 'none' }}>
           <SidebarItem
             icon={<LogOut />}
-            label="Log Out"
+            label={t("admin.logout")}
             showLabel={isSidebarOpen}
             onClick={() => setIsDialogOpen(true)}
             isActive={false}
           />
         </div>
       </nav>
+
+      {isSidebarOpen && <LangButton className={`mt-4 ${isDarkMode ? '!text-gray-300 hover:!text-white hover:!bg-white/10' : ''}`} />}
 
       <button
         onClick={toggleDarkMode}
@@ -111,23 +115,23 @@ const AdminNavbar = ({ isSidebarOpen, toggleSidebar, activeTab, setActiveTab }) 
         <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-md">
           <div className={`rounded-lg shadow-lg p-6 w-full max-w-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>
             <h2 className={`text-lg font-semibold text-center mb-2 ${isDarkMode ? 'text-white' : 'text-blue-700'}`}>
-              Are you sure?
+              {t("admin.sure")}
             </h2>
             <p className={`text-sm text-center mb-4 ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
-              Do you want to log out?
+              {t("admin.logoutQ")}
             </p>
             <div className="flex justify-center">
               <button
                 onClick={handleLogout}
                 className="bg-blue-600 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                Yes
+                {t("admin.yes")}
               </button>
               <button
                 onClick={() => setIsDialogOpen(false)}
                 className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                No
+                {t("admin.no")}
               </button>
             </div>
           </div>

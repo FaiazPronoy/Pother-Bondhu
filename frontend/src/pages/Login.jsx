@@ -3,13 +3,15 @@ import { Link, useNavigate, useLocation, useSearchParams } from "react-router-do
 import { toast } from "react-toastify";
 import axios from "axios";
 import { AppContext } from "../context/AppContext";
-import { Wordmark, PasswordField } from "../components/bits";
+import { useLang } from "../context/LangContext";
+import { Wordmark, PasswordField, LangButton } from "../components/bits";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [params] = useSearchParams();
   const { backendUrl, checkAuthStatus, isLoggedIn } = useContext(AppContext);
+  const { t, apiError } = useLang();
 
   const redirectPath = location.state?.from || "/";
 
@@ -24,8 +26,8 @@ const Login = () => {
     return (
       <main className="min-h-screen grid place-items-center p-6 text-center">
         <div>
-          <p className="text-lg">You're already signed in.</p>
-          <Link to="/" className="btn btn-clay mt-4">Go to your rescue desk</Link>
+          <p className="text-lg">{t("login.already")}</p>
+          <Link to="/" className="btn btn-clay mt-4">{t("login.goDesk")}</Link>
         </div>
       </main>
     );
@@ -50,8 +52,8 @@ const Login = () => {
       endpoint = "/api/auth/login";
     } else {
       const { name, email, password, confirmPassword } = registerData;
-      if (password.length < 8) return toast.error("Use at least 8 characters for the password.");
-      if (password !== confirmPassword) return toast.error("The two passwords don't match.");
+      if (password.length < 8) return toast.error(t("login.shortPw"));
+      if (password !== confirmPassword) return toast.error(t("login.mismatch"));
       payload = { name: name.trim(), email: email.trim(), password };
       endpoint = "/api/auth/register";
     }
@@ -60,7 +62,8 @@ const Login = () => {
     try {
       const response = await axios.post(backendUrl + endpoint, payload);
       if (!response.data.success) {
-        toast.error(response.data.message);
+        // these routes answer 200 with success:false, so shape it like an axios error
+        toast.error(apiError({ response }, "common.wentWrong"));
         return;
       }
 
@@ -70,11 +73,11 @@ const Login = () => {
       }
 
       await checkAuthStatus();
-      toast.success(type === "Login" ? "Welcome back" : "You're in. Welcome to StrayBachao");
+      toast.success(type === "Login" ? t("login.hello") : t("login.helloNew"));
       const admin = response.data.user?.role === "admin";
       navigate(admin ? "/admindashboard" : redirectPath, { replace: true });
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Something went wrong. Try again in a moment.");
+      toast.error(apiError(error, "common.wentWrong"));
     } finally {
       setBusy(false);
     }
@@ -92,33 +95,32 @@ const Login = () => {
         <img src="/img/waiting.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1A1411]/90 via-[#1A1411]/30 to-transparent" />
         <div className="absolute bottom-0 p-12 text-[#FFF8F0] max-w-xl">
-          <p className="bn text-3xl leading-snug">ওরা কথা বলতে পারে না,<br />আমরা পারি।</p>
-          <p className="mt-4 text-lg text-[#EADBC8]">
-            They can't ask for help. So the rest of us keep an eye out, and share what we see.
-          </p>
+          <p className="font-display text-4xl leading-tight">{t("landing.title1")}<br /><span className="italic text-[#F2B659]">{t("landing.title2")}</span></p>
+          <p className="mt-4 text-lg text-[#EADBC8] text-pretty">{t("login.quote")}</p>
         </div>
       </aside>
 
       {/* form side */}
       <main id="main" className="min-h-screen flex flex-col px-5 sm:px-10 py-8 paw-trail">
-        <Link to="/" className="self-center lg:self-start" aria-label="StrayBachao home"><Wordmark /></Link>
+        <div className="flex items-center justify-between gap-3">
+          <Link to="/" aria-label={t("login.home")}><Wordmark /></Link>
+          <LangButton />
+        </div>
 
         <div className="flex-1 grid place-items-center py-10">
           <div className="w-full max-w-md">
             <h1 className="text-3xl sm:text-4xl font-semibold text-center">
-              {state === "Login" ? "Welcome back" : "Join the neighbourhood"}
+              {state === "Login" ? t("login.welcome") : t("login.joinTitle")}
             </h1>
-            <p className="mt-2 text-center text-ink-2">
-              {state === "Login"
-                ? "Sign in to post rescues, join teams and support volunteers."
-                : "It takes a minute. You can post your first rescue right after."}
+            <p className="mt-2 text-center text-ink-2 text-pretty">
+              {state === "Login" ? t("login.welcomeSub") : t("login.joinSub")}
             </p>
 
-            <div className="mt-8 grid grid-cols-2 p-1 rounded-full bg-sunken border border-line" role="tablist" aria-label="Sign in or create an account">
-              {[["Login", "Sign in"], ["Sign Up", "Create account"]].map(([key, label]) => (
+            <div className="mt-8 grid grid-cols-2 p-1 rounded-full bg-sunken border border-line" role="tablist" aria-label={t("login.tabs")}>
+              {[["Login", "login.tabIn"], ["Sign Up", "login.tabUp"]].map(([key, label]) => (
                 <button key={key} type="button" role="tab" aria-selected={state === key} onClick={() => switchTo(key)}
                   className={`min-h-11 rounded-full font-semibold transition-colors ${state === key ? "bg-card text-ink shadow" : "text-ink-2 hover:text-ink"}`}>
-                  {label}
+                  {t(label)}
                 </button>
               ))}
             </div>
@@ -126,41 +128,41 @@ const Login = () => {
             {state === "Login" ? (
               <form onSubmit={(e) => handleAuthSubmit(e, "Login")} className="mt-8 space-y-5">
                 <div>
-                  <label htmlFor="loginEmail" className="label">Email</label>
+                  <label htmlFor="loginEmail" className="label">{t("login.email")}</label>
                   <input type="email" id="loginEmail" name="email" autoComplete="email" required
                     value={loginData.email} onChange={handleLoginInputChange} className="field" />
                 </div>
-                <PasswordField id="loginPassword" label="Password" value={loginData.password} onChange={handleLoginInputChange} />
+                <PasswordField id="loginPassword" label={t("login.password")} value={loginData.password} onChange={handleLoginInputChange} />
                 <button type="submit" disabled={busy} className="btn btn-clay w-full text-base">
-                  {busy ? "Signing in…" : "Sign in"}
+                  {busy ? t("login.signingIn") : t("login.tabIn")}
                 </button>
               </form>
             ) : (
               <form onSubmit={(e) => handleAuthSubmit(e, "Sign Up")} className="mt-8 space-y-5">
                 <div>
-                  <label htmlFor="registerName" className="label">Your name</label>
+                  <label htmlFor="registerName" className="label">{t("login.name")}</label>
                   <input type="text" id="registerName" name="name" autoComplete="name" required maxLength={60}
                     value={registerData.name} onChange={handleRegisterInputChange} className="field" />
                 </div>
                 <div>
-                  <label htmlFor="registerEmail" className="label">Email</label>
+                  <label htmlFor="registerEmail" className="label">{t("login.email")}</label>
                   <input type="email" id="registerEmail" name="email" autoComplete="email" required
                     value={registerData.email} onChange={handleRegisterInputChange} className="field" />
                 </div>
-                <PasswordField id="registerPassword" label="Password" autoComplete="new-password"
-                  value={registerData.password} onChange={handleRegisterInputChange} hint="At least 8 characters." />
-                <PasswordField id="confirmPassword" name="confirmPassword" label="Password again" autoComplete="new-password"
+                <PasswordField id="registerPassword" label={t("login.password")} autoComplete="new-password"
+                  value={registerData.password} onChange={handleRegisterInputChange} hint={t("login.passwordHint")} />
+                <PasswordField id="confirmPassword" name="confirmPassword" label={t("login.passwordAgain")} autoComplete="new-password"
                   value={registerData.confirmPassword} onChange={handleRegisterInputChange} />
                 <label className="flex items-start gap-3 rounded-xl border border-line bg-card p-4 cursor-pointer">
                   <input type="checkbox" name="volunteer" checked={registerData.volunteer} onChange={handleRegisterInputChange}
                     className="mt-1 w-5 h-5 accent-[var(--sb-moss)]" />
                   <span>
-                    <span className="font-semibold block">I want to volunteer</span>
-                    <span className="text-sm text-ink-2">Volunteers can start and join teams. You can change this later.</span>
+                    <span className="font-semibold block">{t("login.wantVolunteer")}</span>
+                    <span className="text-sm text-ink-2">{t("login.wantVolunteerNote")}</span>
                   </span>
                 </label>
                 <button type="submit" disabled={busy} className="btn btn-clay w-full text-base">
-                  {busy ? "Creating your account…" : "Create account"}
+                  {busy ? t("login.creating") : t("login.create")}
                 </button>
               </form>
             )}

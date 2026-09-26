@@ -6,11 +6,13 @@ import { Heart, Wallet } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { DONATIONS } from './Cart';
 import { Empty, PageHeader, Points } from '../components/bits';
+import { useLang } from '../context/LangContext';
 
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { cart, userData, isLoggedIn, backendUrl, setCart, checkAuthStatus } = useContext(AppContext);
+  const { t, num, apiError } = useLang();
   const { from, product, donation = 0 } = location.state || {};
 
   const [includeCart, setIncludeCart] = useState(false);
@@ -40,7 +42,7 @@ const CheckoutPage = () => {
   const handleIncludeCart = () => {
     const inCart = cart.find((c) => c.id === product.id);
     if (inCart && inCart.quantity + (product.quantity || 1) > product.stockQuantity) {
-      toast.error(`There isn't enough ${product.name} in stock for both.`);
+      toast.error(t('checkout.both', { name: product.name }));
     } else {
       setIncludeCart(true);
     }
@@ -52,8 +54,8 @@ const CheckoutPage = () => {
   // reaching /checkout directly, or refreshing it, loses what was being bought
   if (products.length === 0) {
     return (
-      <Empty title="Nothing to check out" action={<Link to="/cart" className="btn btn-clay">Go to your cart</Link>}>
-        This page lost track of your order, which happens after a refresh. Your cart is still there.
+      <Empty title={t('checkout.nothing')} action={<Link to="/cart" className="btn btn-clay">{t('checkout.goCart')}</Link>}>
+        {t('checkout.nothingText')}
       </Empty>
     );
   }
@@ -70,11 +72,11 @@ const CheckoutPage = () => {
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
     if (!/^01[3-9]\d{8}$/.test(formData.phone.trim())) {
-      toast.error('Enter an 11 digit mobile number, like 017XXXXXXXX.');
+      toast.error(t('checkout.badPhone'));
       return;
     }
     if (short > 0) {
-      toast.error(`You need ${short} more PetPoints for this order.`);
+      toast.error(t('checkout.short', { n: short }));
       return;
     }
 
@@ -91,19 +93,17 @@ const CheckoutPage = () => {
 
       if (response.data.success) {
         await checkAuthStatus();
-        toast.success(effectiveDonation > 0
-          ? `Order placed, and ${effectiveDonation} PetPoints went to rescues. Thank you.`
-          : 'Order placed. We will call before delivery.');
+        toast.success(effectiveDonation > 0 ? t('checkout.placedDonation', { n: effectiveDonation }) : t('checkout.placed'));
         // leave first and empty the cart in the same render, or this page
         // flashes its "nothing to check out" state on the way out.
         // A buy-now order leaves the cart alone unless the cart was added to it.
         navigate('/products', { replace: true });
         if (from === 'cart' || includeCart) setCart([]);
       } else {
-        toast.error(response.data.message || 'The order did not go through. Try again.');
+        toast.error(apiError({ response }, 'checkout.fail'));
       }
     } catch (err) {
-      toast.error(err?.response?.data?.message || 'The order did not go through. Try again.');
+      toast.error(apiError(err, 'checkout.fail'));
     } finally {
       setPlacingOrder(false);
     }
@@ -111,16 +111,16 @@ const CheckoutPage = () => {
 
   return (
     <>
-      <PageHeader eyebrow="Checkout" title="Where should it go?" />
+      <PageHeader eyebrow={t('checkout.eyebrow')} title={t('checkout.title')} />
 
       <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
         <div className="space-y-6">
           {showCartBox && (
             <div className="card p-5 border-sun">
-              <p className="font-semibold">You also have {cart.length} thing{cart.length === 1 ? '' : 's'} in your cart. Order them together?</p>
+              <p className="font-semibold">{t('checkout.alsoCart', { n: cart.length })}</p>
               <div className="mt-3 flex gap-2">
-                <button type="button" onClick={handleIncludeCart} className="btn btn-moss">Yes, add them</button>
-                <button type="button" onClick={() => setShowCartBox(false)} className="btn btn-line">Just this one</button>
+                <button type="button" onClick={handleIncludeCart} className="btn btn-moss">{t('checkout.yesAdd')}</button>
+                <button type="button" onClick={() => setShowCartBox(false)} className="btn btn-line">{t('checkout.justThis')}</button>
               </div>
             </div>
           )}
@@ -128,24 +128,24 @@ const CheckoutPage = () => {
           <form id="checkout" onSubmit={handlePlaceOrder} className="card p-5 sm:p-6 space-y-5">
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <label htmlFor="name" className="label">Name</label>
+                <label htmlFor="name" className="label">{t('checkout.name')}</label>
                 <input id="name" name="name" autoComplete="name" required maxLength={60} value={formData.name} onChange={handleChange} className="field" />
               </div>
               <div>
-                <label htmlFor="phone" className="label">Mobile number</label>
+                <label htmlFor="phone" className="label">{t('checkout.phone')}</label>
                 <input id="phone" name="phone" type="tel" inputMode="numeric" autoComplete="tel" required placeholder="017XXXXXXXX"
                   value={formData.phone} onChange={handleChange} className="field" />
               </div>
             </div>
             <div>
-              <label htmlFor="address" className="label">Address</label>
+              <label htmlFor="address" className="label">{t('checkout.address')}</label>
               <textarea id="address" name="address" autoComplete="street-address" required maxLength={300}
-                placeholder="House, road, area" value={formData.address} onChange={handleChange} className="field !min-h-24" />
+                placeholder={t('checkout.addressHint')} value={formData.address} onChange={handleChange} className="field !min-h-24" />
             </div>
             <fieldset>
-              <legend className="label">Delivery</legend>
+              <legend className="label">{t('checkout.delivery')}</legend>
               <div className="grid gap-3 sm:grid-cols-2">
-                {[['standard', 'Standard', '3 to 5 days'], ['express', 'Express', 'Next day inside Dhaka']].map(([value, label, note]) => (
+                {[['standard', t('checkout.standard'), t('checkout.standardNote')], ['express', t('checkout.express'), t('checkout.expressNote')]].map(([value, label, note]) => (
                   <label key={value} className={`flex items-start gap-3 rounded-xl border-[1.5px] p-4 cursor-pointer ${formData.shipping === value ? 'border-clay bg-clay-lo/40' : 'border-line-2'}`}>
                     <input type="radio" name="shipping" value={value} checked={formData.shipping === value} onChange={handleChange}
                       className="mt-1 w-4 h-4 accent-[var(--sb-clay)]" />
@@ -156,11 +156,11 @@ const CheckoutPage = () => {
             </fieldset>
             {from === 'buyNow' && (
               <fieldset>
-                <legend className="label inline-flex items-center gap-2"><Heart size={16} className="text-clay" aria-hidden="true" /> Add something for rescues?</legend>
+                <legend className="label inline-flex items-center gap-2"><Heart size={16} className="text-clay" aria-hidden="true" /> {t('cart.donate')}</legend>
                 <div className="grid grid-cols-4 gap-2 max-w-sm">
                   {DONATIONS.map((d) => (
                     <button key={d} type="button" className="chip justify-center !px-0" aria-pressed={donationInput === d} onClick={() => setDonationInput(d)}>
-                      {d === 0 ? 'No' : `+${d}`}
+                      {d === 0 ? t('cart.no') : `+${num(d)}`}
                     </button>
                   ))}
                 </div>
@@ -170,34 +170,34 @@ const CheckoutPage = () => {
         </div>
 
         <aside className="card p-5 h-fit lg:sticky lg:top-6">
-          <h2 className="text-xl font-semibold">Your order</h2>
+          <h2 className="text-xl font-semibold">{t('checkout.yourOrder')}</h2>
           <ul className="mt-4 divide-y divide-line">
             {products.map((item) => (
               <li key={item.id} className="py-3 flex items-center gap-3">
                 <img src={item.imageUrl} alt="" className="w-14 h-14 rounded-lg object-cover bg-sunken" />
                 <span className="flex-1 min-w-0">
                   <span className="block font-medium truncate">{item.name}</span>
-                  <span className="text-sm text-ink-2">× {item.quantity}</span>
+                  <span className="text-sm text-ink-2">× {num(item.quantity)}</span>
                 </span>
-                <span className="tabular-nums">{(item.sellingPrice * item.quantity).toLocaleString('en-IN')}</span>
+                <span className="tabular-nums">{num(item.sellingPrice * item.quantity)}</span>
               </li>
             ))}
           </ul>
           {effectiveDonation > 0 && (
-            <p className="flex justify-between py-2 text-clay"><span>For rescues</span><span className="tabular-nums">{effectiveDonation}</span></p>
+            <p className="flex justify-between py-2 text-clay"><span>{t('checkout.forRescues')}</span><span className="tabular-nums">{num(effectiveDonation)}</span></p>
           )}
           <p className="flex justify-between items-baseline border-t border-line pt-4 mt-2">
-            <span className="font-semibold">Total</span>
+            <span className="font-semibold">{t('cart.total')}</span>
             <Points value={totalPoints} className="text-2xl font-display text-clay" />
           </p>
           <p className={`mt-3 text-sm rounded-xl p-3 flex items-center gap-2 ${short > 0 ? 'bg-clay-lo text-ink' : 'bg-moss-lo text-ink'}`}>
             <Wallet size={16} aria-hidden="true" />
             {short > 0
-              ? <span>You have {userData.points.toLocaleString('en-IN')}. <Link to="/profile?tab=wallet" className="font-semibold underline">Top up {short} more</Link></span>
-              : <span>Paid from your {userData.points.toLocaleString('en-IN')} PetPoints</span>}
+              ? <span>{t('checkout.youHave', { points: num(userData.points) })} <Link to="/profile?tab=wallet" className="font-semibold underline">{t('checkout.topUpMore', { n: short })}</Link></span>
+              : <span>{t('checkout.paidFrom', { points: num(userData.points) })}</span>}
           </p>
           <button type="submit" form="checkout" disabled={placingOrder || short > 0} className="btn btn-clay w-full mt-4 text-base">
-            {placingOrder ? 'Placing your order…' : 'Place order'}
+            {placingOrder ? t('checkout.placing') : t('checkout.place')}
           </button>
         </aside>
       </div>

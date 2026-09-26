@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, createContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { backendUrl as configBackendUrl } from "../config";
+import { useLang } from "./LangContext";
 
 export const AppContext = createContext();
 
@@ -15,6 +16,7 @@ const readLocalCart = () => {
 
 export const AppContextProvider = (props) => {
   const backendUrl = configBackendUrl;
+  const { t } = useLang();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -57,7 +59,7 @@ export const AppContextProvider = (props) => {
       const res = await axios.get(`${backendUrl}/api/products`);
       setProductData(res.data);
     } catch {
-      toast.error("Could not load the shop. Is the server running?");
+      toast.error(t("shop.loadFail"));
     } finally {
       setProductLoading(false);
     }
@@ -101,10 +103,10 @@ export const AppContextProvider = (props) => {
 
   useEffect(() => {
     if (!isLoggedIn || !cartSynced.current) return;
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       axios.post(`${backendUrl}/api/user/cart`, { items: cart }).catch(() => {});
     }, 600);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
   }, [cart, isLoggedIn, backendUrl]);
 
   const addToCart = (product, quantity = 1) => {
@@ -112,7 +114,7 @@ export const AppContextProvider = (props) => {
     const inCart = cart.find((item) => item.id === id);
     const already = inCart ? inCart.quantity : 0;
     if (already + quantity > product.stockQuantity) {
-      toast.info(`Only ${product.stockQuantity} of ${product.name} left.`);
+      toast.info(t("shop.onlyLeft", { n: product.stockQuantity, name: product.name }));
       return;
     }
     if (inCart) {
@@ -120,7 +122,7 @@ export const AppContextProvider = (props) => {
     } else {
       setCart([...cart, { ...product, id, _id: product._id || id, quantity }]);
     }
-    toast.success(`${product.name} is in your cart`, { autoClose: 1800, hideProgressBar: true });
+    toast.success(t("shop.added", { name: product.name }), { autoClose: 1800, hideProgressBar: true });
   };
 
   const updateCartItemQuantity = (id, quantity) => {
@@ -171,7 +173,7 @@ export const AppContextProvider = (props) => {
       ) : (
         <div className="min-h-screen grid place-items-center text-ink-2" role="status">
           <img src="/paw-heart.svg" alt="" className="w-12 h-12 animate-pulse" />
-          <span className="sr-only">Loading StrayBachao</span>
+          <span className="sr-only">{t("common.loading")}</span>
         </div>
       )}
     </AppContext.Provider>

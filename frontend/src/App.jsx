@@ -20,6 +20,7 @@ import Teams from './pages/Teams';
 import TeamDetails from './pages/TeamDetails';
 import NotFound from './pages/NotFound';
 import ProtectedAdminRoute from './components/ProtectAdminRoute';
+import { useLang } from './context/LangContext';
 
 // the admin screens carry the charts and animation code; visitors never need it
 const OrderPage = lazy(() => import('./components/OrderPage'));
@@ -29,15 +30,16 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const RevenuePage = lazy(() => import('./components/RevenuePage'));
 const admin = (page) => (
   <ProtectedAdminRoute>
-    <Suspense fallback={<p className="p-10 text-center text-ink-2">Loading…</p>}>{page}</Suspense>
+    <Suspense fallback={<div className="p-10" />}>{page}</Suspense>
   </ProtectedAdminRoute>
 );
 
 const App = () => {
+  const { t } = useLang();
   return (
     <>
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] btn btn-clay">
-        Skip to content
+        {t("common.skip")}
       </a>
       <ToastContainer position="top-center" autoClose={3000} />
       <Routes>

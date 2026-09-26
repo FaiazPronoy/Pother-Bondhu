@@ -4,10 +4,12 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Check, X } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
-import { Avatar, Empty, Loading, PageHeader, SignInPrompt, timeAgo } from '../components/bits';
+import { Avatar, Empty, Loading, PageHeader, SignInPrompt } from '../components/bits';
+import { useLang } from '../context/LangContext';
 
 const TeamInvitations = () => {
   const { backendUrl, isLoggedIn } = useContext(AppContext);
+  const { t, ago, apiError } = useLang();
   const [invitations, setInvitations] = useState(null);
   const [answered, setAnswered] = useState({});
 
@@ -18,7 +20,7 @@ const TeamInvitations = () => {
       .catch(() => setInvitations([]));
   }, [backendUrl, isLoggedIn]);
 
-  if (!isLoggedIn) return <SignInPrompt>Sign in to see your invitations.</SignInPrompt>;
+  if (!isLoggedIn) return <SignInPrompt>{t('invites.signIn')}</SignInPrompt>;
   if (invitations === null) return <Loading />;
 
   const handleRespond = async (invite, status) => {
@@ -26,21 +28,19 @@ const TeamInvitations = () => {
       await axios.patch(`${backendUrl}/api/invites/${invite._id}/respond`, { status });
       setAnswered((a) => ({ ...a, [invite._id]: status }));
       window.dispatchEvent(new Event("invites-changed"));
-      toast.success(status === 'accepted' ? `Welcome to ${invite.team?.name}` : 'Invitation declined');
+      toast.success(status === 'accepted' ? t('invites.welcome', { team: invite.team?.name || '' }) : t('invites.declinedToast'));
     } catch (err) {
-      toast.error(err?.response?.data?.error || 'Could not answer that invitation');
+      toast.error(apiError(err, 'invites.fail'));
     }
   };
 
   return (
     <>
-      <PageHeader eyebrow="Invitations" title="Teams that want you">
-        A team lead picked you. Join if you can help in their area; saying no is fine too.
-      </PageHeader>
+      <PageHeader eyebrow={t('invites.eyebrow')} title={t('invites.title')}>{t('invites.lead')}</PageHeader>
 
       {invitations.length === 0 ? (
-        <Empty title="No invitations right now" action={<Link to="/teams" className="btn btn-line">Browse teams</Link>}>
-          When a team lead invites you, it shows up here and on your rescue desk.
+        <Empty title={t('invites.none')} action={<Link to="/teams" className="btn btn-line">{t('invites.browse')}</Link>}>
+          {t('invites.noneText')}
         </Empty>
       ) : (
         <ul className="space-y-4 max-w-3xl">
@@ -50,18 +50,19 @@ const TeamInvitations = () => {
               <li key={inv._id} className="card p-5 flex flex-col sm:flex-row sm:items-center gap-4">
                 <Avatar name={inv.from?.name} size="w-12 h-12" tone="moss" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-lg">
-                    <span className="font-semibold">{inv.from?.name || 'A team lead'}</span> invited you to{' '}
-                    {inv.team ? <Link to={`/teams/${inv.team._id}`} className="font-semibold text-clay hover:underline">{inv.team.name}</Link> : 'a team'}
-                  </p>
-                  <p className="text-sm text-ink-2">{timeAgo(inv.createdAt)}</p>
+                  {inv.team ? (
+                    <Link to={`/teams/${inv.team._id}`} className="text-lg font-semibold text-clay hover:underline">{inv.team.name}</Link>
+                  ) : (
+                    <p className="text-lg font-semibold">{t('invites.aTeam')}</p>
+                  )}
+                  <p className="text-ink-2">{t('invites.invitedYou', { name: inv.from?.name || t('invites.aLead') })} · {ago(inv.createdAt)}</p>
                 </div>
                 {done ? (
-                  <span className={`tag ${done === 'accepted' ? 'tag-moss' : 'tag-sun'}`}>{done === 'accepted' ? 'Joined' : 'Declined'}</span>
+                  <span className={`tag ${done === 'accepted' ? 'tag-moss' : 'tag-sun'}`}>{done === 'accepted' ? t('invites.joined') : t('invites.declined')}</span>
                 ) : (
                   <div className="flex gap-2">
-                    <button onClick={() => handleRespond(inv, 'accepted')} className="btn btn-moss"><Check size={17} aria-hidden="true" /> Join</button>
-                    <button onClick={() => handleRespond(inv, 'rejected')} className="btn btn-line"><X size={17} aria-hidden="true" /> Decline</button>
+                    <button onClick={() => handleRespond(inv, 'accepted')} className="btn btn-moss"><Check size={17} aria-hidden="true" /> {t('invites.join')}</button>
+                    <button onClick={() => handleRespond(inv, 'rejected')} className="btn btn-line"><X size={17} aria-hidden="true" /> {t('invites.decline')}</button>
                   </div>
                 )}
               </li>

@@ -2,8 +2,12 @@ import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Camera, Users, Stethoscope, Coins, ArrowRight, ShoppingBasket, HandHeart, Flag, MapPin, Check, X } from "lucide-react";
+import {
+  Camera, Stethoscope, Coins, ArrowRight, ShoppingBasket, HandHeart, Flag, MapPin, Check, X,
+  Dog, Cat, Bird,
+} from "lucide-react";
 import { AppContext } from "../context/AppContext";
+import { useLang } from "../context/LangContext";
 import RescueCard from "../components/RescueCard";
 import { Avatar, Points } from "../components/bits";
 
@@ -19,6 +23,7 @@ function useRescues(limit) {
 }
 
 function RescueGrid({ posts, cols = "sm:grid-cols-2 lg:grid-cols-3" }) {
+  const { t } = useLang();
   if (posts === null) {
     return (
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -27,7 +32,7 @@ function RescueGrid({ posts, cols = "sm:grid-cols-2 lg:grid-cols-3" }) {
     );
   }
   if (posts.length === 0) {
-    return <p className="text-ink-2">Nothing on the board yet. The first photo could be yours.</p>;
+    return <p className="text-ink-2">{t("landing.boardEmpty")}</p>;
   }
   return (
     <div className={`grid gap-x-8 gap-y-10 ${cols}`}>
@@ -40,79 +45,124 @@ function RescueGrid({ posts, cols = "sm:grid-cols-2 lg:grid-cols-3" }) {
 /* visitors                                                             */
 /* ------------------------------------------------------------------ */
 
+function Hero({ stats, latest, faces }) {
+  const { t, lang, area, ago } = useLang();
+  // Bangla words run wider and taller, so the headline steps down a size
+  const size = lang === "bn"
+    ? "text-[2.3rem] leading-[1.3] sm:text-5xl lg:text-[3.4rem]"
+    : "text-[2.6rem] leading-[1.06] sm:text-6xl lg:text-[4.1rem]";
+  return (
+    <section className="paw-trail relative overflow-hidden">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-16 lg:pt-16 lg:pb-24 grid gap-14 lg:grid-cols-[1.08fr_.92fr] items-center">
+        <div className="rise flex flex-col items-center text-center lg:items-start lg:text-left">
+          <p className="inline-flex items-center gap-2 rounded-full border border-line bg-card pl-1.5 pr-4 py-1.5 text-sm font-semibold text-ink-2 shadow-sm">
+            <span className="flex -space-x-1.5" aria-hidden="true">
+              <span className="w-7 h-7 rounded-full bg-clay text-on-clay grid place-items-center ring-2 ring-card"><Dog size={15} /></span>
+              <span className="w-7 h-7 rounded-full bg-moss text-on-clay grid place-items-center ring-2 ring-card"><Cat size={15} /></span>
+              <span className="w-7 h-7 rounded-full bg-sun text-[#2B2019] grid place-items-center ring-2 ring-card"><Bird size={15} /></span>
+            </span>
+            {t("landing.kicker")}
+          </p>
+
+          <h1 className={`mt-6 font-semibold text-balance ${size}`}>
+            <span className="block">{t("landing.title1")}</span>
+            <span className="block mt-1 italic text-clay">
+              <span className="squiggle">{t("landing.title2")}</span>
+            </span>
+          </h1>
+
+          <p className="mt-6 text-lg sm:text-xl text-ink-2 max-w-[34rem] text-pretty">{t("landing.lead")}</p>
+
+          <div className="mt-8 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <Link to="/login?mode=signup" className="btn btn-clay text-base px-6">
+              {t("landing.join")} <ArrowRight size={18} aria-hidden="true" />
+            </Link>
+            <Link to="/rescues" className="btn btn-line text-base px-6">{t("landing.board")}</Link>
+          </div>
+
+          {stats && faces.length > 0 && (
+            <div className="mt-8 flex items-center gap-3">
+              <span className="flex -space-x-2" aria-hidden="true">
+                {faces.map((f, i) => (
+                  <span key={f._id} className="ring-2 ring-paper rounded-full">
+                    <Avatar name={f.name} size="w-9 h-9 text-xs" tone={["clay", "moss", "sun"][i % 3]} />
+                  </span>
+                ))}
+              </span>
+              <p className="text-sm font-semibold text-ink-2 text-left">{t("landing.already", { n: stats.volunteers })}</p>
+            </div>
+          )}
+        </div>
+
+        <div className="relative mx-auto w-full max-w-md h-[27rem] sm:h-[32rem] rise-2">
+          <div className="absolute inset-6 rounded-full bg-clay-lo/70 blur-2xl" aria-hidden="true" />
+          <figure className="polaroid tape absolute left-0 bottom-6 w-[74%]" style={{ transform: "rotate(-4deg)" }} aria-hidden="true">
+            <img src="/img/hero-hand.jpg" alt="" className="w-full aspect-[4/5] object-cover" />
+            <figcaption className="font-display italic text-center py-3 text-lg">{t("landing.cap1")}</figcaption>
+          </figure>
+          <figure className="polaroid absolute right-0 top-0 w-[48%] z-10" style={{ transform: "rotate(5deg)" }} aria-hidden="true">
+            <img src="/img/feeding.jpg" alt="" className="w-full aspect-square object-cover" />
+            <figcaption className="font-display italic text-center py-2">{t("landing.cap2")}</figcaption>
+          </figure>
+          {latest && (
+            <Link to="/rescues"
+              className="absolute left-0 top-2 z-20 max-w-[15rem] card !rounded-2xl p-3 flex items-center gap-3 hover:border-line-2">
+              <span className="relative flex w-3 h-3 shrink-0" aria-hidden="true">
+                <span className="absolute inset-0 rounded-full bg-clay animate-ping opacity-60" />
+                <span className="relative w-3 h-3 rounded-full bg-clay" />
+              </span>
+              <span className="min-w-0 text-left">
+                <span className="block text-xs font-bold uppercase tracking-wide text-clay">{t("landing.boardTitle")}</span>
+                <span className="block text-sm font-semibold truncate">
+                  <MapPin size={13} className="inline -mt-0.5" aria-hidden="true" /> {area(latest.area || latest.volunteer?.location || "Dhaka")} · {ago(latest.createdAt)}
+                </span>
+              </span>
+            </Link>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Landing() {
   const { backendUrl } = useContext(AppContext);
+  const { t, num, area } = useLang();
   const posts = useRescues(6);
   const [stats, setStats] = useState(null);
   const [teams, setTeams] = useState([]);
+  const [faces, setFaces] = useState([]);
 
   useEffect(() => {
     axios.get(`${backendUrl}/api/stats`).then((r) => setStats(r.data)).catch(() => {});
     axios.get(`${backendUrl}/api/teams/all`).then((r) => setTeams(r.data.slice(0, 3))).catch(() => {});
+    axios.get(`${backendUrl}/api/volunteers/top?limit=4`).then((r) => setFaces(r.data)).catch(() => {});
   }, [backendUrl]);
 
   const steps = [
-    {
-      icon: Camera, img: "/img/waiting.jpg", title: "See one. Snap one.",
-      text: "A photo and a line about where you saw them is enough. It goes straight onto the rescue board for everyone nearby.",
-    },
-    {
-      icon: Stethoscope, img: "/img/vet.jpg", title: "A team nearby picks it up.",
-      text: "Teams are people from the same area: feeders, night drivers, vet students. They go, they help, and they post how it went.",
-    },
-    {
-      icon: Coins, img: "/img/feeding.jpg", title: "Chip in when you can.",
-      text: "Top up PetPoints, send some to a volunteer who has been out every night this week, or add a little for rescues when you buy supplies.",
-    },
+    { icon: Camera, img: "/img/waiting.jpg", title: "landing.s1Title", text: "landing.s1Text" },
+    { icon: Stethoscope, img: "/img/vet.jpg", title: "landing.s2Title", text: "landing.s2Text" },
+    { icon: Coins, img: "/img/feeding.jpg", title: "landing.s3Title", text: "landing.s3Text" },
   ];
 
   return (
     <>
-      {/* hero */}
-      <section className="paw-trail">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 pb-16 lg:pt-20 lg:pb-24 grid gap-12 lg:grid-cols-[1.1fr_.9fr] items-center">
-          <div className="rise text-center lg:text-left">
-            <p className="bn text-xl sm:text-2xl text-clay">ওরা কথা বলতে পারে না, আমরা পারি।</p>
-            <h1 className="mt-4 text-[2.5rem] leading-[1.08] sm:text-6xl font-semibold">
-              The dog by your gate doesn't need a miracle. Just a <span className="squiggle italic">neighbour</span>.
-            </h1>
-            <p className="mt-6 text-lg sm:text-xl text-ink-2 max-w-xl mx-auto lg:mx-0">
-              Spot an animal that's hurt, hungry or scared? Post a photo. Volunteers in your area see it,
-              and a team close by goes to help.
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
-              <Link to="/login?mode=signup" className="btn btn-clay text-base px-6">Join StrayBachao <ArrowRight size={18} aria-hidden="true" /></Link>
-              <Link to="/rescues" className="btn btn-line text-base px-6">See the rescue board</Link>
-            </div>
-          </div>
-
-          <div className="relative mx-auto w-full max-w-md h-[27rem] sm:h-[32rem] rise-2" aria-hidden="true">
-            <figure className="polaroid tape absolute left-0 bottom-0 w-[74%]" style={{ transform: "rotate(-4deg)" }}>
-              <img src="/img/hero-hand.jpg" alt="" className="w-full aspect-[4/5] object-cover" />
-              <figcaption className="font-display italic text-center py-3 text-lg">a little trust, finally</figcaption>
-            </figure>
-            <figure className="polaroid absolute right-0 top-0 w-[48%] z-10" style={{ transform: "rotate(5deg)" }}>
-              <img src="/img/feeding.jpg" alt="" className="w-full aspect-square object-cover" />
-              <figcaption className="font-display italic text-center py-2">dinner, 9 pm</figcaption>
-            </figure>
-          </div>
-        </div>
-      </section>
+      <Hero stats={stats} latest={posts?.[0]} faces={faces} />
 
       {/* numbers, counted from the database */}
       {stats && (
-        <section aria-label="StrayBachao so far" className="border-y border-line bg-card">
+        <section aria-label={t("landing.statsLabel")} className="border-y border-line bg-card">
           <dl className="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
-              [stats.rescues, "rescues posted"],
-              [stats.volunteers, "volunteers"],
-              [stats.teams, "teams across Dhaka"],
-              [stats.donated, "PetPoints given to rescues"],
+              [stats.rescues, "landing.statRescues"],
+              [stats.volunteers, "landing.statVolunteers"],
+              [stats.teams, "landing.statTeams"],
+              [stats.donated, "landing.statDonated"],
             ].map(([n, label]) => (
               <div key={label}>
-                <dt className="sr-only">{label}</dt>
-                <dd className="font-display text-4xl font-semibold text-clay tabular-nums">{Number(n).toLocaleString("en-IN")}</dd>
-                <dd className="text-ink-2 mt-1">{label}</dd>
+                <dt className="sr-only">{t(label)}</dt>
+                <dd className="font-display text-4xl font-semibold text-clay tabular-nums">{num(n)}</dd>
+                <dd className="text-ink-2 mt-1">{t(label)}</dd>
               </div>
             ))}
           </dl>
@@ -122,8 +172,8 @@ function Landing() {
       {/* how it works */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <p className="eyebrow">How it works</p>
-          <h2 className="mt-2 text-3xl sm:text-4xl font-semibold">Three small things, done by a lot of people</h2>
+          <p className="eyebrow">{t("landing.howEyebrow")}</p>
+          <h2 className="mt-2 text-3xl sm:text-4xl font-semibold text-balance">{t("landing.howTitle")}</h2>
         </div>
         <ol className="grid gap-10 md:grid-cols-3">
           {steps.map(({ icon: Icon, img, title, text }, i) => (
@@ -134,9 +184,9 @@ function Landing() {
                   <Icon size={24} aria-hidden="true" />
                 </span>
               </div>
-              <p className="mt-6 text-sm font-bold text-clay">Step {i + 1}</p>
-              <h3 className="mt-1 text-2xl font-semibold">{title}</h3>
-              <p className="mt-2 text-ink-2 max-w-xs mx-auto">{text}</p>
+              <p className="mt-6 text-sm font-bold text-clay">{t("landing.step", { n: i + 1 })}</p>
+              <h3 className="mt-1 text-2xl font-semibold text-balance">{t(title)}</h3>
+              <p className="mt-2 text-ink-2 max-w-xs mx-auto text-pretty">{t(text)}</p>
             </li>
           ))}
         </ol>
@@ -147,10 +197,10 @@ function Landing() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 text-center sm:text-left">
             <div>
-              <p className="eyebrow">On the board</p>
-              <h2 className="mt-2 text-3xl sm:text-4xl font-semibold">Posted lately</h2>
+              <p className="eyebrow">{t("landing.boardEyebrow")}</p>
+              <h2 className="mt-2 text-3xl sm:text-4xl font-semibold">{t("landing.boardTitle")}</h2>
             </div>
-            <Link to="/rescues" className="btn btn-line self-center sm:self-auto">See every rescue <ArrowRight size={18} aria-hidden="true" /></Link>
+            <Link to="/rescues" className="btn btn-line self-center sm:self-auto">{t("landing.boardAll")} <ArrowRight size={18} aria-hidden="true" /></Link>
           </div>
           <RescueGrid posts={posts} />
         </div>
@@ -160,17 +210,17 @@ function Landing() {
       {teams.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="eyebrow">Teams</p>
-            <h2 className="mt-2 text-3xl sm:text-4xl font-semibold">There's probably one near you</h2>
+            <p className="eyebrow">{t("landing.teamsEyebrow")}</p>
+            <h2 className="mt-2 text-3xl sm:text-4xl font-semibold">{t("landing.teamsTitle")}</h2>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
-            {teams.map((t) => (
-              <Link key={t._id} to={`/teams/${t._id}`} className="card p-6 hover:border-line-2 transition-colors">
-                <span className={`tag ${t.category === "Medical" ? "tag-moss" : "tag-clay"}`}>{t.category}</span>
-                <h3 className="mt-3 text-xl font-semibold">{t.name}</h3>
-                <p className="mt-1 text-ink-2 inline-flex items-center gap-1"><MapPin size={15} aria-hidden="true" /> {t.area || "Dhaka"}</p>
-                {t.description && <p className="mt-3 text-ink-2 line-clamp-2">{t.description}</p>}
-                <p className="mt-4 text-sm font-semibold">{t.members?.length || 0} member{t.members?.length === 1 ? "" : "s"}</p>
+            {teams.map((team) => (
+              <Link key={team._id} to={`/teams/${team._id}`} className="card p-6 hover:border-line-2 transition-colors">
+                <span className={`tag ${team.category === "Medical" ? "tag-moss" : "tag-clay"}`}>{t(`teamType.${team.category}`)}</span>
+                <h3 className="mt-3 text-xl font-semibold">{team.name}</h3>
+                <p className="mt-1 text-ink-2 inline-flex items-center gap-1"><MapPin size={15} aria-hidden="true" /> {area(team.area || "Dhaka")}</p>
+                {team.description && <p className="mt-3 text-ink-2 line-clamp-2">{team.description}</p>}
+                <p className="mt-4 text-sm font-semibold">{t("common.members", { n: team.members?.length || 0 })}</p>
               </Link>
             ))}
           </div>
@@ -182,15 +232,11 @@ function Landing() {
         <img src="/img/mother.jpg" alt="" className="absolute inset-0 -z-10 w-full h-full object-cover" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#1A1411]/90 via-[#1A1411]/75 to-[#1A1411]/40" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24 text-center sm:text-left">
-          <p className="bn text-2xl text-[#FBE9C8]">একটু মায়া, অনেকখানি পথ।</p>
-          <h2 className="mt-3 text-4xl sm:text-5xl font-semibold text-[#FFF8F0] max-w-2xl">
-            Be the reason one of them gets through the monsoon.
-          </h2>
-          <p className="mt-4 text-lg text-[#EADBC8] max-w-xl">
-            You don't need a car or a clinic. Most of what volunteers do is show up with food, water and a bit of patience.
-          </p>
+          <p className="font-display italic text-2xl text-[#FBE9C8]">{t("landing.endKicker")}</p>
+          <h2 className="mt-3 text-4xl sm:text-5xl font-semibold text-[#FFF8F0] max-w-2xl text-balance">{t("landing.endTitle")}</h2>
+          <p className="mt-4 text-lg text-[#EADBC8] max-w-xl text-pretty">{t("landing.endText")}</p>
           <Link to="/login?mode=signup" className="btn mt-8 bg-[#E9A23B] text-[#2B2019] hover:bg-[#F2B659] text-base px-6">
-            Become a volunteer <ArrowRight size={18} aria-hidden="true" />
+            {t("landing.endCta")} <ArrowRight size={18} aria-hidden="true" />
           </Link>
         </div>
       </section>
@@ -202,16 +248,17 @@ function Landing() {
 /* signed in                                                            */
 /* ------------------------------------------------------------------ */
 
-function greeting() {
+function greetingKey() {
   const h = new Date().getHours();
-  if (h < 5) return "Up late";
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
+  if (h < 5) return "desk.late";
+  if (h < 12) return "desk.morning";
+  if (h < 17) return "desk.afternoon";
+  return "desk.evening";
 }
 
 function Desk() {
   const { userData, backendUrl } = useContext(AppContext);
+  const { t, apiError } = useLang();
   const posts = useRescues(6);
   const [myTeams, setMyTeams] = useState(null);
   const [invites, setInvites] = useState([]);
@@ -232,39 +279,39 @@ function Desk() {
       setInvites((list) => list.filter((i) => i._id !== invite._id));
       window.dispatchEvent(new Event("invites-changed"));
       if (status === "accepted") {
-        toast.success(`You're in ${invite.team?.name || "the team"} now`);
+        toast.success(t("desk.joined", { team: invite.team?.name || "" }));
         const r = await axios.get(`${backendUrl}/api/teams/my-teams`);
         setMyTeams(r.data);
       }
     } catch (err) {
-      toast.error(err?.response?.data?.error || "Could not answer that invitation");
+      toast.error(apiError(err, "desk.answerFail"));
     }
   };
 
   const actions = [
-    { to: "/rescues#post", icon: Camera, title: "Post a rescue", text: "Add a photo to the board", tone: "bg-clay text-on-clay" },
+    { to: "/rescues#post", icon: Camera, title: "desk.postTitle", text: "desk.postText", tone: "bg-clay text-on-clay" },
     volunteer
-      ? { to: "/createteam", icon: Flag, title: "Start a team", text: "Gather people in your area", tone: "bg-moss text-on-clay" }
-      : { to: "/profile", icon: HandHeart, title: "Become a volunteer", text: "Switch in your profile", tone: "bg-moss text-on-clay" },
-    { to: "/volunteers", icon: Coins, title: "Support a volunteer", text: "Send them PetPoints", tone: "bg-sun text-[#2B2019]" },
-    { to: "/products", icon: ShoppingBasket, title: "Buy supplies", text: "Food, bowls, bedding", tone: "bg-ink text-paper" },
+      ? { to: "/createteam", icon: Flag, title: "desk.startTitle", text: "desk.startText", tone: "bg-moss text-on-clay" }
+      : { to: "/profile", icon: HandHeart, title: "desk.becomeTitle", text: "desk.becomeText", tone: "bg-moss text-on-clay" },
+    { to: "/volunteers", icon: Coins, title: "desk.supportTitle", text: "desk.supportText", tone: "bg-sun text-[#2B2019]" },
+    { to: "/products", icon: ShoppingBasket, title: "desk.buyTitle", text: "desk.buyText", tone: "bg-ink text-paper" },
   ];
 
   return (
     <div className="space-y-10">
       <header className="rise">
-        <p className="bn text-lg text-clay">আজ কার খোঁজ নেবেন?</p>
-        <h1 className="mt-1 text-3xl sm:text-4xl font-semibold">{greeting()}, {userData.name.split(" ")[0]}</h1>
-        <p className="mt-2 text-ink-2 text-lg">Here's what's happening on the street today.</p>
+        <p className="font-display italic text-lg text-clay">{t("desk.ask")}</p>
+        <h1 className="mt-1 text-3xl sm:text-4xl font-semibold">{t(greetingKey(), { name: userData.name.split(" ")[0] })}</h1>
+        <p className="mt-2 text-ink-2 text-lg">{t("desk.sub")}</p>
       </header>
 
-      <nav aria-label="Quick actions" className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 rise-2">
+      <nav aria-label={t("desk.quick")} className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 rise-2">
         {actions.map(({ to, icon: Icon, title, text, tone }) => (
           <Link key={title} to={to} className={`${tone} rounded-2xl p-4 sm:p-5 flex flex-col gap-3 hover:-translate-y-0.5 transition-transform`}>
             <Icon size={26} aria-hidden="true" />
             <span>
-              <span className="block font-semibold text-lg leading-tight">{title}</span>
-              <span className="block text-sm opacity-90 mt-0.5">{text}</span>
+              <span className="block font-semibold text-lg leading-tight">{t(title)}</span>
+              <span className="block text-sm opacity-90 mt-0.5">{t(text)}</span>
             </span>
           </Link>
         ))}
@@ -273,9 +320,9 @@ function Desk() {
       <div className="grid gap-10 xl:grid-cols-[1fr_320px]">
         <section aria-labelledby="board-title">
           <div className="flex items-end justify-between gap-4 mb-8">
-            <h2 id="board-title" className="text-2xl font-semibold">On the board</h2>
+            <h2 id="board-title" className="text-2xl font-semibold">{t("desk.board")}</h2>
             <Link to="/rescues" className="text-clay font-semibold inline-flex items-center gap-1 hover:underline">
-              All rescues <ArrowRight size={16} aria-hidden="true" />
+              {t("desk.allRescues")} <ArrowRight size={16} aria-hidden="true" />
             </Link>
           </div>
           <RescueGrid posts={posts} cols="sm:grid-cols-2 2xl:grid-cols-3" />
@@ -284,15 +331,15 @@ function Desk() {
         <aside className="space-y-6">
           {volunteer && invites.length > 0 && (
             <section className="card p-5 border-clay/40" aria-labelledby="inv-title">
-              <h2 id="inv-title" className="text-lg font-semibold">You've been invited</h2>
+              <h2 id="inv-title" className="text-lg font-semibold">{t("desk.invited")}</h2>
               <ul className="mt-3 space-y-3">
                 {invites.map((inv) => (
                   <li key={inv._id} className="rounded-xl bg-sunken p-3">
                     <p className="font-semibold">{inv.team?.name}</p>
-                    <p className="text-sm text-ink-2">from {inv.from?.name}</p>
+                    <p className="text-sm text-ink-2">{t("desk.from", { name: inv.from?.name || "" })}</p>
                     <div className="mt-2 flex gap-2">
-                      <button onClick={() => answer(inv, "accepted")} className="btn btn-moss !min-h-9 !py-1 text-sm flex-1"><Check size={16} aria-hidden="true" /> Join</button>
-                      <button onClick={() => answer(inv, "rejected")} className="btn btn-line !min-h-9 !py-1 text-sm flex-1"><X size={16} aria-hidden="true" /> Decline</button>
+                      <button onClick={() => answer(inv, "accepted")} className="btn btn-moss !min-h-9 !py-1 text-sm flex-1"><Check size={16} aria-hidden="true" /> {t("desk.join")}</button>
+                      <button onClick={() => answer(inv, "rejected")} className="btn btn-line !min-h-9 !py-1 text-sm flex-1"><X size={16} aria-hidden="true" /> {t("desk.decline")}</button>
                     </div>
                   </li>
                 ))}
@@ -303,20 +350,20 @@ function Desk() {
           {volunteer && (
             <section className="card p-5" aria-labelledby="teams-title">
               <div className="flex items-center justify-between">
-                <h2 id="teams-title" className="text-lg font-semibold">Your teams</h2>
-                <Link to="/my-team" className="text-sm font-semibold text-clay hover:underline">Manage</Link>
+                <h2 id="teams-title" className="text-lg font-semibold">{t("desk.yourTeams")}</h2>
+                <Link to="/my-team" className="text-sm font-semibold text-clay hover:underline">{t("desk.manage")}</Link>
               </div>
               {myTeams === null ? (
                 <div className="skeleton h-16 mt-3" />
               ) : myTeams.length === 0 ? (
-                <p className="mt-2 text-ink-2">You're not in a team yet. <Link to="/teams" className="text-clay font-semibold underline">Find one</Link> or start your own.</p>
+                <p className="mt-2 text-ink-2">{t("desk.noTeam")} <Link to="/teams" className="text-clay font-semibold underline">{t("desk.findOne")}</Link> {t("desk.orStart")}</p>
               ) : (
                 <ul className="mt-3 divide-y divide-line">
-                  {myTeams.map((t) => (
-                    <li key={t._id}>
-                      <Link to={`/teams/${t._id}`} className="flex items-center justify-between py-2.5 hover:text-clay">
-                        <span className="font-medium">{t.name}</span>
-                        <span className="text-sm text-ink-2">{t.members.length} <Users size={14} className="inline" aria-label="members" /></span>
+                  {myTeams.map((team) => (
+                    <li key={team._id}>
+                      <Link to={`/teams/${team._id}`} className="flex items-center justify-between gap-3 py-2.5 hover:text-clay">
+                        <span className="font-medium">{team.name}</span>
+                        <span className="text-sm text-ink-2 shrink-0">{t("common.members", { n: team.members.length })}</span>
                       </Link>
                     </li>
                   ))}
@@ -326,8 +373,8 @@ function Desk() {
           )}
 
           <section className="card p-5" aria-labelledby="top-title">
-            <h2 id="top-title" className="text-lg font-semibold">Volunteers to thank</h2>
-            <p className="text-sm text-ink-2">The ones with the most PetPoints right now.</p>
+            <h2 id="top-title" className="text-lg font-semibold">{t("desk.thank")}</h2>
+            <p className="text-sm text-ink-2">{t("desk.thankSub")}</p>
             <ul className="mt-3 space-y-2">
               {top.map((v, i) => (
                 <li key={v._id}>
