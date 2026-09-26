@@ -48,6 +48,9 @@ function RescueGrid({ posts, cols = "sm:grid-cols-2 lg:grid-cols-3" }) {
 function Hero({ stats, latest, faces }) {
   const { t, lang, area, ago } = useLang();
   // Bangla words run wider and taller, so the headline steps down a size
+  // Bangla's last line is short, so it can sit flush right; in English the
+  // last line is the longest, so the steps are pushed in by a fixed indent
+  const step = lang === "bn" ? "sm:text-right" : "sm:pl-[1.9em]";
   const size = lang === "bn"
     ? "text-[2.3rem] leading-[1.35] sm:text-5xl lg:text-[3.5rem]"
     : "text-[2.35rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]";
@@ -56,26 +59,24 @@ function Hero({ stats, latest, faces }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-16 lg:pt-16 lg:pb-24 grid gap-14 lg:grid-cols-[1.08fr_.92fr] items-center">
         <div className="rise flex flex-col items-center text-center lg:items-start lg:text-left">
           {/* the motto stays in Bangla in both languages; it is the name's own voice */}
-          <figure className="flex flex-col items-center lg:items-start">
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-              <span className="flex -space-x-2 shrink-0" aria-hidden="true">
-                <span className="w-9 h-9 rounded-full bg-clay text-on-clay grid place-items-center ring-[3px] ring-paper"><Dog size={18} /></span>
-                <span className="w-9 h-9 rounded-full bg-moss text-on-clay grid place-items-center ring-[3px] ring-paper"><Cat size={18} /></span>
-                <span className="w-9 h-9 rounded-full bg-sun text-[#2B2019] grid place-items-center ring-[3px] ring-paper"><Bird size={18} /></span>
-              </span>
-              <blockquote lang="bn" className="bn text-[1.3rem] sm:text-2xl leading-snug text-clay whitespace-nowrap">
-                ওরা কথা বলতে পারে না, আমরা পারি।
-              </blockquote>
-            </div>
+          <figure className="grid sm:grid-cols-[auto_auto] items-center justify-items-center sm:justify-items-start gap-x-3 gap-y-1.5 text-center sm:text-left">
+            <span className="flex -space-x-2 sm:row-span-2" aria-hidden="true">
+              <span className="w-9 h-9 rounded-full bg-clay text-on-clay grid place-items-center ring-[3px] ring-paper"><Dog size={18} /></span>
+              <span className="w-9 h-9 rounded-full bg-moss text-on-clay grid place-items-center ring-[3px] ring-paper"><Cat size={18} /></span>
+              <span className="w-9 h-9 rounded-full bg-sun text-[#2B2019] grid place-items-center ring-[3px] ring-paper"><Bird size={18} /></span>
+            </span>
+            <blockquote lang="bn" className="bn text-[1.3rem] sm:text-2xl leading-tight text-clay whitespace-nowrap">
+              ওরা কথা বলতে পারে না, আমরা পারি।
+            </blockquote>
             {lang === "en" && (
-              <figcaption className="mt-1 text-sm italic text-ink-2 lg:pl-[5.5rem]">{t("landing.mottoGloss")}</figcaption>
+              <figcaption className="font-display italic text-ink-2 leading-snug">{t("landing.mottoGloss")}</figcaption>
             )}
           </figure>
 
           <h1 className={`mt-7 font-semibold sm:w-fit ${size}`}>
             {/* four lines that zigzag left, right, left, right, like steps */}
             {[...t("landing.title1").split("|"), t("landing.title2a"), t("landing.title2b")].map((line, i) => (
-              <span key={line} className={`block ${i > 0 ? "mt-1" : ""} ${i % 2 ? "sm:text-right" : ""} ${i > 1 ? "italic text-clay" : ""}`}>
+              <span key={line} className={`block ${i > 0 ? "mt-1" : ""} ${i % 2 ? step : ""} ${i > 1 ? "italic text-clay" : ""}`}>
                 {i > 1 ? <span className="squiggle">{line}</span> : line}
               </span>
             ))}

@@ -107,9 +107,13 @@ const Login = () => {
       <aside className="relative hidden lg:block overflow-hidden bg-[#1A1411]">
         <img src="/img/waiting.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1A1411]/90 via-[#1A1411]/30 to-transparent" />
-        <div className="absolute bottom-0 p-12 text-[#FFF8F0] max-w-xl">
-          <p lang="bn" className="bn text-4xl leading-snug">ওরা কথা বলতে পারে না,<br /><span className="text-[#F2B659]">আমরা পারি।</span></p>
-          <p className="mt-4 text-lg text-[#EADBC8] text-pretty">{lang === "en" && <>{t("landing.mottoGloss")} </>}{t("login.quote")}</p>
+        <div className="absolute inset-x-0 bottom-0 p-12 text-[#FFF8F0]">
+          <div className="max-w-md">
+            <p lang="bn" className="bn text-4xl leading-snug">ওরা কথা বলতে পারে না,<br /><span className="text-[#F2B659]">আমরা পারি।</span></p>
+            {lang === "en" && <p className="mt-2 font-display italic text-xl text-[#F2B659]">{t("landing.mottoGloss")}</p>}
+            <span className="mt-6 block h-0.5 w-14 rounded-full bg-[#F2B659]" aria-hidden="true" />
+            <p className="mt-5 text-lg text-[#EADBC8] text-balance">{t("login.quote")}</p>
+          </div>
         </div>
       </aside>
 

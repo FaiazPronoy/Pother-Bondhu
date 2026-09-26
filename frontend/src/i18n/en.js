@@ -64,7 +64,7 @@ const en = {
     title1: 'A little care,|a little light,',
     title2a: 'can make their',
     title2b: 'world feel right.',
-    mottoGloss: "They can't speak. We can.",
+    mottoGloss: 'They have no voice, so we lend them ours.',
     lead: 'A limping dog by the tea stall. A kitten crying under a CNG. A pigeon that can\'t fly. Snap a photo, drop it on the board, and someone nearby comes running.',
     join: 'Join StrayBachao',
     board: 'See the rescue board',
@@ -157,7 +157,7 @@ const en = {
     emptyText: 'Keep your eyes open on the way home. You might be the first to spot someone.',
   },
   login: {
-    quote: 'Every rescue here started with one person who didn\'t look away.',
+    quote: 'Somewhere tonight, a street dog is waiting for someone like you to stop.',
     home: 'StrayBachao home',
     welcome: 'Welcome back',
     joinTitle: 'Join the neighbourhood',
