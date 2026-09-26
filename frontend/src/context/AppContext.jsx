@@ -1,11 +1,12 @@
 import React, { useState, useEffect, createContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { backendUrl as configBackendUrl } from "../config";
 
 export const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = configBackendUrl;
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);

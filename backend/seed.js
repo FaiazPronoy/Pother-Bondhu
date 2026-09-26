@@ -36,13 +36,13 @@ const products = [
 ];
 
 const people = [
-  { name: 'Admin', email: 'admin@savepaws.com', password: 'Admin@1234', role: 'admin', points: 0, location: 'Dhaka', bio: 'Runs the Save Paws shop and rescue network.' },
-  { name: 'Nabila Rahman', email: 'nabila@savepaws.com', password: 'Volunteer@123', role: 'volunteer', points: 4200, location: 'Dhanmondi', bio: 'Fosters kittens and runs the Dhanmondi feeding route.' },
-  { name: 'Tanvir Hasan', email: 'tanvir@savepaws.com', password: 'Volunteer@123', role: 'volunteer', points: 3100, location: 'Uttara', bio: 'Handles night rescues and transport to the clinic.' },
-  { name: 'Sadia Islam', email: 'sadia@savepaws.com', password: 'Volunteer@123', role: 'volunteer', points: 2650, location: 'Mirpur', bio: 'Vet student, does first aid and vaccination drives.' },
-  { name: 'Rafiq Ahmed', email: 'rafiq@savepaws.com', password: 'Volunteer@123', role: 'volunteer', points: 1800, location: 'Gulshan', bio: 'Weekend volunteer, mostly adoption day logistics.' },
-  { name: 'Mehedi Khan', email: 'mehedi@savepaws.com', password: 'Donor@1234', role: 'donor', points: 6000, location: 'Banani', bio: '' },
-  { name: 'Farhana Akter', email: 'farhana@savepaws.com', password: 'Donor@1234', role: 'donor', points: 4500, location: 'Bashundhara', bio: '' },
+  { name: 'Admin', email: 'admin@straybachao.com', password: 'Admin@1234', role: 'admin', points: 0, location: 'Dhaka', bio: 'Runs the StrayBachao shop and rescue network.' },
+  { name: 'Nabila Rahman', email: 'nabila@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 4200, location: 'Dhanmondi', bio: 'Fosters kittens and runs the Dhanmondi feeding route.' },
+  { name: 'Tanvir Hasan', email: 'tanvir@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 3100, location: 'Uttara', bio: 'Handles night rescues and transport to the clinic.' },
+  { name: 'Sadia Islam', email: 'sadia@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 2650, location: 'Mirpur', bio: 'Vet student, does first aid and vaccination drives.' },
+  { name: 'Rafiq Ahmed', email: 'rafiq@straybachao.com', password: 'Volunteer@123', role: 'volunteer', points: 1800, location: 'Gulshan', bio: 'Weekend volunteer, mostly adoption day logistics.' },
+  { name: 'Mehedi Khan', email: 'mehedi@straybachao.com', password: 'Donor@1234', role: 'donor', points: 6000, location: 'Banani', bio: '' },
+  { name: 'Farhana Akter', email: 'farhana@straybachao.com', password: 'Donor@1234', role: 'donor', points: 4500, location: 'Bashundhara', bio: '' },
 ];
 
 const teams = [
@@ -59,14 +59,14 @@ function daysAgo(n) {
 }
 
 const orderPlan = [
-  { buyer: 'mehedi@savepaws.com', days: 2,  lines: [['SP-001', 1], ['SP-009', 2]], donation: 200, status: 'Delivered' },
-  { buyer: 'farhana@savepaws.com', days: 4, lines: [['SP-006', 3]], donation: 0, status: 'Delivered' },
-  { buyer: 'mehedi@savepaws.com', days: 6,  lines: [['SP-004', 1], ['SP-007', 2]], donation: 100, status: 'Delivered' },
-  { buyer: 'farhana@savepaws.com', days: 9, lines: [['SP-010', 1]], donation: 0, status: 'Out for Delivery' },
-  { buyer: 'mehedi@savepaws.com', days: 13, lines: [['SP-008', 1], ['SP-012', 1]], donation: 300, status: 'Delivered' },
-  { buyer: 'farhana@savepaws.com', days: 18, lines: [['SP-002', 1]], donation: 0, status: 'Delivered' },
-  { buyer: 'mehedi@savepaws.com', days: 24, lines: [['SP-011', 1], ['SP-009', 1]], donation: 0, status: 'Pending' },
-  { buyer: 'farhana@savepaws.com', days: 30, lines: [['SP-003', 1], ['SP-006', 2]], donation: 500, status: 'Delivered' },
+  { buyer: 'mehedi@straybachao.com', days: 2,  lines: [['SP-001', 1], ['SP-009', 2]], donation: 200, status: 'Delivered' },
+  { buyer: 'farhana@straybachao.com', days: 4, lines: [['SP-006', 3]], donation: 0, status: 'Delivered' },
+  { buyer: 'mehedi@straybachao.com', days: 6,  lines: [['SP-004', 1], ['SP-007', 2]], donation: 100, status: 'Delivered' },
+  { buyer: 'farhana@straybachao.com', days: 9, lines: [['SP-010', 1]], donation: 0, status: 'Out for Delivery' },
+  { buyer: 'mehedi@straybachao.com', days: 13, lines: [['SP-008', 1], ['SP-012', 1]], donation: 300, status: 'Delivered' },
+  { buyer: 'farhana@straybachao.com', days: 18, lines: [['SP-002', 1]], donation: 0, status: 'Delivered' },
+  { buyer: 'mehedi@straybachao.com', days: 24, lines: [['SP-011', 1], ['SP-009', 1]], donation: 0, status: 'Pending' },
+  { buyer: 'farhana@straybachao.com', days: 30, lines: [['SP-003', 1], ['SP-006', 2]], donation: 500, status: 'Delivered' },
 ];
 
 async function seed() {
@@ -143,9 +143,9 @@ async function seed() {
 
   const revenue = orders.reduce((sum, o) => sum + o.totalPoints, 0);
   console.log(`\nDone. Demo revenue across seeded orders: ${revenue} points`);
-  console.log('Admin login:     admin@savepaws.com / Admin@1234');
-  console.log('Volunteer login: nabila@savepaws.com / Volunteer@123');
-  console.log('Donor login:     mehedi@savepaws.com / Donor@1234');
+  console.log('Admin login:     admin@straybachao.com / Admin@1234');
+  console.log('Volunteer login: nabila@straybachao.com / Volunteer@123');
+  console.log('Donor login:     mehedi@straybachao.com / Donor@1234');
 
   await mongoose.disconnect();
 }

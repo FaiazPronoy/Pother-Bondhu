@@ -1,9 +1,9 @@
 @echo off
-title Save Paws - launcher
+title StrayBachao - launcher
 cd /d "%~dp0"
 
 echo ==========================================
-echo   SAVE PAWS
+echo   STRAYBACHAO
 echo ==========================================
 echo.
 
@@ -31,10 +31,11 @@ echo [3/5] Writing backend\.env ...
 set "SECRET="
 for /f %%i in ('node -p "require('crypto').randomBytes(32).toString('hex')"') do set "SECRET=%%i"
 if not defined SECRET set "SECRET=change_me_a_long_random_value_please"
-> ".env" echo MONGODB_URI=mongodb://127.0.0.1:27017/savepaws
+> ".env" echo MONGODB_URI=mongodb://127.0.0.1:27017/straybachao
 >> ".env" echo JWT_SECRET=%SECRET%
 >> ".env" echo NODE_ENV=development
 >> ".env" echo PORT=4000
+>> ".env" echo CLIENT_URL=http://localhost:5175
 >> ".env" echo SMTP_USER=
 >> ".env" echo SMTP_PASS=
 >> ".env" echo SENDER_EMAIL=
@@ -54,16 +55,16 @@ call npm install
 
 echo [5/5] Starting backend and frontend in their own windows ...
 cd /d "%~dp0backend"
-start "Save Paws - BACKEND (4000)" cmd /k "npm run dev"
+start "StrayBachao - BACKEND (4000)" cmd /k "npm run dev"
 cd /d "%~dp0frontend"
-start "Save Paws - FRONTEND (5175)" cmd /k "npm run dev -- --port 5175"
+start "StrayBachao - FRONTEND (5175)" cmd /k "npm run dev -- --port 5175"
 
 echo.
 echo   Open  http://localhost:5175
 echo.
-echo   Admin       admin@savepaws.com    /  Admin@1234
-echo   Volunteer   nabila@savepaws.com   /  Volunteer@123
-echo   Donor       mehedi@savepaws.com   /  Donor@1234
+echo   Admin       admin@straybachao.com    /  Admin@1234
+echo   Volunteer   nabila@straybachao.com   /  Volunteer@123
+echo   Donor       mehedi@straybachao.com   /  Donor@1234
 echo.
 echo   Port 5175 on purpose, so this and the Course Compass
 echo   can run at the same time without clashing.

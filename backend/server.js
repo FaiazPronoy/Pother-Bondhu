@@ -22,7 +22,7 @@ const port = process.env.PORT || 4000;
 connectDB();
 
 // the site the API accepts cookies from; a comma separated list in production
-const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173").split(",").map((s) => s.trim());
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173,http://localhost:5175").split(",").map((s) => s.trim());
 
 // ✅ Middlewares
 app.use(express.json({ limit: "10mb" }));

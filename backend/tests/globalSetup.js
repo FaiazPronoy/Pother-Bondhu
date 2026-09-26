@@ -24,7 +24,7 @@ async function waitForServer(url, timeoutMs = 30000) {
 
 export async function setup({ provide }) {
   mongo = await MongoMemoryServer.create();
-  const uri = mongo.getUri('savepaws_test');
+  const uri = mongo.getUri('straybachao_test');
   provide('mongoUri', uri);
   provide('baseUrl', 'http://localhost:4100');
 
