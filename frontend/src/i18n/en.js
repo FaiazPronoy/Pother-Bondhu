@@ -30,6 +30,8 @@ const en = {
     save: 'Save changes',
     saving: 'Saving…',
     saved: 'Saved',
+    brand: 'CholoBachai',
+    pageTitle: 'CholoBachai | An Animal Rescue Network',
   },
   role: { donor: 'Supporter', volunteer: 'Volunteer', admin: 'Admin' },
   teamType: { Rescue: 'Rescue', Medical: 'Medical', Other: 'Other' },

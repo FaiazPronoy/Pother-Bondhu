@@ -10,13 +10,17 @@ export const AREAS = [
   "Moghbazar", "Mohammadpur", "Puran Dhaka", "Uttara",
 ];
 
+// the name is written in the reader's language: CholoBachai or চলো বাঁচাই
 export function Wordmark({ className = "", size = "text-2xl" }) {
+  const { lang } = useLang();
+  const [first, second] = lang === "bn" ? ["চলো", "বাঁচাই"] : ["Cholo", "Bachai"];
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`} lang="en">
+    <span className={`inline-flex items-center gap-2 ${className}`} lang={lang}>
       <img src="/paw-heart.svg" alt="" className="w-9 h-9 shrink-0" />
       <span className={`font-display font-semibold tracking-tight leading-none ${size}`}>
-        <span className="italic font-normal">Cholo</span>
-        <span className="text-clay">Bachai</span>
+        {/* Tiro Bangla's italic is too thin for a logo, so Bangla stays upright */}
+        <span className={lang === "bn" ? "font-bold" : "italic font-normal"}>{first}</span>
+        <span className={`text-clay ${lang === "bn" ? "font-bold ml-[.3em]" : ""}`}>{second}</span>
       </span>
     </span>
   );

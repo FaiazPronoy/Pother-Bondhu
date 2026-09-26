@@ -26,6 +26,8 @@ const bn = {
     save: 'সেভ করুন',
     saving: 'সেভ হচ্ছে…',
     saved: 'সেভ হয়েছে',
+    brand: 'চলো বাঁচাই',
+    pageTitle: 'চলো বাঁচাই | প্রাণী রেসকিউ নেটওয়ার্ক',
   },
   role: { donor: 'সাপোর্টার', volunteer: 'স্বেচ্ছাসেবক', admin: 'অ্যাডমিন' },
   teamType: { Rescue: 'রেসকিউ', Medical: 'চিকিৎসা', Other: 'অন্যান্য' },

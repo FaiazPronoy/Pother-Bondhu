@@ -26,6 +26,7 @@ export function LangProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.lang = lang;
+    document.title = lookup(dicts[lang], 'common.pageTitle');
     try { localStorage.setItem('lang', lang); } catch { /* private mode */ }
   }, [lang]);
 
