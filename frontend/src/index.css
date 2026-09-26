@@ -13,11 +13,11 @@
    ------------------------------------------------------------------------ */
 
 :root {
-  --sb-paper:   #F6EFE4;
-  --sb-card:    #FFFDF8;
-  --sb-sunken:  #EFE5D6;
-  --sb-line:    #E2D3BE;
-  --sb-line-2:  #C9B497;
+  --sb-paper:   #F8EADA;
+  --sb-card:    #FFF7EE;
+  --sb-sunken:  #F2E0CB;
+  --sb-line:    #EACFB4;
+  --sb-line-2:  #D3B08E;
   --sb-ink:     #2B2019;
   --sb-ink-2:   #6B5646;
   --sb-clay:    #B4441F;
@@ -269,7 +269,7 @@
 
   /* rescue photos are shown like prints pinned to a board, a little crooked */
   .polaroid {
-    background: #FFFDF8;
+    background: #FFF6EC;
     padding: .6rem .6rem 0;
     border-radius: 4px;
     box-shadow: 0 1px 2px rgb(43 32 25 / .12), 0 14px 30px -18px rgb(43 32 25 / .45);
@@ -310,6 +310,15 @@
     animation: shimmer 1.4s linear infinite;
     border-radius: 10px;
   }
+}
+
+/* light theme: a low orange glow at the corners, so the page is warm
+   rather than white */
+:root:not(.dark) body {
+  background-image:
+    radial-gradient(60rem 30rem at 100% 0%, rgb(233 162 59 / .16), transparent 70%),
+    radial-gradient(50rem 30rem at 0% 100%, rgb(180 68 31 / .08), transparent 70%);
+  background-attachment: fixed;
 }
 
 /* faint paw prints walking across the page background */
