@@ -39,13 +39,12 @@ if not defined SECRET set "SECRET=change_me_a_long_random_value_please"
 >> ".env" echo SMTP_USER=
 >> ".env" echo SMTP_PASS=
 >> ".env" echo SENDER_EMAIL=
-echo [4/5] Loading demo data ...
-call npm run seed
 goto :envdone
 :envready
 echo [3/5] backend\.env already there.
-echo [4/5] Skipping the seed. To reload demo data later: cd backend, then npm run seed
 :envdone
+echo [4/5] Loading demo data if the database needs it ...
+call npm run seed -- --if-needed
 
 cd /d "%~dp0frontend"
 if exist "node_modules\" goto :webdone

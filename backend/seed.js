@@ -114,6 +114,21 @@ async function seed() {
   await mongoose.connect(uri);
   console.log('Connected to', mongoose.connection.name);
 
+  // the launcher runs this with --if-needed on every start: it fills an empty
+  // database, or one that only holds the demo people from before the rename,
+  // and leaves anything else alone
+  if (process.argv.includes('--if-needed')) {
+    const emails = (await userModel.find({}, 'email').lean()).map((u) => u.email);
+    const oldDemo = emails.length > 0 && emails.every((e) => e.endsWith('@straybachao.com'));
+    if (emails.length && !oldDemo) {
+      console.log(emails.includes('admin@cholobachai.com')
+        ? 'Demo data is already there.'
+        : 'This database has other accounts in it, so the demo data was not loaded. Run npm run seed to replace everything.');
+      await mongoose.disconnect();
+      return;
+    }
+  }
+
   await Promise.all([
     userModel.deleteMany({}),
     Product.deleteMany({}),
