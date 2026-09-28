@@ -54,6 +54,50 @@
   --sb-shadow:  0 0 0;
 }
 
+/* the demo people on the sign in page, as "hello, I am" name tag stickers */
+.name-tag {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1.5px solid var(--sb-clay);
+  border-radius: 12px;
+  background: var(--sb-card);
+  color: var(--sb-ink);
+  box-shadow: 0 6px 14px -8px rgb(var(--sb-shadow) / 0.45);
+  transition: transform 0.2s;
+}
+.name-tag:nth-child(odd) {
+  transform: rotate(-2deg);
+}
+.name-tag:nth-child(even) {
+  transform: rotate(1.5deg);
+}
+.name-tag:hover {
+  transform: rotate(0) translateY(-2px);
+}
+.name-tag:disabled {
+  opacity: 0.5;
+}
+.name-tag-top {
+  padding: 5px 0 4px;
+  background: var(--sb-clay);
+  color: var(--sb-on-clay);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.name-tag-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px 12px;
+  font-family: var(--font-display, Fraunces), serif;
+  font-style: italic;
+  font-size: 1rem;
+}
+
 @theme inline {
   --color-paper:   var(--sb-paper);
   --color-card:    var(--sb-card);

@@ -157,15 +157,17 @@ const Login = () => {
             ) : null}
 
             {state === "Login" && (
-              <section className="mt-8 rounded-2xl border border-dashed border-line-2 bg-card/70 p-4 text-center" aria-labelledby="demo-title">
+              <section className="mt-8 text-center" aria-labelledby="demo-title">
                 <h2 id="demo-title" className="font-display text-lg">{t("login.demoTitle")}</h2>
                 <p className="text-sm text-ink-2">{t("login.demoText")}</p>
-                <div className="mt-3 grid grid-cols-3 gap-2">
+                <div className="mt-4 grid grid-cols-3 gap-3">
                   {DEMO.map((d) => (
-                    <button key={d.key} type="button" disabled={busy} onClick={() => handleAuthSubmit(null, "Login", d)}
-                      className="flex flex-col items-center gap-1 rounded-xl border border-line bg-paper px-2 py-3 text-sm font-semibold hover:border-clay hover:text-clay disabled:opacity-50">
-                      <d.icon size={20} aria-hidden="true" />
-                      {t(`role.${d.key}`)}
+                    <button key={d.key} type="button" disabled={busy} onClick={() => handleAuthSubmit(null, "Login", d)} className="name-tag">
+                      <span className="name-tag-top">{t("login.helloTag")}</span>
+                      <span className="name-tag-body">
+                        <d.icon size={18} aria-hidden="true" />
+                        {t(`role.${d.key}`)}
+                      </span>
                     </button>
                   ))}
                 </div>
