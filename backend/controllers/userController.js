@@ -73,15 +73,14 @@ export const addPoints = async (req, res) => {
       return res.status(400).json({ message: "Amount must be a whole number between 1 and 10000" });
     }
 
-    const user = await userModel.findById(userId);
+    // $inc so two top-ups at once both count, and only the points go back:
+    // the whole document would include the password hash
+    const user = await userModel.findByIdAndUpdate(userId, { $inc: { points } }, { new: true }).select("points");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    user.points += points;
-    await user.save();
-
-    res.json({ user });
+    res.json({ user: { points: user.points } });
   } catch (error) {
     res.status(500).json({ message: "Failed to add points" });
   }
