@@ -2,9 +2,9 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { HandHeart, Heart, Wallet, UserRound } from "lucide-react";
+import { HandHeart, Heart, Package, Wallet, UserRound } from "lucide-react";
 import { AppContext } from "../context/AppContext";
-import { AREAS, Avatar, Loading, Points, SignInPrompt } from "../components/bits";
+import { AREAS, Avatar, Empty, Loading, Points, SignInPrompt } from "../components/bits";
 import { useLang } from "../context/LangContext";
 
 const TOPUPS = [500, 1000, 2000];
@@ -146,11 +146,65 @@ function WalletPanel({ user, onToppedUp }) {
   );
 }
 
+// the order's progress as three steps, so "Out for Delivery" reads as two of three done
+const STEPS = ["Pending", "Out for Delivery", "Delivered"];
+const STEP_KEY = { Pending: "pending", "Out for Delivery": "onTheWay", Delivered: "delivered" };
+
+function OrdersPanel() {
+  const { backendUrl } = useContext(AppContext);
+  const { t, num, ago } = useLang();
+  const [orders, setOrders] = useState(null);
+
+  useEffect(() => {
+    axios.get(`${backendUrl}/api/orders/mine`).then((r) => setOrders(r.data.orders)).catch(() => setOrders([]));
+  }, [backendUrl]);
+
+  if (!orders) return <Loading rows={2} />;
+  if (!orders.length) {
+    return (
+      <Empty title={t("orders.none")} action={<Link to="/products" className="btn btn-clay">{t("orders.shop")}</Link>}>
+        {t("orders.noneNote")}
+      </Empty>
+    );
+  }
+
+  return (
+    <ul className="space-y-4">
+      {orders.map((o) => {
+        const step = STEPS.indexOf(o.status);
+        return (
+          <li key={o._id} className="card p-5">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <p className="font-semibold">{t("orders.placed", { when: ago(o.createdAt) })}</p>
+              <Points value={o.totalPoints} />
+            </div>
+            <ol className="mt-3 grid grid-cols-3 gap-2" aria-label={t("orders.progress")}>
+              {STEPS.map((s, i) => (
+                <li key={s} className="text-sm">
+                  <span className={`block h-1.5 rounded-full ${i <= step ? "bg-moss" : "bg-line"}`} />
+                  <span className={`mt-1.5 block ${i === step ? "font-semibold text-ink" : "text-ink-2"}`}>
+                    {t(`orders.${STEP_KEY[s]}`)}
+                    {i === step && <span className="sr-only"> ({t("orders.now")})</span>}
+                  </span>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-3 text-sm text-ink-2 text-pretty">
+              {o.items.map((it) => `${it.name} × ${num(it.quantity)}`).join(", ")}
+              {o.donation > 0 && ` · ${t("orders.gave", { n: o.donation })}`}
+            </p>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 const ProfilePage = () => {
   const { backendUrl, isLoggedIn, checkAuthStatus } = useContext(AppContext);
   const { t, area } = useLang();
   const [params, setParams] = useSearchParams();
-  const tab = params.get("tab") === "wallet" ? "wallet" : "account";
+  const tab = ["wallet", "orders"].includes(params.get("tab")) ? params.get("tab") : "account";
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -161,7 +215,7 @@ const ProfilePage = () => {
   if (!isLoggedIn) return <SignInPrompt>{t("profile.signIn")}</SignInPrompt>;
   if (!user) return <Loading />;
 
-  const tabs = [["account", t("profile.tabProfile"), UserRound], ["wallet", t("profile.tabWallet"), Wallet]];
+  const tabs = [["account", t("profile.tabProfile"), UserRound], ["wallet", t("profile.tabWallet"), Wallet], ["orders", t("profile.tabOrders"), Package]];
 
   return (
     <>
@@ -181,18 +235,16 @@ const ProfilePage = () => {
 
       <div className="flex gap-2 mb-6 border-b border-line" role="tablist" aria-label={t("profile.sections")}>
         {tabs.map(([key, label, Icon]) => (
-          <button key={key} type="button" role="tab" aria-selected={tab === key} onClick={() => setParams(key === "wallet" ? { tab: "wallet" } : {})}
+          <button key={key} type="button" role="tab" aria-selected={tab === key} onClick={() => setParams(key === "account" ? {} : { tab: key })}
             className={`inline-flex items-center gap-2 px-4 min-h-11 -mb-px border-b-[3px] font-semibold ${tab === key ? "border-clay text-ink" : "border-transparent text-ink-2 hover:text-ink"}`}>
             <Icon size={17} aria-hidden="true" /> {label}
           </button>
         ))}
       </div>
 
-      {tab === "account" ? (
-        <AccountForm user={user} onSaved={async (u) => { setUser(u); await checkAuthStatus(); }} />
-      ) : (
-        <WalletPanel user={user} onToppedUp={async (points) => { setUser({ ...user, points }); await checkAuthStatus(); }} />
-      )}
+      {tab === "account" && <AccountForm user={user} onSaved={async (u) => { setUser(u); await checkAuthStatus(); }} />}
+      {tab === "wallet" && <WalletPanel user={user} onToppedUp={async (points) => { setUser({ ...user, points }); await checkAuthStatus(); }} />}
+      {tab === "orders" && <OrdersPanel />}
     </>
   );
 };

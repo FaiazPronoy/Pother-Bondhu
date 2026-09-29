@@ -3,6 +3,7 @@ import { Plus, Edit, Trash2, Save, X, PlusCircle, MinusCircle, Info } from 'luci
 import AdminNavbar from './AdminNavbar';
 import { DarkmodeContext } from '../context/DarkmodeContext';
 import { backendUrl } from '../config';
+import { petPoints } from './bits';
 
 const ProductPage = () => {
     const [products, setProducts] = useState([]);
@@ -544,10 +545,10 @@ const ProductPage = () => {
                                                     <strong> Description: </strong>{selectedProductDetails.description}
                                                 </p>
                                                 <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                                                    <strong> Purchase Cost:</strong> {selectedProductDetails.purchaseCost?.toFixed(2)}$
+                                                    <strong> Purchase Cost:</strong> {petPoints(selectedProductDetails.purchaseCost)}
                                                 </p>
                                                 <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                                                    <strong> Selling Price: </strong> {selectedProductDetails.sellingPrice?.toFixed(2)}$
+                                                    <strong> Selling Price: </strong> {petPoints(selectedProductDetails.sellingPrice)}
                                                 </p>
                                                 <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
                                                     <strong> Stock Quantity:</strong> {selectedProductDetails.stockQuantity}

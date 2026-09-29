@@ -4,6 +4,7 @@ import { AppContext } from '../context/AppContext';
 import {Trash2, AlertTriangle, Info, Truck, CheckCircle, Clock } from 'lucide-react';
 import AdminNavbar from './AdminNavbar';
 import { DarkmodeContext } from '../context/DarkmodeContext';
+import { petPoints } from './bits';
 
 const OrderPage = () => {
     const [orders, setOrders] = useState([]);
@@ -158,7 +159,7 @@ const OrderPage = () => {
             case 'Pending':
                 return <span className={`${baseClass} ${isDarkMode ? 'bg-indigo-800 text-indigo-100 border-indigo-700' : 'bg-indigo-100 text-indigo-800 border-indigo-300'} ${textBaseClass}`}><Clock className={`${iconClass} w-4 h-4 mr-1`} /> Pending</span>;
             case 'Out for Delivery':
-                return <span className={`${baseClass} ${isDarkMode ? 'bg-orange-800 text-orange-100 border-orange-700' : 'bg-orange-100 text-orange-800 border-orange-300'} ${textBaseClass}`}><Truck className={`${iconClass} w-4 h-4 mr-1`} /> Shipped</span>;
+                return <span className={`${baseClass} ${isDarkMode ? 'bg-orange-800 text-orange-100 border-orange-700' : 'bg-orange-100 text-orange-800 border-orange-300'} ${textBaseClass}`}><Truck className={`${iconClass} w-4 h-4 mr-1`} /> Out for Delivery</span>;
             case 'Delivered':
                 return <span className={`${baseClass} ${isDarkMode ? 'bg-green-800 text-green-100 border-green-700' : 'bg-green-100 text-green-800 border-green-300'} ${textBaseClass}`}><CheckCircle className={`${iconClass} w-4 h-4 mr-1`} /> Delivered</span>;
             default:
@@ -240,10 +241,10 @@ const OrderPage = () => {
                                         <tr key={order._id}>
                                             <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{order._id}</td>
                                             <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{order.userInfo?.name}</td>
-                                            <td className={`px-6 py-4 pr-8 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{new Date(order.createdAt).toLocaleDateString()}</td>
+                                            <td className={`px-6 py-4 pr-8 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{new Date(order.createdAt).toLocaleDateString('en-GB')}</td>
                                             {filterView === 'delivered' && (
                                                 <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>
-                                                    {order.updatedAt ? new Date(order.updatedAt).toLocaleDateString() : 'N/A'}
+                                                    {order.updatedAt ? new Date(order.updatedAt).toLocaleDateString('en-GB') : 'N/A'}
                                                 </td>
                                             )}
                                             <td className={`px-6 py-4 whitespace-nowrap text-sm`}>
@@ -270,16 +271,20 @@ const OrderPage = () => {
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>${order.totalPoints}</td>
+                                            <td className={`px-6 py-4 whitespace-nowrap text-sm ${isDarkMode ? 'text-white' : 'text-gray-700'}`}>{petPoints(order.totalPoints)}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <div className="flex gap-2 justify-end">
                                                     <button
+                                                        type="button"
+                                                        aria-label={`Details of the order from ${order.userInfo?.name || 'this customer'}`}
                                                         onClick={() => openDetailsModal(order)}
                                                         className="text-gray-500 hover:text-gray-700 px-2 py-1 rounded"
                                                     >
                                                         <Info className="h-4 w-4" />
                                                     </button>
                                                     <button
+                                                        type="button"
+                                                        aria-label={`Cancel the order from ${order.userInfo?.name || 'this customer'}`}
                                                         onClick={() => handleDeleteOrder(order._id)}
                                                         className="text-blue-700 hover:text-gray-800 px-2 py-1 rounded"
                                                     >
@@ -332,7 +337,7 @@ const OrderPage = () => {
                                                         <ul className={isDarkMode ? 'text-gray-300 list-disc ml-5' : 'text-gray-700 list-disc ml-5'}>
                                                             {selectedOrderDetails.items.map((item, index) => (
                                                                 <li key={index}>
-                                                                    {item.name} (Qty: {item.quantity}, Price: ${item.sellingPrice})
+                                                                    {item.name} (Qty: {item.quantity}, Price: {petPoints(item.sellingPrice)})
                                                                 </li>
                                                             ))}
                                                         </ul>
@@ -345,7 +350,7 @@ const OrderPage = () => {
                                                 )}
                                                 {selectedOrderDetails.donation > 0 && (
                                                     <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                                                        <strong>Donation:</strong> ${selectedOrderDetails.donation}
+                                                        <strong>Donation:</strong> {petPoints(selectedOrderDetails.donation)}
                                                     </p>
                                                 )}
                                                 {selectedOrderDetails.userInfo?.promo && (
@@ -387,11 +392,11 @@ const OrderPage = () => {
                                         </div>
                                         <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                             <h3 className={`text-lg leading-6 font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`} id="modal-headline">
-                                                Confirm Delete
+                                                Cancel this order?
                                             </h3>
                                             <div className="mt-2">
                                                 <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
-                                                    Are you sure you want to delete this order? This action cannot be undone.
+                                                    If it has not been delivered yet, the buyer gets their PetPoints back and the items go back into stock. This cannot be undone.
                                                 </p>
                                             </div>
                                         </div>
@@ -403,14 +408,14 @@ const OrderPage = () => {
                                         className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
                                         onClick={confirmDeleteOrder}
                                     >
-                                        Delete
+                                        Cancel order
                                     </button>
                                     <button
                                         type="button"
                                         className={`mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium ${isDarkMode ? 'text-gray-300 bg-gray-800 border-gray-500' : 'text-gray-700'} hover:${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm`}
                                         onClick={cancelDeleteOrder}
                                     >
-                                        Cancel
+                                        Keep it
                                     </button>
                                 </div>
                             </div>

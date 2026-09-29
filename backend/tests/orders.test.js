@@ -137,3 +137,55 @@ describe('placing an order', () => {
     expect(res.status).toBe(401);
   });
 });
+
+describe('your own orders', () => {
+  it('shows each person only the orders they placed', async () => {
+    const p = await createProduct({ sellingPrice: 100, purchaseCost: 60 });
+    const buyer = await createUser({ points: 1000 });
+    const other = await createUser({ points: 1000 });
+    await api('POST', '/api/orders/place', { cookie: buyer.cookie, body: { ...shipping, items: [{ id: p.id, quantity: 2 }] } });
+    await api('POST', '/api/orders/place', { cookie: other.cookie, body: { ...shipping, items: [{ id: p.id, quantity: 1 }] } });
+
+    const res = await api('GET', '/api/orders/mine', { cookie: buyer.cookie });
+    expect(res.status).toBe(200);
+    expect(res.body.orders).toHaveLength(1);
+    expect(res.body.orders[0].totalPoints).toBe(200);
+    expect(res.body.orders[0].status).toBe('Pending');
+    // what the shop paid for the item is not the buyer's business
+    expect(res.body.orders[0].items[0].purchaseCost).toBeUndefined();
+  });
+
+  it('needs you to be signed in', async () => {
+    const res = await api('GET', '/api/orders/mine');
+    expect(res.status).toBe(401);
+  });
+});
+
+describe('cancelling an order', () => {
+  it('gives the points back and restocks when it was not delivered', async () => {
+    const admin = await createUser({ role: 'admin' });
+    const p = await createProduct({ sellingPrice: 200, stockQuantity: 10 });
+    const buyer = await createUser({ points: 1000 });
+    await api('POST', '/api/orders/place', { cookie: buyer.cookie, body: { ...shipping, items: [{ id: p.id, quantity: 2 }] } });
+    const order = await getLatestOrder();
+    expect((await getUser(buyer.email)).points).toBe(600);
+
+    const res = await api('DELETE', `/api/orders/${order._id}`, { cookie: admin.cookie });
+    expect(res.status).toBe(200);
+    expect((await getUser(buyer.email)).points).toBe(1000);
+    const again = await api('GET', `/api/products/${p.id}`);
+    expect(again.body.stockQuantity ?? again.body.product?.stockQuantity).toBe(10);
+  });
+
+  it('does not refund an order that was already delivered', async () => {
+    const admin = await createUser({ role: 'admin' });
+    const p = await createProduct({ sellingPrice: 200 });
+    const buyer = await createUser({ points: 1000 });
+    await api('POST', '/api/orders/place', { cookie: buyer.cookie, body: { ...shipping, items: [{ id: p.id, quantity: 1 }] } });
+    const order = await getLatestOrder();
+    await api('PUT', `/api/orders/${order._id}`, { cookie: admin.cookie, body: { status: 'Delivered' } });
+
+    await api('DELETE', `/api/orders/${order._id}`, { cookie: admin.cookie });
+    expect((await getUser(buyer.email)).points).toBe(800);
+  });
+});

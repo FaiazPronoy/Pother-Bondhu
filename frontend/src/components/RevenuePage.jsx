@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { X, DollarSign, CalendarDays, CircleDollarSign } from 'lucide-react';
+import { X, Coins, CalendarDays, PiggyBank } from 'lucide-react';
 import AdminNavbar from './AdminNavbar';
 import { DarkmodeContext } from '../context/DarkmodeContext';
 import axios from 'axios';
 import { backendUrl } from '../config';
+import { petPoints } from './bits';
 
 const Card = ({ title, children, className, onClick }) => {
     const { isDarkMode } = useContext(DarkmodeContext);
@@ -71,11 +72,11 @@ const InvestmentCalculationDisplay = ({ title, calculation, onClose, isDarkMode,
                         </div>
                         <div className={`flex justify-between ${rowBgLight} py-2 px-3 rounded-md`}>
                             <span className={`${fontWeight} ${textColor}`}>Ordered Purchase Cost:</span>
-                            <span className={`${valueTextColor}`}> ${orderedPurchaseCost !== null ? orderedPurchaseCost.toFixed(2) : '0.00'} </span>
+                            <span className={`${valueTextColor}`}> {petPoints(orderedPurchaseCost)} </span>
                         </div>
                         <div className={`flex justify-between ${isDarkMode ? 'bg-gray-100 dark:bg-gray-800' : 'bg-gray-100'} py-2 px-3 rounded-md`}>
                             <span className={`text-lg ${fontWeight} ${totalTextColor}`}>Total Profit:</span>
-                            <span className={`text-lg ${fontWeight} ${totalTextColor}`}>${totalRevenue !== null && orderedPurchaseCost !== null ? (totalRevenue - orderedPurchaseCost).toFixed(2) : '0.00'}</span>
+                            <span className={`text-lg ${fontWeight} ${totalTextColor}`}>{petPoints(totalRevenue !== null && orderedPurchaseCost !== null ? totalRevenue - orderedPurchaseCost : 0)}</span>
                         </div>
                     </div>
                 </div>
@@ -216,7 +217,7 @@ const TotalRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, erro
                                 <td className={`py-2 px-3 text-sm ${valueTextColor}`}>{order._id}</td>
                                 <td className={`py-2 px-3 text-sm ${valueTextColor}`}>{order.userId}</td>
                                 <td className={`py-2 px-3 text-sm ${valueTextColor}`}>{new Date(order.createdAt).toLocaleString()}</td>
-                                <td className={`py-2 px-3 text-sm ${valueTextColor}`}>${order.totalPoints ? order.totalPoints.toFixed(2) : '0.00'}</td>
+                                <td className={`py-2 px-3 text-sm ${valueTextColor}`}>{petPoints(order.totalPoints)}</td>
                             </tr>
                         ))}</tbody>
                         <tfoot>
@@ -292,7 +293,7 @@ const MonthlyRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, er
                                     <td className={`py-2 px-3 text-sm ${valueTextColor}`}>{order._id}</td>
                                     <td className={`py-2 px-3 text-sm ${valueTextColor}`}>{new Date(order.createdAt).toLocaleDateString()}</td>
                                     <td className={`py-2 px-3 text-sm ${valueTextColor}`}>
-                                        {order.totalPoints ? `$${order.totalPoints.toFixed(2)}` : '$0.00'}
+                                        {petPoints(order.totalPoints)}
                                     </td>
                                 </tr>
                             ))}
@@ -376,7 +377,7 @@ const WeeklyRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, err
                                         <td className={`py-2 px-3 text-sm ${valueTextColor}`}>{date}</td>
                                         <td className={`py-2 px-3 text-sm ${valueTextColor}`}>{day}</td>
                                         <td className={`py-2 px-3 text-sm ${valueTextColor}`}>
-                                            ${order.totalPoints ? order.totalPoints.toFixed(2) : '0.00'}
+                                            {petPoints(order.totalPoints)}
                                         </td>
                                     </tr>
                                 );
@@ -386,7 +387,7 @@ const WeeklyRevenueDetailsModal = ({ isOpen, onClose, orderDetails, loading, err
                             <tr>
                                 <td colSpan="3" className={`py-2 px-3 text-lg ${fontWeight} ${headerTextColor} text-right`}>Total:</td> {/* Adjusted colSpan */}
                                 <td className={`py-2 px-3 text-lg ${fontWeight} ${valueTextColor}`}>
-                                    ${orderDetails.reduce((sum, order) => sum + (order.totalPoints || 0), 0).toFixed(2)}
+                                    {petPoints(orderDetails.reduce((sum, order) => sum + (order.totalPoints || 0), 0))}
                                 </td>
                             </tr>
                         </tfoot>
@@ -730,7 +731,7 @@ const RevenuePage = () => {
 
                     <Card title="Total Revenue" onClick={() => handleCardClick("Total Revenue")}>
                         <div className="flex items-center justify-center">
-                            <DollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
+                            <Coins className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
                             {loadingTotalRevenue ? (
                                 <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>Loading...</p>
                             ) : errorTotalRevenue ? (
@@ -743,46 +744,46 @@ const RevenuePage = () => {
                     </Card>
                     <Card title="Ordered Purchase Cost" onClick={() => handleCardClick("Ordered Purchase Cost")}>
                         <div className="flex items-center justify-center">
-                            <DollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-lime-400' : 'text-lime-600'}`} />
+                            <Coins className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-lime-400' : 'text-lime-600'}`} />
                             <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>
-                                ${orderedPurchaseCost !== null ? orderedPurchaseCost.toFixed(2) : '0.00'}
+                                {petPoints(orderedPurchaseCost)}
                             </p>
                         </div>
                         <p className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Total cost of products in all orders.</p>
                     </Card>
                     <Card title="Total Profit" onClick={() => handleCardClick('Total Profit')}>
                         <div className="flex items-center justify-center">
-                            <DollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+                            <Coins className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
                             <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : (totalRevenue !== null && orderedPurchaseCost !== null && (totalRevenue - orderedPurchaseCost) > 0 ? 'text-green-600' : 'text-red-600')}`}>
-                                ${totalRevenue !== null && orderedPurchaseCost !== null ? (totalRevenue - orderedPurchaseCost).toFixed(2) : '0.00'}
+                                {petPoints(totalRevenue !== null && orderedPurchaseCost !== null ? totalRevenue - orderedPurchaseCost : 0)}
                             </p>
                         </div>
                         <p className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Net earnings after deducting product costs.</p>
                     </Card>
                     <Card title="Average Order Value" onClick={() => handleCardClick("Average Order Value")}>
                         <div className="flex items-center justify-center">
-                            <DollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
+                            <Coins className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
                             <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>${averageOrderValue.toFixed(2) || '0.00'}</p>
                         </div>
                         <p className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Average revenue generated per order.</p>
                     </Card>
                     <Card title="Weekly Revenue" onClick={() => handleCardClick("Weekly Revenue")}>
                         <div className="flex items-center justify-center">
-                            <CircleDollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`} />
+                            <PiggyBank className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-orange-400' : 'text-orange-600'}`} />
                             <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>${weeklyRevenue !== null ? weeklyRevenue.toFixed(2) : '0.00'}</p>
                         </div>
                         <p className={`text-sm text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Revenue for the current week (starting Sunday).</p>
                     </Card>
                     <Card title="Weekly Order Purchase Cost" onClick={() => handleCardClick("Weekly Order Purchase Cost")}>
                         <div className="flex items-center justify-center">
-                            <DollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-lime-400' : 'text-lime-600'}`} />
+                            <Coins className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-lime-400' : 'text-lime-600'}`} />
                             {loadingWeeklyOrderPurchaseCost ? (
                                 <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>Loading...</p>
                             ) : errorWeeklyOrderPurchaseCost ? (
                                 <p className={`text-red-500`}>{errorWeeklyOrderPurchaseCost}</p>
                             ) : (
                                 <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>
-                                    ${weeklyOrderPurchaseCost !== null ? weeklyOrderPurchaseCost.toFixed(2) : '0.00'}
+                                    {petPoints(weeklyOrderPurchaseCost)}
                                 </p>
                             )}
                         </div>
@@ -792,14 +793,14 @@ const RevenuePage = () => {
                     </Card>
                     <Card title="Weekly Profit" onClick={() => handleCardClick("Weekly Profit")}>
                         <div className="flex items-center justify-center">
-                            <CircleDollarSign className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-lime-400' : 'text-lime-600'}`} />
+                            <PiggyBank className={`w-8 h-8 mr-2 ${isDarkMode ? 'text-lime-400' : 'text-lime-600'}`} />
                             {loadingWeeklyProfit ? (
                                 <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : 'text-blue-700'}`}>Loading...</p>
                             ) : errorWeeklyProfit ? (
                                 <p className={`text-red-500`}>{errorWeeklyProfit}</p>
                             ) : (
                                 <p className={`text-2xl font-semibold ${isDarkMode ? 'text-gray-200' : (weeklyProfit >= 0 ? 'text-green-600' : 'text-red-600')}`}>
-                                    ${weeklyProfit !== null ? weeklyProfit.toFixed(2) : '0.00'}
+                                    {petPoints(weeklyProfit)}
                                 </p>
                             )}
                         </div>

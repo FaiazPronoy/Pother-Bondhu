@@ -129,6 +129,9 @@ export function PasswordField({ id, label, value, onChange, autoComplete = "curr
   );
 }
 
+// plain text for the admin tables: "1,350 PetPoints"
+export const petPoints = (n) => `${Math.round(Number(n) || 0).toLocaleString("en-GB")} PetPoints`;
+
 export function Points({ value, className = "" }) {
   const { t, num } = useLang();
   return (

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Boxes, ClipboardList, ArrowRight, ShoppingCart, AlertTriangle, CheckCircle, GripVertical, CreditCard, DollarSign, TrendingUp, PiggyBank } from 'lucide-react';
+import { Boxes, ClipboardList, ArrowRight, ShoppingCart, AlertTriangle, CheckCircle, GripVertical, CreditCard, Coins, TrendingUp, PiggyBank } from 'lucide-react';
 import AdminNavbar from '../components/AdminNavbar';
 import { DarkmodeContext } from '../context/DarkmodeContext';
 import axios from 'axios';
 import { backendUrl } from '../config';
+import { petPoints } from '../components/bits';
 
 const Card = ({ title, children, className, onClick }) => {
     const { isDarkMode } = useContext(DarkmodeContext);
@@ -716,14 +717,14 @@ const AdminDashboard = () => {
                             </StyledLink>
                             <OverviewCard
                                 title="Monthly Revenue"
-                                value={loadingMonthlyRevenue ? 'Loading...' : errorMonthlyRevenue ? 'Error' : monthlyRevenue !== null ? `$${monthlyRevenue.toFixed(2)}` : '$0.00'}
+                                value={loadingMonthlyRevenue ? 'Loading...' : errorMonthlyRevenue ? 'Error' : petPoints(monthlyRevenue)}
                                 icon={() => <CreditCard className={isDarkMode ? 'text-green-500 w-11 h-11' : 'text-green-600 w-11 h-11'} />}
                                 onClick={() => setActiveTab('Revenue')}
                             />
                             <OverviewCard
                                 title="Average Order Value"
-                                value={loading ? 'Loading...' : errorAverageOrderValue ? 'Error' : averageOrderValue !== 'Loading...' ? `$${averageOrderValue}` : '$0.00'}
-                                icon={DollarSign} // Using DollarSign as a relevant icon
+                                value={loading ? 'Loading...' : errorAverageOrderValue ? 'Error' : averageOrderValue !== 'Loading...' ? petPoints(averageOrderValue) : petPoints(0)}
+                                icon={Coins}
                                 onClick={() => console.log('Average Order Value card clicked')}
                             />
                         </div>
@@ -777,9 +778,9 @@ const AdminDashboard = () => {
                             <Card title={<span><span className="text-3xl mr-1">💰</span> Financial Overview</span>} className="bg-gray-200">
                                 <ul className="space-y-3.5 mt-2">
                                     <li className="flex items-center space-x-2">
-                                        <DollarSign className="w-6 h-6 text-red-600" />
+                                        <Coins className="w-6 h-6 text-red-600" />
                                         <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700 text-sm flex items-center'}>
-                                            <span className="font-semibold">Ordered Purchase Cost</span>: {orderedPurchaseCost?.toFixed(2)}$
+                                            <span className="font-semibold">Ordered Purchase Cost</span>: {petPoints(orderedPurchaseCost)}
                                         </span>
                                     </li>
                                     <li className="flex items-center space-x-2">
@@ -791,7 +792,7 @@ const AdminDashboard = () => {
                                     <li className="flex items-center space-x-2">
                                         <PiggyBank className="w-6 h-6 text-purple-500" />
                                         <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700 text-sm flex items-center'}>
-                                            <span className="font-semibold">Net Profit</span>: {totalProfit?.toFixed(2)}$
+                                            <span className="font-semibold">Net Profit</span>: {petPoints(totalProfit)}
                                         </span>
                                     </li>
                                 </ul>

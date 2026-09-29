@@ -100,6 +100,17 @@ export const placeOrder = async (req, res) => {
   }
 };
 
+// The signed-in user's own orders, newest first, without what the shop paid
+// for the items
+export const getMyOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.userId }, '-items.purchaseCost').sort({ createdAt: -1 }).limit(50);
+    res.status(200).json({ success: true, orders });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to fetch orders." });
+  }
+};
+
 // Admin: Get all orders
 export const getAllOrders = async (req, res) => {
   try {
@@ -111,15 +122,29 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
-// Admin: Delete order
+// Admin: cancel an order. One that has not been delivered gives the buyer
+// their PetPoints back and puts the items back on the shelf; a delivered one
+// is only taken off the list.
 export const deleteOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+      return res.status(404).json({ success: false, message: 'Order not found.' });
+    }
     const order = await Order.findByIdAndDelete(orderId);
     if (!order) {
       return res.status(404).json({ success: false, message: 'Order not found.' });
     }
-    res.status(200).json({ success: true, message: 'Order deleted successfully.' });
+    if (order.status !== 'Delivered') {
+      await Promise.all([
+        User.updateOne({ _id: order.userId }, { $inc: { points: order.totalPoints } }),
+        ...order.items
+          .filter((i) => i.productId)
+          .map((i) => Product.updateOne({ _id: i.productId }, { $inc: { stockQuantity: i.quantity } })),
+      ]);
+      return res.status(200).json({ success: true, refunded: order.totalPoints, message: 'Order cancelled and refunded.' });
+    }
+    res.status(200).json({ success: true, refunded: 0, message: 'Order removed.' });
   } catch (error) {
     console.error('Error deleting order:', error);
     res.status(500).json({ success: false, message: 'Internal server error.' });
