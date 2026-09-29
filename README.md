@@ -11,9 +11,9 @@ they did. Supporters top up an in-app credit called PetPoints, which they can
 send to a volunteer or spend in a small supplies shop, with an optional extra
 for rescues at checkout. An admin runs the shop and sees orders and revenue.
 
-It started life as **Save Paws**, a personal project. I came back to it twice:
-once to fix the backend, and once to rename it and rebuild the interface. Both
-passes are written up [below](#what-changed-and-why).
+I came back to it twice after the first version: once to fix the backend, and
+once to rebuild the interface. Both passes are written up
+[below](#what-changed-and-why).
 
 | English | বাংলা |
 |---|---|
@@ -217,14 +217,13 @@ Going back through it properly, a fair bit was worse than I remembered:
   of invite endpoints (one let anyone join any team), and an unused admin
   router.
 
-### Second pass: the name and the interface
+### Second pass: the interface
 
 The old front page claimed "5,000+ animals rescued" and "$250K raised", listed
 GPS tracking and chat that never existed, and linked to three pages that were
 not there. The banner photo had real, recognisable people in it, and the shop
 used product photos copied from Amazon listings. So:
 
-- **Renamed to CholoBachai** everywhere, from the page title to the seed emails.
 - **Rebuilt every screen** on one set of colour tokens: warm paper, clay and
   moss, Fraunces for headings, Figtree for text and Tiro Bangla for the Bangla
   lines. Visitors get a public site; signed-in users get a sidebar and the

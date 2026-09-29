@@ -29,8 +29,6 @@ yarn-error.log*
 # Coverage
 coverage/
 
-# local agent notes
-
 # screenshots from tools/browser_checks.py
 tools/out/
 __pycache__/
