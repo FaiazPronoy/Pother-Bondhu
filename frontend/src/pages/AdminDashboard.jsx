@@ -199,7 +199,6 @@ const AdminDashboard = () => {
             try {
                 const response = await axios.get(`${backendUrl}/api/products/most-ordered`);
                 setMostOrderedProductsData(response.data);
-                console.log("Most ordered products fetched:", response.data);
             } catch (error) {
                 console.error("Error fetching most ordered products:", error);
             }
@@ -247,7 +246,6 @@ const AdminDashboard = () => {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
                     withCredentials: true,
                 });
-                console.log("All Orders Response for Weekly Revenue Chart:", response.data);
                 if (response.data?.success && response.data.orders) {
                     const now = new Date();
                     const startOfWeek = new Date(now);
@@ -306,7 +304,18 @@ const AdminDashboard = () => {
     }, [orders]);
 
     const recentOrders = orders ? orders.slice(0, 3) : [];
-    const profitTrendsThisWeek = [10, 20, 15, 25, 30, 28, 35];
+    // profit per day since Sunday, from the orders themselves
+    const weekStart = new Date();
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+    const profitTrendsThisWeek = Array(7).fill(0);
+    for (const order of orders || []) {
+        const createdAt = new Date(order.createdAt);
+        if (createdAt < weekStart) continue;
+        for (const item of order.items || []) {
+            profitTrendsThisWeek[createdAt.getDay()] += ((item.sellingPrice || 0) - (item.purchaseCost || 0)) * (item.quantity || 0);
+        }
+    }
 
     const renderBarChart = (data, title) => {
         if (loadingWeeklyRevenueChart) {
@@ -340,7 +349,7 @@ const AdminDashboard = () => {
                                         fill={isDarkMode ? "white" : "black"}
                                         textAnchor="middle"
                                     >
-                                        {point.revenue.toFixed(2)}
+                                        {point.revenue.toLocaleString('en-GB')}
                                     </text>
                                     <rect
                                         x={x}
@@ -451,7 +460,8 @@ const AdminDashboard = () => {
     const renderLineChart = (data, title) => {
         const availableWidth = chartRef?.current?.offsetWidth || 200;
         if (!chartRef.current) return null;
-        const maxDataValue = Math.max(...data);
+        // a quiet week is all zeros, and dividing by zero draws nothing
+        const maxDataValue = Math.max(...data, 1);
         const chartHeight = 150;
         const dataPoints = data.length;
         const xStep = availableWidth / (dataPoints - 1);
@@ -572,7 +582,6 @@ const AdminDashboard = () => {
         const fetchAllOrdersForRevenue = async () => {
             setLoadingTotalRevenue(true);
             setErrorTotalRevenue(null);
-            console.log("Fetching all orders for revenue and cost calculation...");
             try {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
                     withCredentials: true,
@@ -581,18 +590,20 @@ const AdminDashboard = () => {
                     const fetchedOrders = response.data.orders;
                     setOrders(fetchedOrders);
                     let calculatedTotalRevenue = 0;
+                    let calculatedSales = 0;
                     let calculatedOrderedPurchaseCost = 0;
                     for (const order of fetchedOrders) {
                         calculatedTotalRevenue += (order.totalPoints || 0);
                         if (order.items && Array.isArray(order.items)) {
                             for (const item of order.items) {
+                                calculatedSales += (item.sellingPrice || 0) * (item.quantity || 0);
                                 calculatedOrderedPurchaseCost += (item.purchaseCost || 0) * (item.quantity || 0);
                             }
                         }
                     }
                     setTotalRevenue(calculatedTotalRevenue);
                     setOrderedPurchaseCost(calculatedOrderedPurchaseCost);
-                    setTotalProfit(calculatedTotalRevenue - calculatedOrderedPurchaseCost); // Calculate total profit
+                    setTotalProfit(calculatedSales - calculatedOrderedPurchaseCost);
                 } else {
                     console.error("Failed to fetch orders. Response data:", response.data);
                     setErrorTotalRevenue(response.data?.message || 'Failed to fetch orders.');
@@ -602,7 +613,6 @@ const AdminDashboard = () => {
                 setErrorTotalRevenue(error.message || 'An error occurred while fetching orders.');
             } finally {
                 setLoadingTotalRevenue(false);
-                console.log("Order fetching and revenue/cost calculation complete. Loading state set to false.");
             }
         };
         fetchAllOrdersForRevenue();
@@ -615,7 +625,6 @@ const AdminDashboard = () => {
                 const response = await axios.get(`${backendUrl}/api/orders/all`, {
                     withCredentials: true,
                 });
-                console.log("All Orders Response for Monthly Revenue:", response.data);
                 if (response.data?.success && response.data.orders) {
                     const now = new Date();
                     const currentYear = now.getFullYear();
@@ -653,12 +662,12 @@ const AdminDashboard = () => {
                         <DraggablePanel title="Dashboard Notes">
                             <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 <AlertTriangle className="inline-block w-4 h-4 mr-1 text-yellow-400" />
-                                <span className="font-medium">Important:</span> Welcome to our Save Paw's admin dashboard.
+                                <span className="font-medium">Welcome back.</span> This is where the shop side of CholoBachai is run.
                             </p>
                             <ul className={`list-disc list-inside mt-2 space-y-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                <li>Click on the overview cards to view details.</li>
-                                <li>Charts are placeholders; real data will be dynamic.</li>
-                                <li>Use the sidebar to navigate to other sections.</li>
+                                <li>Click a card to open the page behind it.</li>
+                                <li>All figures are in PetPoints and come from real orders.</li>
+                                <li>Profit leaves out donations, which go to rescues.</li>
                             </ul>
                             <button
                                 onClick={() => setShowDraggablePanel(false)}
@@ -670,7 +679,6 @@ const AdminDashboard = () => {
                         </DraggablePanel>
                     )}
                 </AnimatePresence>
-                {activeTab === 'Dashboard' && (
                     <>
                         <div className="flex justify-center mb-8">
                             <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
@@ -704,7 +712,6 @@ const AdminDashboard = () => {
                                     title="Total Products"
                                     value={totalProducts}
                                     icon={() => <Boxes className={isDarkMode ? 'text-blue-400 w-12 h-12' : 'text-blue-600 w-12 h-12'} />}
-                                    onClick={() => setActiveTab('Products')}
                                 />
                             </StyledLink>
                             <StyledLink to="/adminorders">
@@ -712,21 +719,22 @@ const AdminDashboard = () => {
                                     title="Pending Orders"
                                     value={loading ? 'Loading...' : pendingOrdersCount}
                                     icon={() => <ShoppingCart className={isDarkMode ? 'text-yellow-200 w-11 h-11' : 'text-yellow-400 w-11 h-11'} />}
-                                    onClick={() => setActiveTab('Orders')}
                                 />
                             </StyledLink>
+                            <StyledLink to="/adminrevenue">
                             <OverviewCard
                                 title="Monthly Revenue"
                                 value={loadingMonthlyRevenue ? 'Loading...' : errorMonthlyRevenue ? 'Error' : petPoints(monthlyRevenue)}
                                 icon={() => <CreditCard className={isDarkMode ? 'text-green-500 w-11 h-11' : 'text-green-600 w-11 h-11'} />}
-                                onClick={() => setActiveTab('Revenue')}
                             />
+                            </StyledLink>
+                            <StyledLink to="/adminrevenue">
                             <OverviewCard
                                 title="Average Order Value"
                                 value={loading ? 'Loading...' : errorAverageOrderValue ? 'Error' : averageOrderValue !== 'Loading...' ? petPoints(averageOrderValue) : petPoints(0)}
                                 icon={Coins}
-                                onClick={() => console.log('Average Order Value card clicked')}
                             />
+                            </StyledLink>
                         </div>
                     
                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-10 mb-10">
@@ -746,12 +754,12 @@ const AdminDashboard = () => {
                                 <ul className="space-y-3.5 mt-2">
                                     {recentOrders.map(order => (
                                         <li key={order._id} className={isDarkMode ? 'text-gray-300 text-sm' : 'text-gray-700 text-sm'}>
-                                            <span className="font-medium">Order #{order._id}</span> -{' '}
+                                            <span className="font-medium">#{order._id.slice(-6)} {order.userInfo?.name}</span>, {petPoints(order.totalPoints)} -{' '}
                                             <span
                                                 className={
                                                     order.status === 'Pending'
                                                         ? 'text-yellow-500'
-                                                        : order.status === 'Shipped'
+                                                        : order.status === 'Out for Delivery'
                                                             ? 'text-blue-500'
                                                             : 'text-green-500'}>
                                                 {order.status}
@@ -786,7 +794,7 @@ const AdminDashboard = () => {
                                     <li className="flex items-center space-x-2">
                                         <TrendingUp className="w-6 h-6 text-green-500" />
                                         <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700 text-sm flex items-center'}>
-                                            <span className="font-semibold">Total Revenue</span>: {typeof totalRevenue === 'number' ? `${totalRevenue.toFixed(2)}$` : totalRevenue}
+                                            <span className="font-semibold">Total Paid In</span>: {typeof totalRevenue === 'number' ? petPoints(totalRevenue) : totalRevenue}
                                         </span>
                                     </li>
                                     <li className="flex items-center space-x-2">
@@ -802,32 +810,6 @@ const AdminDashboard = () => {
                             </Card>
                         </div>
                     </>
-                )}
-                {activeTab === 'Products' && (
-                    <div className={isDarkMode ? 'bg-gray-800 backdrop-blur-md p-6 rounded-xl shadow-md border border-gray-700' : 'bg-white/5 backdrop-blur-md p-6 rounded-xl shadow-md border border-white/10'}>
-                        <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-blue-700'} mb-6`}>Products</h2>
-                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>This is the Products Management page.</p>
-                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>You can Add, edit, and delete products here.</p>
-                        <StyledLink to="/adminproducts" className="mt-4 inline-flex items-center">
-                            Go to Products <ArrowRight className="w-4 h-4 ml-1" />
-                        </StyledLink>
-                    </div>
-                )}
-                {activeTab === 'Orders' && (
-                    <div className={isDarkMode ? 'bg-gray-800 backdrop-blur-md p-6 rounded-xl shadow-md border border-gray-700' : 'bg-white/5 backdrop-blur-md p-6 rounded-xl shadow-md border border-white/10'}>
-                        <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-blue-700'} mb-6`}>Orders</h2>
-                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>This is the Orders Management page.</p>
-                        <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>You can View past orders and orders to be delivered here.</p>
-                    </div>
-                )}
-                {activeTab === 'Revenue' && (
-                    <div className={isDarkMode ? 'bg-gray-800 backdrop-blur-md p-6 rounded-xl shadow-md border border-gray-700' : 'bg-white/5 backdrop-blur-md p-6 rounded-xl shadow-md border border-white/10'}>
-                        <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-blue-700'} mb-6`}>Revenue</h2>
-                        <StyledLink to="/adminrevenue" className="mt-4 inline-flex items-center">
-                            View Revenue Details <ArrowRight className="w-4 h-4 ml-1" />
-                        </StyledLink>
-                    </div>
-                )}
             </div>
         </div >
     );

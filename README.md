@@ -133,7 +133,7 @@ Open <http://localhost:5173>. If you use a different port, add it to
 
 ## Tests
 
-**Backend**, 66 tests:
+**Backend**, 70 tests:
 
 ```bash
 cd backend
@@ -244,6 +244,12 @@ used product photos copied from Amazon listings. So:
   messages are translated on the way in.
 - **Smaller bundle**: the admin screens load only when an admin opens them,
   which took the main script from 615 kB to 400 kB.
+- **The revenue page was rebuilt.** It fetched the same orders six times, showed
+  PetPoints with a dollar sign, counted donations as profit, and its monthly
+  card never finished loading. It now reads the orders once and splits shop
+  sales, product cost, profit and donations, for all time, this week and this
+  month. The dashboard's profit chart used made up numbers; it now draws the
+  real profit for each day of the week.
 
 ## Known limitations
 
@@ -251,8 +257,8 @@ used product photos copied from Amazon listings. So:
   payment happens; the amount is validated and capped at 10,000.
 - **The login lockout lives in memory**, so it resets when the server restarts
   and would not be shared across several servers.
-- **`npm run lint` still reports errors in the admin screens**, mostly unused
-  variables in the revenue page. The pages I rewrote have none.
+- **`npm run lint` still reports errors in the admin dashboard**, mostly
+  unused variables. The pages I rewrote have none.
 - **Product images are URLs typed into the admin form**, not uploads.
 - The admin screens' tables and charts are still English only; their sidebar
   switches language with the rest.
