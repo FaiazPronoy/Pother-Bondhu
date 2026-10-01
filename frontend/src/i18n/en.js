@@ -60,6 +60,7 @@ const en = {
   footer: {
     blurb: 'Made by people who can\'t walk past a hungry dog. Feeders, night drivers and vet students, all over Dhaka.',
     photos: 'Photos from',
+    madeBy: 'Made by Faiaz Abrar Zaman Pronoy and Sinthia Khandoker. All rights reserved.',
   },
   landing: {
     // the | marks where the line breaks
