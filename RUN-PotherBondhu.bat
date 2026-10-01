@@ -1,9 +1,9 @@
 @echo off
-title CholoBachai - launcher
+title Pother Bondhu - launcher
 cd /d "%~dp0"
 
 echo ==========================================
-echo   CHOLOBACHAI
+echo   POTHER BONDHU
 echo ==========================================
 echo.
 
@@ -31,7 +31,7 @@ echo [3/5] Writing backend\.env ...
 set "SECRET="
 for /f %%i in ('node -p "require('crypto').randomBytes(32).toString('hex')"') do set "SECRET=%%i"
 if not defined SECRET set "SECRET=change_me_a_long_random_value_please"
-> ".env" echo MONGODB_URI=mongodb://127.0.0.1:27017/cholobachai
+> ".env" echo MONGODB_URI=mongodb://127.0.0.1:27017/potherbondhu
 >> ".env" echo JWT_SECRET=%SECRET%
 >> ".env" echo NODE_ENV=development
 >> ".env" echo PORT=4000
@@ -54,16 +54,16 @@ call npm install
 
 echo [5/5] Starting backend and frontend in their own windows ...
 cd /d "%~dp0backend"
-start "CholoBachai - BACKEND (4000)" cmd /k "npm run dev"
+start "Pother Bondhu - BACKEND (4000)" cmd /k "npm run dev"
 cd /d "%~dp0frontend"
-start "CholoBachai - FRONTEND (5175)" cmd /k "npm run dev -- --port 5175"
+start "Pother Bondhu - FRONTEND (5175)" cmd /k "npm run dev -- --port 5175"
 
 echo.
 echo   Open  http://localhost:5175
 echo.
-echo   Admin       admin@cholobachai.com    /  Admin@1234
-echo   Volunteer   nabila@cholobachai.com   /  Volunteer@123
-echo   Donor       mehedi@cholobachai.com   /  Donor@1234
+echo   Admin       admin@potherbondhu.com    /  Admin@1234
+echo   Volunteer   nabila@potherbondhu.com   /  Volunteer@123
+echo   Donor       mehedi@potherbondhu.com   /  Donor@1234
 echo.
 echo   Port 5175 on purpose, so this and the Course Compass
 echo   can run at the same time without clashing.

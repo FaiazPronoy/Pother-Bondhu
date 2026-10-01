@@ -662,7 +662,7 @@ const AdminDashboard = () => {
                         <DraggablePanel title="Dashboard Notes">
                             <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 <AlertTriangle className="inline-block w-4 h-4 mr-1 text-yellow-400" />
-                                <span className="font-medium">Welcome back.</span> This is where the shop side of CholoBachai is run.
+                                <span className="font-medium">Welcome back.</span> This is where the shop side of Pother Bondhu is run.
                             </p>
                             <ul className={`list-disc list-inside mt-2 space-y-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                                 <li>Click a card to open the page behind it.</li>
@@ -688,7 +688,7 @@ const AdminDashboard = () => {
                         <div className="flex items-center justify-between mb-12">
                             <div>
                                 <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                                    Orders, stock and the money side of CholoBachai.
+                                    Orders, stock and the money side of Pother Bondhu.
                                 </p>
                             </div>
                             <button

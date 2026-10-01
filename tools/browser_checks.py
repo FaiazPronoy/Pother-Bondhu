@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Browser checks for CholoBachai, run in a real browser through Playwright.
+Browser checks for Pother Bondhu, run in a real browser through Playwright.
 
   1. crawl     every page a visitor, a volunteer, a supporter and the admin can
                reach: nothing blank, no console errors, no failed requests
@@ -205,11 +205,11 @@ def main():
         print("\n=== crawl ===")
         visitor = browser.new_context()
         volunteer = browser.new_context()
-        sign_in(volunteer, "nabila@cholobachai.com", "Volunteer@123")
+        sign_in(volunteer, "nabila@potherbondhu.com", "Volunteer@123")
         supporter = browser.new_context()
-        sign_in(supporter, "mehedi@cholobachai.com", "Donor@1234")
+        sign_in(supporter, "mehedi@potherbondhu.com", "Donor@1234")
         admin = browser.new_context()
-        sign_in(admin, "admin@cholobachai.com", "Admin@1234")
+        sign_in(admin, "admin@potherbondhu.com", "Admin@1234")
 
         crawled = {
             "visitor": crawl(visitor, BASE + "/"),
@@ -269,7 +269,7 @@ def main():
         page.evaluate("localStorage.setItem('lang', 'en')")
         page.close()
 
-        for who, email, password in (("visitor", None, None), ("volunteer", "nabila@cholobachai.com", "Volunteer@123")):
+        for who, email, password in (("visitor", None, None), ("volunteer", "nabila@potherbondhu.com", "Volunteer@123")):
             ctx = browser.new_context()
             ctx.add_init_script("try { localStorage.setItem('lang', 'bn') } catch (e) {}")
             if email:

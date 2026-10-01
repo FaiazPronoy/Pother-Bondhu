@@ -1,15 +1,16 @@
-# CholoBachai: An Animal Rescue Network
+# Pother Bondhu: An Animal Rescue Network
 
 *ওরা কথা বলতে পারে না, আমরা পারি।* They can't speak. We can.
 
 *একটু যত্ন, একটু আলো, ওদের জীবন হোক আরও ভালো।*
 
-CholoBachai connects people who spot a street animal in trouble with volunteers
-nearby. Anyone can post a photo to the rescue board; volunteers form teams by
-area (feeding routes, night rescues, vaccination camps) and keep a log of what
-they did. Supporters top up an in-app credit called PetPoints, which they can
-send to a volunteer or spend in a small supplies shop, with an optional extra
-for rescues at checkout. An admin runs the shop and sees orders and revenue.
+Pother Bondhu (পথের বন্ধু, "a friend of the street") connects people who spot a
+street animal in trouble with volunteers nearby. Anyone can post a photo to the
+rescue board; volunteers form teams by area (feeding routes, night rescues,
+vaccination camps) and keep a log of what they did. Supporters top up an in-app
+credit called PetPoints, which they can send to a volunteer or spend in a small
+supplies shop, with an optional extra for rescues at checkout. An admin runs the
+shop and sees orders and revenue.
 
 I came back to it twice after the first version: once to fix the backend, and
 once to rebuild the interface. Both passes are written up
@@ -61,7 +62,7 @@ once to rebuild the interface. Both passes are written up
 
 ## Running it on Windows
 
-The quick way is `RUN-CholoBachai.bat` in the project folder. It checks for
+The quick way is `RUN-PotherBondhu.bat` in the project folder. It checks for
 MongoDB on `127.0.0.1:27017`, installs packages, writes `backend/.env` with a
 random JWT secret, loads the demo data the first time, and opens the API and
 the site in two windows (<http://localhost:5175>).
@@ -100,9 +101,9 @@ rescue posts with photos, 12 products and 8 orders. The logins:
 
 | Role | Email | Password |
 |---|---|---|
-| Admin | `admin@cholobachai.com` | `Admin@1234` |
-| Volunteer | `nabila@cholobachai.com` | `Volunteer@123` |
-| Supporter | `mehedi@cholobachai.com` | `Donor@1234` |
+| Admin | `admin@potherbondhu.com` | `Admin@1234` |
+| Volunteer | `nabila@potherbondhu.com` | `Volunteer@123` |
+| Supporter | `mehedi@potherbondhu.com` | `Donor@1234` |
 
 The sign-in page also has one-tap buttons for these three, so nobody has to
 type them. Nabila has a team invitation waiting, so the invite flow can be
