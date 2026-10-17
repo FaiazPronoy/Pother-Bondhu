@@ -12,6 +12,8 @@ with PetPoints and a small supplies shop.
 |---|---|
 | **Type** | Personal project (not for a course) |
 | **Made by** | Faiaz Abrar Zaman Pronoy and Sinthia Khandoker |
+| **Versions** | [v1.0, the first version, and v2.0, the rebuild](../../releases) |
+| **Old name** | The first version was called **Save Paws**. It is **Pother Bondhu** from v2.0. |
 | **Languages** | Bangla and English, with a dark mode |
 
 | English | বাংলা |
