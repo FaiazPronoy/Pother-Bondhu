@@ -1,5 +1,7 @@
 # Pother Bondhu (পথের বন্ধু)
 
+[![Tests](https://github.com/FaiazPronoy/Pother-Bondhu/actions/workflows/tests.yml/badge.svg)](https://github.com/FaiazPronoy/Pother-Bondhu/actions/workflows/tests.yml)
+
 **An animal rescue network for the streets of Dhaka.**
 
 *ওরা কথা বলতে পারে না, আমরা পারি।* They can't speak. We can.
