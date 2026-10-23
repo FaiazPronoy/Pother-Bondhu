@@ -126,6 +126,21 @@ Open <http://localhost:5173>. In `backend/.env`, set `MONGODB_URI` and `JWT_SECR
 
 ---
 
+## Settings
+
+Copy `backend/.env.example` to `backend/.env`. The `.env` file is never committed.
+
+| Variable | What it is |
+|---|---|
+| `MONGODB_URI` | MongoDB connection string |
+| `JWT_SECRET` | A long random string that signs the login cookie |
+| `PORT` | Port for the API (default `4000`) |
+| `CLIENT_URL` | The site allowed to call the API |
+| `NODE_ENV` | `development` or `production` |
+| `SMTP_USER`, `SMTP_PASS`, `SENDER_EMAIL` | Optional, for the welcome email |
+
+---
+
 ## Tests
 
 - `cd backend && npm test` runs **70 tests** against the real server and an in-memory database
