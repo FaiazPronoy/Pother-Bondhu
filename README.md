@@ -15,7 +15,7 @@ with PetPoints and a small supplies shop.
 | **Type** | Personal project (not for a course) |
 | **Made by** | Faiaz Abrar Zaman Pronoy and Sinthia Khandoker |
 | **Versions** | [v1.0, the first version, and v2.0, the rebuild](../../releases) |
-| **Old name** | The first version was called **Save Paws**. It is **Pother Bondhu** from v2.0. |
+| **History** | First built in Summer 2025 as **Save Paws**. Rebuilt as **Pother Bondhu** (v2.0) and published here in October 2026. |
 | **Languages** | Bangla and English, with a dark mode |
 
 | English | বাংলা |
@@ -188,10 +188,20 @@ and @neakasa.
 
 ---
 
-## Authors
+## Who made it
+
+Faiaz started the project and led it. He built the backend and the parts that
+handle money, and shared the community side of the app with Sinthia.
 
 - **Faiaz Abrar Zaman Pronoy** (ফাইয়াজ আবরার জামান প্রনয়), lead developer
+  - The API and the database design
+  - Sign in and security: the login cookie, lockout and photo checks
+  - PetPoints, the shop, orders and stock that stay right under many requests at once
+  - The admin panel with revenue and profit, and the test suite
 - **Sinthia Khandoker** (সিনথিয়া খন্দকার)
+  - The rescue board and the volunteer pages
+  - Teams and invitations
+  - The Bangla translation
 
 ## Licence
 
