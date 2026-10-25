@@ -1,7 +1,3 @@
-// Every piece of interface text, in English. bn.js has the same keys.
-// Things people write themselves (captions, team names, bios, updates) are
-// never translated: they show in whatever language they were written in.
-
 const en = {
   common: {
     signIn: 'Sign in',
@@ -63,7 +59,6 @@ const en = {
     madeBy: 'Made by Faiaz Abrar Zaman Pronoy and Sinthia Khandoker. All rights reserved.',
   },
   landing: {
-    // the | marks where the line breaks
     title1: 'A little care,|a little light,',
     title2a: 'can make their',
     title2b: 'world feel right.',
@@ -467,7 +462,6 @@ const en = {
     sure: 'Are you sure?', logoutQ: 'Do you want to log out?', yes: 'Yes', no: 'No',
     collapse: 'Collapse sidebar', expand: 'Expand sidebar',
   },
-  // what the server says, for the Bangla side to translate; English shows it as is
   server: {},
 };
 

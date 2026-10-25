@@ -21,7 +21,6 @@ function PostForm({ onPosted }) {
   const [sending, setSending] = useState(false);
   const input = useRef(null);
 
-  // free the old preview URL whenever the photo changes
   useEffect(() => () => preview && URL.revokeObjectURL(preview), [preview]);
 
   const pick = (f) => {
@@ -126,7 +125,6 @@ export default function Rescues() {
 
   useEffect(load, [backendUrl]);
 
-  // the dashboard's "Post a rescue" button links to #post
   useEffect(() => {
     if (location.hash === "#post") document.getElementById("post")?.scrollIntoView({ behavior: "smooth" });
   }, [location.hash]);

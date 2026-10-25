@@ -11,7 +11,6 @@ import TeamInvite from './models/inviteModel.js';
 import Cart from './models/CartModel.js';
 import { readFileSync } from 'fs';
 
-// photos in frontend/public/img/shop, all from Unsplash (credits in the README)
 const shop = '/img/shop';
 const products = [
   { id: 'SP-001', name: 'Dry Dog Food, 3 kg', category: 'food', purchaseCost: 950, sellingPrice: 1350, stockQuantity: 40, imageUrl: `${shop}/dry-food.jpg`,
@@ -52,7 +51,6 @@ const people = [
   { name: 'Farhana Akter', email: 'farhana@potherbondhu.com', password: 'Donor@1234', role: 'donor', points: 4500, location: 'Moghbazar', bio: '' },
 ];
 
-// the first in crew leads the team; log entries are [who, message, hours ago]
 const teams = [
   { id: 'TEAM-01', name: 'Dhanmondi Street Feeders', area: 'Dhanmondi', category: 'Rescue', crew: ['nabila', 'sadia', 'priya'],
     description: 'Evening feeding route around Dhanmondi lake and Road 27. We meet at 8 pm by the Rabindra Sarobar steps.',
@@ -71,8 +69,6 @@ const teams = [
     log: [['arif', 'ছয়টা পানির পাত্রই ভরে দিয়েছি। এই সপ্তাহে গরম খুব বেশি।', 18]] },
 ];
 
-// photos in backend/seed-photos, stored in the database the same way an upload is
-// [who, file, area, caption, hours ago]
 const rescues = [
   ['nabila', 'injured-eye.jpg', 'Dhanmondi', 'Eye looks swollen and cloudy. Found him near Road 27. Friendly, let me sit next to him. Needs a clinic trip.', 5],
   ['sadia', 'street-dinner.jpg', 'Mirpur', 'Night round done. 14 dogs fed between Mirpur 10 and 11. The black one ate twice, she is nursing somewhere close.', 9],
@@ -86,7 +82,6 @@ const rescues = [
   ['sadia', 'calico.jpg', 'Mirpur', 'Vaccinated this one at the Mirpur camp. Sat through it like a champion.', 130],
 ];
 
-// spread the demo orders over the last few weeks so the revenue charts have a shape
 function daysAgo(n) {
   const d = new Date();
   d.setDate(d.getDate() - n);
@@ -114,8 +109,6 @@ async function seed() {
   await mongoose.connect(uri);
   console.log('Connected to', mongoose.connection.name);
 
-  // the launcher runs this with --if-needed on every start: it fills an empty
-  // database and leaves anything else alone
   if (process.argv.includes('--if-needed')) {
     const emails = (await userModel.find({}, 'email').lean()).map((u) => u.email);
     if (emails.length) {
@@ -163,7 +156,6 @@ async function seed() {
   );
   console.log(`Inserted ${createdTeams.length} teams`);
 
-  // Nabila has an invitation waiting, so the invite flow can be tried straight away
   const catWatch = createdTeams.find((t) => t.id === 'TEAM-04');
   await TeamInvite.create({ team: catWatch._id, from: byName('rafiq')._id, to: byName('nabila')._id, status: 'pending', createdAt: hoursAgo(3) });
 

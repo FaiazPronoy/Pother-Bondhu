@@ -3,14 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { Eye, EyeOff, PawPrint, Languages } from "lucide-react";
 import { useLang } from "../context/LangContext";
 
-// areas the teams and volunteers are spread across; used by every picker.
-// Stored in English, shown in the reader's language through area().
 export const AREAS = [
   "Badda", "Banani", "Bashundhara", "Dhanmondi", "Gulshan", "Mirpur",
   "Moghbazar", "Mohammadpur", "Puran Dhaka", "Uttara",
 ];
 
-// the name is written in the reader's language: Pother Bondhu or পথের বন্ধু
 export function Wordmark({ className = "", size = "text-2xl" }) {
   const { lang } = useLang();
   const [first, second] = lang === "bn" ? ["পথের", "বন্ধু"] : ["Pother", "Bondhu"];
@@ -18,7 +15,6 @@ export function Wordmark({ className = "", size = "text-2xl" }) {
     <span className={`inline-flex items-center gap-2 ${className}`} lang={lang}>
       <img src="/paw-heart.svg" alt="" className="w-9 h-9 shrink-0" />
       <span className={`font-display font-semibold tracking-tight leading-none ${size}`}>
-        {/* Tiro Bangla's italic is too thin for a logo, so Bangla stays upright */}
         <span className={lang === "bn" ? "font-bold" : "italic font-normal"}>{first}</span>
         <span className={`text-clay ml-[.3em] ${lang === "bn" ? "font-bold" : ""}`}>{second}</span>
       </span>
@@ -26,7 +22,6 @@ export function Wordmark({ className = "", size = "text-2xl" }) {
   );
 }
 
-// switches the whole interface between English and Bangla
 export function LangButton({ className = "" }) {
   const { t, toggle } = useLang();
   return (
@@ -38,7 +33,6 @@ export function LangButton({ className = "" }) {
   );
 }
 
-// a round badge with someone's initials; there are no profile photos
 export function Avatar({ name = "", size = "w-10 h-10 text-sm", tone = "clay" }) {
   const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
   const tones = {
@@ -53,8 +47,6 @@ export function Avatar({ name = "", size = "w-10 h-10 text-sm", tone = "clay" })
   );
 }
 
-// every page opens the same way: a small label, the heading, one line under
-// it, all centred and balanced so the lines come out even
 export function PageHeader({ eyebrow, title, children, action }) {
   return (
     <header className="mb-10 text-center">
@@ -129,7 +121,6 @@ export function PasswordField({ id, label, value, onChange, autoComplete = "curr
   );
 }
 
-// plain text for the admin tables: "1,350 PetPoints"
 export const petPoints = (n) => `${Math.round(Number(n) || 0).toLocaleString("en-GB")} PetPoints`;
 
 export function Points({ value, className = "" }) {

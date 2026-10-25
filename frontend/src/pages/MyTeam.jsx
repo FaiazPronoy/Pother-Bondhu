@@ -26,7 +26,6 @@ const MyTeam = () => {
 
   const leading = useMemo(() => (teams || []).filter((t) => t.creator?._id === userData?._id), [teams, userData]);
 
-  // only volunteers who are not me and not already in the chosen team
   const invitable = useMemo(() => {
     const team = leading.find((t) => t._id === selectedTeam);
     const inTeam = new Set((team?.members || []).map((m) => m._id));

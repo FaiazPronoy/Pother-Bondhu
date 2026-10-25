@@ -3,7 +3,6 @@ import Team from '../models/teamModel.js';
 import RescueImage from '../models/imageModel.js';
 import Order from '../models/Order.js';
 
-// the numbers on the landing page, counted from the database rather than typed in
 export const publicStats = async (req, res) => {
   try {
     const [rescues, volunteers, teams, donated] = await Promise.all([

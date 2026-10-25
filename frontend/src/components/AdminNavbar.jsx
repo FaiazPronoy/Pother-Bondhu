@@ -65,7 +65,7 @@ const AdminNavbar = ({ isSidebarOpen, toggleSidebar, activeTab, setActiveTab }) 
 
         <button
           onClick={toggleSidebar}
-          className={`text-white bg-transparent border-none p-0 transition-all duration-300 ${!isSidebarOpen ? 'mr-1' : '' // Add margin-left when sidebar is off
+          className={`text-white bg-transparent border-none p-0 transition-all duration-300 ${!isSidebarOpen ? 'mr-1' : ''
             }`}
           aria-label={isSidebarOpen ? t("admin.collapse") : t("admin.expand")}
         >

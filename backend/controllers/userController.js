@@ -33,7 +33,6 @@ export const setUserData = async (req, res) => {
   const { userId } = req;
   const { name, location, bio, role } = req.body;
 
-  // only name, location, bio, and switching between donor and volunteer
   const updates = {};
   if (name !== undefined) updates.name = String(name).trim().slice(0, 60);
   if (location !== undefined) updates.location = String(location).slice(0, 60);
@@ -67,14 +66,11 @@ export const addPoints = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // no real payment gateway yet, so cap it
     const points = Number(amount);
     if (!Number.isInteger(points) || points < 1 || points > 10000) {
       return res.status(400).json({ message: "Amount must be a whole number between 1 and 10000" });
     }
 
-    // $inc so two top-ups at once both count, and only the points go back:
-    // the whole document would include the password hash
     const user = await userModel.findByIdAndUpdate(userId, { $inc: { points } }, { new: true }).select("points");
     if (!user) {
       return res.status(404).json({ message: "User not found" });

@@ -15,7 +15,6 @@ async function waitForServer(url, timeoutMs = 30000) {
       const res = await fetch(url);
       if (res.ok) return;
     } catch {
-      // server not listening yet
     }
     await new Promise((r) => setTimeout(r, 250));
   }

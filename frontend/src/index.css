@@ -1,17 +1,6 @@
-/*! Pother Bondhu. Copyright 2026 Faiaz Abrar Zaman Pronoy and Sinthia Khandoker. All rights reserved. See LICENSE. */
 @import "tailwindcss";
 
-/* dark mode follows the toggle in the sidebar, not the OS */
 @custom-variant dark (&:where(.dark, .dark *));
-
-/* ------------------------------------------------------------------------
-   Pother Bondhu colours.
-
-   Warm paper, clay and moss - the colours of a Dhaka street after rain
-   rather than a pet shop. Everything reads from these variables, so the
-   dark theme is just a second set of values below and the components do
-   not need a dark: class each.
-   ------------------------------------------------------------------------ */
 
 :root {
   --sb-paper:   #F8EADA;
@@ -55,7 +44,6 @@
   --sb-shadow:  0 0 0;
 }
 
-/* the demo people on the sign in page, as "hello, I am" name tag stickers */
 .name-tag {
   display: flex;
   flex-direction: column;
@@ -124,9 +112,6 @@
   --font-display: "Fraunces", "Tiro Bangla", Georgia, "Times New Roman", serif;
   --font-bangla: "Tiro Bangla", "Noto Serif Bengali", serif;
 
-  /* The admin screens were written against Tailwind's blue, purple and
-     gray. Rather than rewrite 3000 lines of tables I pointed those scales
-     at clay, moss and the paper neutrals, so they sit in the same family. */
   --color-blue-50:  #FBEEE7;
   --color-blue-100: #F7DCCD;
   --color-blue-200: #EDB9A0;
@@ -188,8 +173,6 @@
 
   ::selection { background: var(--sb-clay-lo); color: var(--sb-ink); }
 
-  /* Bangla letters sit taller, with marks above and below the line, so they
-     need more room between lines and no tightened letter spacing */
   html[lang="bn"] body { line-height: 1.75; }
   html[lang="bn"] h1, html[lang="bn"] h2, html[lang="bn"] h3, html[lang="bn"] h4 {
     letter-spacing: 0;
@@ -205,10 +188,6 @@
 
   a { color: inherit; }
 }
-
-/* ------------------------------------------------------------------------
-   Pieces used across the pages
-   ------------------------------------------------------------------------ */
 
 @layer components {
   .bn { font-family: var(--font-bangla); letter-spacing: 0; }
@@ -312,7 +291,6 @@
   .tag-sun  { background: var(--sb-sun-lo); color: var(--sb-ink); }
   .dark .tag-clay { color: var(--sb-clay-hi); }
 
-  /* rescue photos are shown like prints pinned to a board, a little crooked */
   .polaroid {
     background: #FFF6EC;
     padding: .6rem .6rem 0;
@@ -340,7 +318,6 @@
     border-radius: 2px;
   }
 
-  /* a hand-drawn line under the word that matters in a heading */
   .squiggle {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 10' preserveAspectRatio='none'%3E%3Cpath d='M1 7 C 20 1, 35 1, 50 6 S 85 10, 119 3' fill='none' stroke='%23E9A23B' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -357,8 +334,6 @@
   }
 }
 
-/* light theme: a low orange glow at the corners, so the page is warm
-   rather than white */
 :root:not(.dark) body {
   background-image:
     radial-gradient(60rem 30rem at 100% 0%, rgb(233 162 59 / .16), transparent 70%),
@@ -366,7 +341,6 @@
   background-attachment: fixed;
 }
 
-/* faint paw prints walking across the page background */
 .paw-trail {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='%23B4441F' fill-opacity='.05'%3E%3Cg transform='translate(30 120) rotate(-25)'%3E%3Cellipse cx='0' cy='0' rx='7' ry='6'/%3E%3Ccircle cx='-8' cy='-9' r='2.6'/%3E%3Ccircle cx='-2.5' cy='-12' r='2.6'/%3E%3Ccircle cx='3.5' cy='-12' r='2.6'/%3E%3Ccircle cx='8.5' cy='-8' r='2.6'/%3E%3C/g%3E%3Cg transform='translate(120 50) rotate(-25)'%3E%3Cellipse cx='0' cy='0' rx='7' ry='6'/%3E%3Ccircle cx='-8' cy='-9' r='2.6'/%3E%3Ccircle cx='-2.5' cy='-12' r='2.6'/%3E%3Ccircle cx='3.5' cy='-12' r='2.6'/%3E%3Ccircle cx='8.5' cy='-8' r='2.6'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
@@ -386,7 +360,6 @@
   .polaroid, .polaroid:hover { transform: none !important; }
 }
 
-/* toasts in the same warm palette */
 .Toastify__toast {
   font-family: var(--font-sans);
   border-radius: 14px;

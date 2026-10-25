@@ -6,7 +6,6 @@ import axios from 'axios';
 import { backendUrl } from '../config';
 import { petPoints } from './bits';
 
-// what the shop sold, what those products cost us, and what was given for rescues
 const sum = (orders) => {
     let sales = 0, cost = 0, donations = 0;
     for (const order of orders) {
@@ -19,7 +18,6 @@ const sum = (orders) => {
     return { sales, cost, profit: sales - cost, donations, count: orders.length };
 };
 
-// the week starts on Sunday, the month on the 1st
 const startOfWeek = () => {
     const d = new Date();
     d.setDate(d.getDate() - d.getDay());
@@ -48,7 +46,6 @@ const Card = ({ title, icon: Icon, iconClass, value, valueClass, note, onClick }
     );
 };
 
-// clicking a card shows the orders behind its number
 const OrdersModal = ({ title, orders, totals, onClose }) => {
     const { isDarkMode } = useContext(DarkmodeContext);
     const row = `flex justify-between py-2 px-3 rounded-md ${isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-50 text-gray-800'}`;
@@ -106,7 +103,6 @@ const OrdersModal = ({ title, orders, totals, onClose }) => {
 
 const RevenuePage = () => {
     const { isDarkMode } = useContext(DarkmodeContext);
-    // start folded on a phone, where the open sidebar takes most of the screen
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 768);
     const [activeTab, setActiveTab] = useState('Revenue & Profit');
     const [orders, setOrders] = useState([]);

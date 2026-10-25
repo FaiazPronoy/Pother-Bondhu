@@ -50,7 +50,6 @@ describe('money and stock under load', () => {
       cookie: d.cookie, body: { bkashNumber: '01700000000', amount: 200 },
     });
 
-    // every donor gives twice at once: only one of each pair can be afforded
     await Promise.all(donors.flatMap((d) => [give(d), give(d)]));
 
     expect((await getUser(volunteer.email)).points).toBe(800);
@@ -139,7 +138,6 @@ describe('teams and volunteers', () => {
   });
 });
 
-// the smallest valid PNG: one transparent pixel
 const PNG = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
 

@@ -65,7 +65,6 @@ const VolunteerProfile = () => {
     axios.get(`${backendUrl}/api/volunteers/${id}?page=${currentPage}&limit=9`)
       .then(({ data }) => {
         setProfile(data.volunteer);
-        // the profile route does not repeat who posted each photo, so add it for the cards
         setRescueImages(data.rescueImages.map((img) => ({ ...img, volunteer: { ...data.volunteer, role: "volunteer" } })));
         setTotalPages(data.totalPages);
         setError("");

@@ -42,8 +42,6 @@ function CartLink({ className = "" }) {
   );
 }
 
-/* ---------------- signed in: the sidebar ---------------- */
-
 function SideNav({ invites, onNavigate }) {
   const { userData, cart, logout } = useContext(AppContext);
   const { t, num } = useLang();
@@ -130,8 +128,6 @@ function MemberShell({ children }) {
   const [invites, setInvites] = useState(0);
   const location = useLocation();
 
-  // count waiting invitations for the badge; refreshed on each page change
-  // pages that answer an invitation fire "invites-changed" so the badge drops at once
   useEffect(() => {
     if (userData.role !== "volunteer") return;
     const count = () => axios.get(`${backendUrl}/api/invites/me`)
@@ -189,8 +185,6 @@ function MemberShell({ children }) {
     </div>
   );
 }
-
-/* ---------------- visitors: a plain header ---------------- */
 
 const publicLinks = [
   { to: "/rescues", key: "nav.rescues" },
@@ -269,7 +263,6 @@ function Footer({ compact }) {
   );
 }
 
-// the landing page runs edge to edge; every other page sits in the column
 export default function Layout() {
   const { isLoggedIn, userData } = useContext(AppContext);
   const location = useLocation();

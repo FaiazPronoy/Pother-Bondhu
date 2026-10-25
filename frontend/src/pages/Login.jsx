@@ -7,8 +7,6 @@ import { useLang } from "../context/LangContext";
 import { HandHeart, Heart, LayoutDashboard } from "lucide-react";
 import { Wordmark, PasswordField, LangButton } from "../components/bits";
 
-// the accounts `npm run seed` creates, so anyone looking at the project can
-// get in with one click; they are listed in the README too
 const DEMO = [
   { key: "volunteer", email: "nabila@potherbondhu.com", password: "Volunteer@123", icon: HandHeart },
   { key: "donor", email: "mehedi@potherbondhu.com", password: "Donor@1234", icon: Heart },
@@ -75,12 +73,10 @@ const Login = () => {
     try {
       const response = await axios.post(backendUrl + endpoint, payload);
       if (!response.data.success) {
-        // these routes answer 200 with success:false, so shape it like an axios error
         toast.error(apiError({ response }, "common.wentWrong"));
         return;
       }
 
-      // new accounts start as donors; ticking the box switches to volunteer straight away
       if (type === "Sign Up" && registerData.volunteer) {
         await axios.put(`${backendUrl}/api/user/profile`, { role: "volunteer" });
       }
@@ -103,7 +99,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-2">
-      {/* photo side */}
       <aside className="relative hidden lg:block overflow-hidden bg-[#1A1411]">
         <img src="/img/waiting.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#1A1411]/90 via-[#1A1411]/30 to-transparent" />
@@ -117,7 +112,6 @@ const Login = () => {
         </div>
       </aside>
 
-      {/* form side */}
       <main id="main" className="min-h-screen flex flex-col px-5 sm:px-10 py-8 paw-trail">
         <div className="flex items-center justify-between gap-3">
           <Link to="/" aria-label={t("login.home")}><Wordmark /></Link>

@@ -67,14 +67,12 @@ export const postTeamActivity = async (req, res) => {
 
 export const getMyTeams = async (req, res) => {
   try {
-    // teams the user started or has joined
     const teams = await Team.find({ members: req.userId }).lean();
 
     if (!teams || teams.length === 0) {
       return res.json([]);
     }
 
-    // Get all unique user IDs from teams (creator  members)
     const userIds = new Set();
     teams.forEach(team => {
       if (team.creator) userIds.add(team.creator.toString());
@@ -83,21 +81,17 @@ export const getMyTeams = async (req, res) => {
       }
     });
 
-    // Fetch all users in a single query
     const users = await userModel.find(
       { _id: { $in: Array.from(userIds) } },
       { name: 1, email: 1 }
     ).lean();
 
-    // Create a map for quick lookups
     const userMap = {};
     users.forEach(user => {
       userMap[user._id.toString()] = user;
     });
 
-    // Manually populate the teams
     const populatedTeams = teams.map(team => {
-      // Populate creator
       if (team.creator && userMap[team.creator.toString()]) {
         team.creator = {
           _id: team.creator,
@@ -107,7 +101,6 @@ export const getMyTeams = async (req, res) => {
         team.creator = { _id: team.creator, name: "Unknown User" };
       }
 
-      // Populate members
       if (team.members && Array.isArray(team.members)) {
         team.members = team.members.map(memberId => {
           const member = userMap[memberId.toString()];
@@ -134,7 +127,7 @@ export const getAllTeams = async (req, res) => {
   try {
     const { type = '' } = req.query;
     const filter = {};
-    if (type) filter.category = new RegExp(`^${escapeRegex(type)}$`, 'i'); // exact, case-insensitive
+    if (type) filter.category = new RegExp(`^${escapeRegex(type)}$`, 'i');
     const teams = await Team.find(filter)
       .populate('creator', 'name')
       .populate('members', 'name')
@@ -155,13 +148,12 @@ export const listTeams = async (req, res) => {
     const type = (req.query.type || '').trim();
 
     let query = {};
-    let useText = false; // only true when we actually use $text
+    let useText = false;
 
     if (raw) {
       const words = raw.split(/\s+/).filter(Boolean).map(escapeRegex);
 
       if (words.length === 1) {
-        // 1 word -> fuzzy regex
         const w = words[0];
         query = {
           $or: [
@@ -171,7 +163,6 @@ export const listTeams = async (req, res) => {
           ],
         };
       } else {
-        // many words -> ALL words must match somewhere (AND of ORs)
         query = {
           $and: words.map((w) => ({
             $or: [
@@ -183,19 +174,13 @@ export const listTeams = async (req, res) => {
         };
       }
     
-
-      // If you prefer exact phrase for multi-word, comment out the AND block above
-      // and use this instead:
-      // useText = true;
-      // query = { $text: { $search: `"${raw}"` } };
     }
     if (type) {
-     query.category = new RegExp(`^${escapeRegex(type)}$`, 'i'); // exact type
+     query.category = new RegExp(`^${escapeRegex(type)}$`, 'i');
     }
 
     const findQuery = Team.find(query);
 
-    // Only apply textScore sort/select when using $text
     if (useText) {
       findQuery.sort({ score: { $meta: 'textScore' } })
                .select({ score: { $meta: 'textScore' } });
@@ -228,31 +213,26 @@ export const getTeamByKey = async (req, res) => {
       { path: 'members', select: 'name' }
     ];
 
-    // 1) Try custom id and slug first (string fields)
     let team =
       (await Team.findOne({ id: rawKey }).populate(populate)) ||
       (await Team.findOne({ slug: rawKey }).populate(populate));
 
-    // 2) If key looks like an ObjectId, try _id explicitly in multiple ways
     if (!team && mongoose.Types.ObjectId.isValid(rawKey)) {
       try {
-        // a) findById (casting)
         team = await Team.findById(rawKey).populate(populate);
-      } catch (_) { /* ignore */ }
+      } catch (_) { }
 
       if (!team) {
         try {
-          // b) direct match on _id
           team = await Team.findOne({ _id: rawKey }).populate(populate);
-        } catch (_) { /* ignore */ }
+        } catch (_) { }
       }
 
       if (!team) {
         try {
-          // c) cast to ObjectId and match (some drivers prefer explicit cast)
           const oid = new mongoose.Types.ObjectId(rawKey);
           team = await Team.findOne({ _id: oid }).populate(populate);
-        } catch (_) { /* ignore */ }
+        } catch (_) { }
       }
     }
 

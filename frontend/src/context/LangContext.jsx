@@ -4,7 +4,6 @@ import bn from '../i18n/bn';
 
 const dicts = { en, bn };
 
-// areas are stored in English, so a post from "Mirpur" is the same place in both languages
 const AREA_BN = {
   Badda: 'বাড্ডা', Banani: 'বনানী', Bashundhara: 'বসুন্ধরা', Dhanmondi: 'ধানমন্ডি',
   Gulshan: 'গুলশান', Mirpur: 'মিরপুর', Moghbazar: 'মগবাজার', Mohammadpur: 'মোহাম্মদপুর',
@@ -27,12 +26,11 @@ export function LangProvider({ children }) {
   useEffect(() => {
     document.documentElement.lang = lang;
     document.title = lookup(dicts[lang], 'common.pageTitle');
-    try { localStorage.setItem('lang', lang); } catch { /* private mode */ }
+    try { localStorage.setItem('lang', lang); } catch { }
   }, [lang]);
 
   const num = useCallback((n) => Number(n || 0).toLocaleString(lang === 'bn' ? 'bn-BD' : 'en-IN'), [lang]);
 
-  // t('desk.from', { name }) ; a numeric `n` also picks the `_one` form when there is one
   const t = useCallback((key, vars) => {
     let text;
     if (vars && vars.n === 1) text = lookup(dicts[lang], key + '_one');
@@ -58,8 +56,6 @@ export function LangProvider({ children }) {
     return new Date(date).toLocaleDateString(lang === 'bn' ? 'bn-BD' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   }, [t, lang]);
 
-  // the API answers in English; show its message in Bangla when we know it,
-  // or our own fallback when we don't
   const apiError = useCallback((err, fallbackKey) => {
     const said = err?.response?.data?.message || err?.response?.data?.error;
     if (lang === 'en') return said || t(fallbackKey);

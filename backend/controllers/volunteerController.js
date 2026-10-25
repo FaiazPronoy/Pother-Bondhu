@@ -15,7 +15,7 @@ export const volunteers = async (req, res) => {
 
     const volunteers = await userModel.find(query)
       .select('-password -email')
-      .sort({ points: -1 }); // Sort by points descending
+      .sort({ points: -1 });
       
     res.status(200).json(volunteers);
   } catch (error) {
@@ -37,7 +37,6 @@ export const getVolunteerProfile = async (req, res) => {
       return res.status(404).json({ message: 'Volunteer not found' });
     }
     
-    // Get volunteer's rescue images with pagination
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
@@ -64,7 +63,6 @@ export const getVolunteerProfile = async (req, res) => {
   }
 };
 
-// New controller to get top volunteers
 export const getTopVolunteers = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 5;
@@ -72,7 +70,7 @@ export const getTopVolunteers = async (req, res) => {
     const topVolunteers = await userModel.find({ role: 'volunteer' })
       .sort({ points: -1 })
       .limit(limit)
-      .select('name points imageUrl'); // Assuming you'll add profile images later
+      .select('name points imageUrl');
       
     res.status(200).json(topVolunteers);
   } catch (error) {
@@ -85,7 +83,6 @@ export const getTopVolunteers = async (req, res) => {
 export const donateToVolunteer = async (req, res) => {
   try {
     const { id } = req.params;
-    // this moves PetPoints the donor already holds, so no payment details are needed
     const { amount } = req.body;
 
     const points = Number(amount);
@@ -104,8 +101,6 @@ export const donateToVolunteer = async (req, res) => {
       return res.status(400).json({ message: 'You cannot donate to yourself.' });
     }
 
-    // take from the donor only if they still have it, then add with $inc, so
-    // two donations landing together are both counted
     const taken = await userModel.updateOne(
       { _id: req.userId, points: { $gte: points } },
       { $inc: { points: -points } }

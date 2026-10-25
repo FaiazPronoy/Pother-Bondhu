@@ -151,7 +151,6 @@ describe('your own orders', () => {
     expect(res.body.orders).toHaveLength(1);
     expect(res.body.orders[0].totalPoints).toBe(200);
     expect(res.body.orders[0].status).toBe('Pending');
-    // what the shop paid for the item is not the buyer's business
     expect(res.body.orders[0].items[0].purchaseCost).toBeUndefined();
   });
 

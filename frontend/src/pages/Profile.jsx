@@ -32,7 +32,6 @@ function AccountForm({ user, onSaved }) {
     }
   };
 
-  // keep an area that was typed before the list existed
   const areas = form.location && !AREAS.includes(form.location) ? [form.location, ...AREAS] : AREAS;
 
   return (
@@ -146,7 +145,6 @@ function WalletPanel({ user, onToppedUp }) {
   );
 }
 
-// the order's progress as three steps, so "Out for Delivery" reads as two of three done
 const STEPS = ["Pending", "Out for Delivery", "Delivered"];
 const STEP_KEY = { Pending: "pending", "Out for Delivery": "onTheWay", Delivered: "delivered" };
 

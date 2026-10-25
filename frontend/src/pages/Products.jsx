@@ -8,7 +8,6 @@ import { useLang } from '../context/LangContext';
 
 const CATEGORIES = ['all', 'food', 'accessories', 'toys', 'health'];
 
-// one page for the shop, a category and a search: they only differ in the filter
 const Products = () => {
   const { productData, productLoading } = useContext(AppContext);
   const { t } = useLang();

@@ -1,4 +1,3 @@
-/*! Pother Bondhu. Copyright 2026 Faiaz Abrar Zaman Pronoy and Sinthia Khandoker. All rights reserved. See LICENSE. */
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';

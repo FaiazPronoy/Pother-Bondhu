@@ -5,7 +5,6 @@ const rescueImageSchema = new mongoose.Schema({
   imageUrl: { type: String, required: true },
   caption: { type: String, maxlength: [500, 'Caption cannot exceed 500 characters'] },
   area: { type: String, maxlength: 60, default: '' },
-  // the photo itself; left out of queries unless asked for
   data: { type: Buffer, select: false },
   contentType: { type: String, select: false },
 }, { timestamps: true });

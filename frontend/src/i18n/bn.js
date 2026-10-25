@@ -1,5 +1,3 @@
-// বাংলা. Same keys as en.js; anything missing here falls back to English.
-
 const bn = {
   common: {
     signIn: 'সাইন ইন',
@@ -455,7 +453,6 @@ const bn = {
     sure: 'আপনি কি নিশ্চিত?', logoutQ: 'লগ আউট করতে চান?', yes: 'হ্যাঁ', no: 'না',
     collapse: 'সাইডবার ছোট করুন', expand: 'সাইডবার বড় করুন',
   },
-  // the API answers in English; these are the messages a person can actually see
   server: {
     'Wrong email or password': 'ইমেইল বা পাসওয়ার্ড ভুল',
     'Too many wrong tries. Please wait 15 minutes.': 'অনেকবার ভুল হয়েছে। ১৫ মিনিট পরে চেষ্টা করুন।',

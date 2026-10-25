@@ -1,24 +1,4 @@
 #!/usr/bin/env python3
-"""
-Browser checks for Pother Bondhu, run in a real browser through Playwright.
-
-  1. crawl     every page a visitor, a volunteer, a supporter and the admin can
-               reach: nothing blank, no console errors, no failed requests
-  2. contrast  every piece of text on those pages, light and dark, against WCAG AA
-  3. phone     no page scrolls sideways at 390 px
-  4. bangla    the language switch, then 1 to 3 again with the site in Bangla
-  5. shots     screenshots of the main pages, desktop and phone
-
-Run it against a freshly seeded database, with the API on :4000 and the
-frontend on :5175:
-
-  cd backend && npm run seed && npm run dev
-  cd frontend && npm run dev -- --port 5175
-  python tools/browser_checks.py
-
-It uses the Edge that ships with Windows; set SB_BROWSER=chrome for Chrome.
-Needs: pip install playwright
-"""
 import os, re, sys
 from urllib.parse import urljoin, urlparse
 from playwright.sync_api import sync_playwright
@@ -47,17 +27,13 @@ def sign_in(context, email, password):
 
 def settle(page):
     page.wait_for_load_state("networkidle")
-    # skeletons are swapped for content once the API answers
     page.wait_for_timeout(250)
 
-
-# ------------------------------------------------------------------ crawl
 
 SKIP = re.compile(r"^mailto:|^https?://(?!localhost)|#")
 
 
 def crawl(context, start, limit=60):
-    """Follows every same-site link from start. Returns {path: errors}."""
     page = context.new_page()
     errors = []
     page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
@@ -69,7 +45,6 @@ def crawl(context, start, limit=60):
         if url in seen:
             continue
         seen.add(url)
-        # ten volunteer profiles are one page as far as the crawl is concerned
         shape = re.sub(r"/[0-9a-f]{24}|/SP-\d+", "/:id", urlparse(url).path)
         per_shape[shape] = per_shape.get(shape, 0) + 1
         if per_shape[shape] > 2:
@@ -91,8 +66,6 @@ def crawl(context, start, limit=60):
     return result
 
 
-# --------------------------------------------------------------- contrast
-
 CONTRAST_JS = r"""
 () => {
   const parse = c => {
@@ -108,14 +81,11 @@ CONTRAST_JS = r"""
                                  b: top.b * top.a + under.b * (1 - top.a), a: 1});
   const ratio = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
 
-  // every background this element could be sitting on; a gradient gives one per stop
   const backgrounds = el => {
     let stack = [];
     for (let e = el; e; e = e.parentElement) {
       const cs = getComputedStyle(e);
       if (cs.backgroundImage.includes('gradient')) {
-        // a see-through stop (a glow laid over the card) is painted on top of
-        // the solid stops underneath it, so test it mixed with each of them
         const stops = [...cs.backgroundImage.matchAll(/rgba?\([^)]+\)/g)].map(m => parse(m[0]));
         const solid = stops.filter(s => s.a >= 1), glass = stops.filter(s => s.a < 1);
         const under = solid.length ? solid : [{r: 255, g: 255, b: 255, a: 1}];

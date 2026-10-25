@@ -16,7 +16,6 @@ export async function api(method, path, { body, cookie } = {}) {
   try {
     json = await res.json();
   } catch {
-    // some responses have no body
   }
   return { status: res.status, body: json, cookie: (res.headers.get('set-cookie') || '').split(';')[0] };
 }

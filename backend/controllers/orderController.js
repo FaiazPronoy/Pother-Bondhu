@@ -1,13 +1,8 @@
-
 import Order from '../models/Order.js';
 import User from '../models/userModel.js';
 import Product from '../models/ProductModel.js'; 
 import mongoose from 'mongoose';
 
-// Place an order.
-// Stock and points are taken with conditional updates ("only if there is
-// enough"), so two orders arriving together cannot both spend the same
-// points or the last item. If a later step fails, the earlier ones are put back.
 export const placeOrder = async (req, res) => {
   const userId = req.userId;
   const { items, name, phone, address, shipping, promo, donation } = req.body;
@@ -24,13 +19,12 @@ export const placeOrder = async (req, res) => {
     return res.status(400).json({ success: false, message: "Donation must be a whole number of points." });
   }
 
-  const taken = []; // stock already reserved, so it can be returned on failure
+  const taken = [];
   let charged = 0;
   const giveBack = () => Promise.all(taken.map((t) =>
     Product.updateOne({ _id: t._id }, { $inc: { stockQuantity: t.quantity } })));
 
   try {
-    // the same product twice in one order counts as one line
     const wanted = new Map();
     for (const item of items) {
       const key = String(item.id || item._id || '');
@@ -100,8 +94,6 @@ export const placeOrder = async (req, res) => {
   }
 };
 
-// The signed-in user's own orders, newest first, without what the shop paid
-// for the items
 export const getMyOrders = async (req, res) => {
   try {
     const orders = await Order.find({ userId: req.userId }, '-items.purchaseCost').sort({ createdAt: -1 }).limit(50);
@@ -111,7 +103,6 @@ export const getMyOrders = async (req, res) => {
   }
 };
 
-// Admin: Get all orders
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
@@ -122,9 +113,6 @@ export const getAllOrders = async (req, res) => {
   }
 };
 
-// Admin: cancel an order. One that has not been delivered gives the buyer
-// their PetPoints back and puts the items back on the shelf; a delivered one
-// is only taken off the list.
 export const deleteOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
@@ -151,7 +139,6 @@ export const deleteOrder = async (req, res) => {
   }
 };
 
-// Admin: Update order status
 export const updateOrderStatus = async (req, res) => {
   try {
     const orderId = req.params.id;
@@ -170,8 +157,6 @@ export const updateOrderStatus = async (req, res) => {
     if (!updatedOrder) {
       return res.status(404).json({ success: false, message: 'Order not found.' });
     }
-
-// Notify frontend (real-time order status update)
 
     
     res.status(200).json({ success: true, message: 'Order status updated successfully.', order: updatedOrder });

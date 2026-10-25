@@ -91,7 +91,6 @@ describe('topping up points', () => {
 
     expect(res.status).toBe(200);
     expect((await getUser(donor.email)).points).toBe(600);
-    // the reply is the new balance, nothing else from the account
     expect(res.body.user).toEqual({ points: 600 });
   });
 });

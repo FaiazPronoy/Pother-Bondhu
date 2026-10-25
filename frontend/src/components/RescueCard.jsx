@@ -15,7 +15,6 @@ export default function RescueCard({ post }) {
         className="w-full aspect-[4/3] object-cover"
       />
       <figcaption className="px-1 pt-3 pb-4 text-center">
-        {/* the caption stays in whatever language it was written in */}
         <p className="font-display italic text-[1.05rem] leading-snug line-clamp-3 text-balance">
           {post.caption || t("rescue.noNote")}
         </p>

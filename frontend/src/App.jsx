@@ -22,7 +22,6 @@ import NotFound from './pages/NotFound';
 import ProtectedAdminRoute from './components/ProtectAdminRoute';
 import { useLang } from './context/LangContext';
 
-// the admin screens carry the charts and animation code; visitors never need it
 const OrderPage = lazy(() => import('./components/OrderPage'));
 const ProductPage = lazy(() => import('./components/ProductPage'));
 const VolunteerPage = lazy(() => import('./components/VolunteerPage'));

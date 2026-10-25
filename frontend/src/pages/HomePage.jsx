@@ -41,15 +41,8 @@ function RescueGrid({ posts, cols = "sm:grid-cols-2 lg:grid-cols-3" }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* visitors                                                             */
-/* ------------------------------------------------------------------ */
-
 function Hero({ stats, latest, faces }) {
   const { t, lang, area, ago } = useLang();
-  // Bangla words run wider and taller, so the headline steps down a size
-  // Bangla's last line is short, so it can sit flush right; in English the
-  // last line is the longest, so the steps are pushed in by a fixed indent
   const step = lang === "bn" ? "sm:text-right" : "sm:pl-[1.9em]";
   const size = lang === "bn"
     ? "text-[2.3rem] leading-[1.35] sm:text-5xl lg:text-[3.5rem]"
@@ -58,7 +51,6 @@ function Hero({ stats, latest, faces }) {
     <section className="paw-trail relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-16 lg:pt-16 lg:pb-24 grid gap-14 lg:grid-cols-[1.08fr_.92fr] items-center">
         <div className="rise flex flex-col items-center text-center lg:items-start lg:text-left">
-          {/* the motto stays in Bangla in both languages; it is the name's own voice */}
           <figure className="grid sm:grid-cols-[auto_auto] items-center justify-items-center sm:justify-items-start gap-x-3 gap-y-1.5 text-center sm:text-left">
             <span className="flex -space-x-2 sm:row-span-2" aria-hidden="true">
               <span className="w-9 h-9 rounded-full bg-clay text-on-clay grid place-items-center ring-[3px] ring-paper"><Dog size={18} /></span>
@@ -74,7 +66,6 @@ function Hero({ stats, latest, faces }) {
           </figure>
 
           <h1 className={`mt-7 font-semibold sm:w-fit sm:text-left ${size}`}>
-            {/* four lines that zigzag left, right, left, right, like steps */}
             {[...t("landing.title1").split("|"), t("landing.title2a"), t("landing.title2b")].map((line, i) => (
               <span key={line} className={`block ${i > 0 ? "mt-1" : ""} ${i % 2 ? step : ""} ${i > 1 ? "italic text-clay" : ""}`}>
                 {i > 1 ? <span className="squiggle">{line}</span> : line}
@@ -160,7 +151,6 @@ function Landing() {
     <>
       <Hero stats={stats} latest={posts?.[0]} faces={faces} />
 
-      {/* numbers, counted from the database */}
       {stats && (
         <section aria-label={t("landing.statsLabel")} className="border-y border-line bg-card">
           <dl className="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
@@ -180,7 +170,6 @@ function Landing() {
         </section>
       )}
 
-      {/* how it works */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
         <div className="text-center max-w-2xl mx-auto mb-14">
           <p className="eyebrow">{t("landing.howEyebrow")}</p>
@@ -203,7 +192,6 @@ function Landing() {
         </ol>
       </section>
 
-      {/* the board */}
       <section className="bg-sunken/60 border-y border-line">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 text-center sm:text-left">
@@ -217,7 +205,6 @@ function Landing() {
         </div>
       </section>
 
-      {/* teams */}
       {teams.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
           <div className="text-center max-w-2xl mx-auto mb-12">
@@ -238,7 +225,6 @@ function Landing() {
         </section>
       )}
 
-      {/* last word */}
       <section className="relative isolate overflow-hidden bg-[#1A1411]">
         <img src="/img/mother.jpg" alt="" className="absolute inset-0 -z-10 w-full h-full object-cover" />
         <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#1A1411]/90 via-[#1A1411]/75 to-[#1A1411]/40" />
@@ -252,7 +238,6 @@ function Landing() {
               <span className="block">{t("landing.endTitle1")}</span>
               <span className="block mt-2 sm:pl-[1.5em] italic text-[#F2B659]">{t("landing.endTitle2")}</span>
             </h2>
-            {/* the text and the button sit behind a gold line, stepped in under the headline */}
             <div className="mt-8 sm:ml-[4.5rem] sm:border-l-2 sm:border-[#E9A23B]/70 sm:pl-6">
               <p className="text-lg text-[#EADBC8] max-w-xl mx-auto sm:mx-0 text-pretty">{t("landing.endText")}</p>
               <Link to="/login?mode=signup" className="btn mt-6 bg-[#E9A23B] text-[#2B2019] hover:bg-[#F2B659] text-base px-6">
@@ -265,10 +250,6 @@ function Landing() {
     </>
   );
 }
-
-/* ------------------------------------------------------------------ */
-/* signed in                                                            */
-/* ------------------------------------------------------------------ */
 
 function greetingKey() {
   const h = new Date().getHours();
