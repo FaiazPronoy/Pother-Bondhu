@@ -146,7 +146,7 @@ Copy `backend/.env.example` to `backend/.env`. The `.env` file is never committe
 
 ## Tests
 
-- `cd backend && npm test` runs **70 tests** against the real server and an in-memory database
+- `cd backend && npm test` runs **71 tests** against the real server and an in-memory database
 - They cover who can do what, orders, stock and points when many requests come at once, photo uploads, teams and the login lockout
 - `tools/browser_checks.py` signs in as each role, opens every page, and checks contrast in both themes, both languages and on a phone
 
@@ -175,7 +175,7 @@ tools/           browser checks
 ## Notes
 
 - Top ups are simulated. No real payment happens.
-- Product images are links typed into the admin form, not uploads.
+- Product photos are picked in the admin form and saved with the product.
 
 ## Photo credits
 
