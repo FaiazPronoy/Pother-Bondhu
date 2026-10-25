@@ -1,811 +1,285 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Boxes, ClipboardList, ArrowRight, ShoppingCart, AlertTriangle, CheckCircle, GripVertical, CreditCard, Coins, TrendingUp, PiggyBank } from 'lucide-react';
+import axios from 'axios';
+import { AlertTriangle, ArrowRight, Boxes, Coins, CreditCard, PiggyBank, ShoppingCart, TrendingUp } from 'lucide-react';
 import AdminNavbar from '../components/AdminNavbar';
 import { DarkmodeContext } from '../context/DarkmodeContext';
-import axios from 'axios';
 import { backendUrl } from '../config';
 import { petPoints } from '../components/bits';
 
-const Card = ({ title, children, className, onClick }) => {
-    const { isDarkMode } = useContext(DarkmodeContext);
-    return (
-        <motion.div
-            className={`rounded-xl shadow-md border overflow-hidden ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'} ${className} cursor-pointer transition-all duration-300 hover:shadow-lg hover:scale-[1.01]`}
-            whileHover={{ scale: 1.01, boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" }}
-            onClick={onClick}
-        >
-            <div className="p-6">
-                {title && (
-                    <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>{title}</h3>
-                )}
-                {children}
-            </div>
-        </motion.div>
-    );
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const SLICE_COLOURS = ['#FFD700', '#9B59B6', '#FF69B4', '#1E90FF', '#2ECC71'];
+const BAR_COLOUR = '#A2574F';
+
+const startOfWeek = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - d.getDay());
+    d.setHours(0, 0, 0, 0);
+    return d;
 };
 
-const StyledLink = ({ to, children, className }) => {
-    const { isDarkMode } = useContext(DarkmodeContext);
-    return (
-        <Link
-            to={to}
-            className={`transition-colors duration-200 ${isDarkMode ? 'text-blue-300 hover:text-blue-200' : 'text-blue-700 hover:text-blue-800'} ${className}`}
-        >
-            {children}
-        </Link>
-    );
+const itemTotals = (order) => {
+    let sales = 0, cost = 0;
+    for (const item of order.items || []) {
+        sales += (item.sellingPrice || 0) * (item.quantity || 0);
+        cost += (item.purchaseCost || 0) * (item.quantity || 0);
+    }
+    return { sales, cost };
 };
 
-const OverviewCard = ({ title, value, icon: Icon, onClick }) => {
-    const [displayValue, setDisplayValue] = useState(0);
-    const { isDarkMode } = useContext(DarkmodeContext);
+const summarise = (orders) => {
+    const weekStart = startOfWeek();
+    const now = new Date();
+    const revenueByDay = Array(7).fill(0);
+    const profitByDay = Array(7).fill(0);
+    let paidIn = 0, sales = 0, cost = 0, month = 0;
 
-    useEffect(() => {
-        if (typeof value === 'number') {
-            const animationDuration = 1000;
-            const frameRate = 60;
-            const totalFrames = Math.ceil(animationDuration / (1000 / frameRate));
-            let currentFrame = 0;
-            const interval = setInterval(() => {
-                currentFrame++;
-                const progress = Math.min(currentFrame / totalFrames, 1);
-                setDisplayValue(Math.ceil(value * progress));
-                if (progress >= 1) {
-                    clearInterval(interval);
-                }
-            }, 1000 / frameRate);
-            return () => clearInterval(interval);
-        } else {
-            setDisplayValue(value);
+    for (const order of orders) {
+        const created = new Date(order.createdAt);
+        const totals = itemTotals(order);
+        paidIn += order.totalPoints || 0;
+        sales += totals.sales;
+        cost += totals.cost;
+        if (created.getFullYear() === now.getFullYear() && created.getMonth() === now.getMonth()) {
+            month += order.totalPoints || 0;
         }
-    }, [value]);
+        if (created >= weekStart) {
+            revenueByDay[created.getDay()] += order.totalPoints || 0;
+            profitByDay[created.getDay()] += totals.sales - totals.cost;
+        }
+    }
 
+    return {
+        pending: orders.filter((o) => o.status === 'Pending').length,
+        average: orders.length ? paidIn / orders.length : 0,
+        paidIn, cost, profit: sales - cost, month, revenueByDay, profitByDay,
+    };
+};
+
+const Panel = ({ title, children }) => {
+    const { isDarkMode } = useContext(DarkmodeContext);
     return (
-        <Card
-            className={`relative overflow-hidden ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
-            onClick={onClick}>
+        <section className={`rounded-xl shadow-md border p-6 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            {title && <h3 className={`text-sm font-semibold uppercase tracking-wide mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{title}</h3>}
+            {children}
+        </section>
+    );
+};
+
+const Stat = ({ to, title, value, icon: Icon, iconClass }) => {
+    const { isDarkMode } = useContext(DarkmodeContext);
+    return (
+        <Link to={to} className={`relative block rounded-xl shadow-md border p-6 overflow-hidden transition hover:shadow-lg hover:-translate-y-0.5 ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
             <span className="absolute left-0 inset-y-0 w-1 bg-blue-600" aria-hidden="true" />
             <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                     <h3 className={`text-xs font-semibold uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{title}</h3>
-                    <motion.p
-                        className={`mt-1 text-3xl font-bold tabular-nums leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
-                        {typeof displayValue === 'number' ? displayValue : value}
-                    </motion.p>
+                    <p className={`mt-1 text-2xl font-bold tabular-nums leading-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{value}</p>
                 </div>
-                <Icon className={`w-7 h-7 shrink-0 ${isDarkMode ? 'text-gray-500' : 'text-blue-600'}`} />
+                <Icon className={`w-10 h-10 shrink-0 ${iconClass}`} aria-hidden="true" />
             </div>
-        </Card>
+        </Link>
     );
 };
 
-const AnalyticsCard = ({ title, children, chartRef }) => {
+const QuietWeek = () => {
     const { isDarkMode } = useContext(DarkmodeContext);
+    return <p className={`text-center py-16 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>No orders this week yet</p>;
+};
+
+const BarChart = ({ values }) => {
+    const { isDarkMode } = useContext(DarkmodeContext);
+    if (!values.some(Boolean)) return <QuietWeek />;
+    const max = Math.max(...values, 100);
     return (
-        <Card className={isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}>
-            <h3 className={`text-sm font-semibold uppercase tracking-wide mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{title}</h3>
-            <div ref={chartRef}>
-                {children}
-            </div>
-        </Card>
+        <svg viewBox="0 0 350 200" className="w-full h-[220px]" role="img" aria-label="Revenue for each day this week">
+            {values.map((value, i) => {
+                const height = (value / max) * 130;
+                const x = i * 50 + 10;
+                const y = 170 - height;
+                return (
+                    <g key={DAYS[i]}>
+                        <text x={x + 15} y={y - 8} fontSize="11" fontWeight="bold" textAnchor="middle" fill={isDarkMode ? 'white' : 'black'}>
+                            {value.toLocaleString('en-GB')}
+                        </text>
+                        <rect x={x} y={y} width="30" height={height} rx="6" fill={BAR_COLOUR} />
+                        <text x={x + 15} y="190" fontSize="11" textAnchor="middle" fill={isDarkMode ? '#D1D5DB' : '#4B5563'}>{DAYS[i]}</text>
+                    </g>
+                );
+            })}
+        </svg>
     );
 };
 
-const DraggablePanel = ({ title, children }) => {
-    const [position, setPosition] = useState({ x: 0, y: 0 });
+const LineChart = ({ values }) => {
     const { isDarkMode } = useContext(DarkmodeContext);
+    if (!values.some(Boolean)) return <QuietWeek />;
+    const max = Math.max(...values, 1);
+    const points = values.map((value, i) => ({ x: 20 + i * 52, y: 150 - (value / max) * 120, value }));
     return (
-        <motion.div
-            drag
-            dragMomentum={false}
-            dragElastic={0.2}
-            onDrag={(event, info) => {
-                setPosition(prev => ({
-                    x: prev.x + info.delta.x,
-                    y: prev.y + info.delta.y
-                }));
-            }}
-            style={{ x: position.x, y: position.y }}
-            className={`fixed top-20 right-6 w-80 rounded-xl shadow-2xl border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white/10 backdrop-blur-md border-white/10'} z-50`}
-            initial={{ opacity: 0, x: 50, y: -50 }}
-            animate={{ opacity: 1, x: 0, y: 0 }}
-            transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        >
-            <div className="flex items-center gap-2 p-3 bg-blue-600 rounded-t-xl cursor-move">
-                <GripVertical className="w-4 h-4 text-white/50" />
-                <h4 className="text-sm font-medium text-white">{title}</h4>
-            </div>
-            <div className="p-4">
-                {children}
-            </div>
-        </motion.div>
+        <svg viewBox="0 0 350 190" className="w-full h-[220px]" role="img" aria-label="Profit for each day this week">
+            <polyline points={points.map((p) => `${p.x},${p.y}`).join(' ')} fill="none" stroke={BAR_COLOUR} strokeWidth="3" />
+            {points.map((p, i) => (
+                <g key={DAYS[i]}>
+                    <circle cx={p.x} cy={p.y} r="5" fill={BAR_COLOUR} />
+                    <text x={p.x} y={p.y - 10} fontSize="11" textAnchor="middle" fill={isDarkMode ? 'white' : 'black'}>{p.value}</text>
+                    <text x={p.x} y="180" fontSize="11" textAnchor="middle" fill={isDarkMode ? '#D1D5DB' : '#4B5563'}>{DAYS[i]}</text>
+                </g>
+            ))}
+        </svg>
     );
 };
+
+const DonutChart = ({ items }) => {
+    const { isDarkMode } = useContext(DarkmodeContext);
+    const total = items.reduce((sum, item) => sum + (Number(item.orders) || 0), 0);
+    if (!total) return <p className={`text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>No orders yet</p>;
+
+    const r = 90, hole = 35;
+    const at = (angle, radius) => [r + radius * Math.cos((angle - 90) * Math.PI / 180), r + radius * Math.sin((angle - 90) * Math.PI / 180)];
+    let start = 0;
+    const slices = items.map((item, i) => {
+        const angle = ((Number(item.orders) || 0) / total) * 360;
+        const end = start + angle;
+        const large = angle > 180 ? 1 : 0;
+        const [x1, y1] = at(start, r), [x2, y2] = at(end, r), [x3, y3] = at(end, hole), [x4, y4] = at(start, hole);
+        const [lx, ly] = at(start + angle / 2, r * 0.65);
+        const slice = {
+            key: item.name || i,
+            colour: SLICE_COLOURS[i % SLICE_COLOURS.length],
+            path: `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${x3} ${y3} A ${hole} ${hole} 0 ${large} 0 ${x4} ${y4} Z`,
+            label: [lx, ly, ((angle / 360) * 100).toFixed(1)],
+        };
+        start = end;
+        return slice;
+    });
+
+    return (
+        <div className="flex flex-wrap items-center justify-center gap-6">
+            <svg width={r * 2} height={r * 2} role="img" aria-label="Share of orders by product">
+                {slices.map((s) => (
+                    <g key={s.key}>
+                        <path d={s.path} fill={s.colour} stroke="#f3f4f6" strokeWidth="1" />
+                        <text x={s.label[0]} y={s.label[1]} fontSize="10" fontWeight="bold" textAnchor="middle" fill="black">{s.label[2]}%</text>
+                    </g>
+                ))}
+            </svg>
+            <ul className={`text-xs space-y-1 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                {items.map((item, i) => (
+                    <li key={item.name || i} className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full" style={{ backgroundColor: SLICE_COLOURS[i % SLICE_COLOURS.length] }} />
+                        {item.name || `Product ${i + 1}`}
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
+};
+
+const statusClass = { Pending: 'text-yellow-500', 'Out for Delivery': 'text-blue-500' };
 
 const AdminDashboard = () => {
-    // start folded on a phone, where the open sidebar takes most of the screen
+    const { isDarkMode } = useContext(DarkmodeContext);
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 768);
     const [activeTab, setActiveTab] = useState('Dashboard');
-    const [showDraggablePanel, setShowDraggablePanel] = useState(false);
-    const chartRef = useRef(null);
-    const { isDarkMode } = useContext(DarkmodeContext);
-    const [totalProducts, setTotalProducts] = useState(0);
-    const [lowStockProducts, setLowStockProducts] = useState([]);
-    const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
-    const [mostOrderedProductsData, setMostOrderedProductsData] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [fetchError, setFetchError] = useState(null);
-    const [orders, setOrders] = useState(null);
-    const [monthlyRevenue, setMonthlyRevenue] = useState(null);
-    const [loadingMonthlyRevenue, setLoadingMonthlyRevenue] = useState(true);
-    const [errorMonthlyRevenue, setErrorMonthlyRevenue] = useState(null);
-    const [totalRevenue, setTotalRevenue] = useState('Loading...');
-    const [errorTotalRevenueDetails, setErrorTotalRevenueDetails] = useState(null);
-    const [loadingTotalRevenue, setLoadingTotalRevenue] = useState(true);
-    const [errorTotalRevenue, setErrorTotalRevenue] = useState(null);
-    const [orderedPurchaseCost, setOrderedPurchaseCost] = useState(0);
-    const [weeklyRevenueData, setWeeklyRevenueData] = useState([]);
-    const [loadingWeeklyRevenueChart, setLoadingWeeklyRevenueChart] = useState(true);
-    const [errorWeeklyRevenueChart, setErrorWeeklyRevenueChart] = useState(null);
-    const [totalProfit, setTotalProfit] = useState(0);
-    const [averageOrderValue, setAverageOrderValue] = useState('Loading...'); // State for AOV
-    const [errorAverageOrderValue, setErrorAverageOrderValue] = useState(null); // Error state for AOV
-    const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
-    };
+    const [orders, setOrders] = useState([]);
+    const [productCount, setProductCount] = useState(0);
+    const [lowStock, setLowStock] = useState([]);
+    const [topProducts, setTopProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchOrders = async () => {
-            setLoading(true);
-            setFetchError(null);
-            try {
-                const res = await axios.get(`${backendUrl}/api/orders/all`, {
-                    withCredentials: true,
-                });
-                if (res.data?.success) {
-                    setOrders(res.data.orders);
-                } else {
-                    const errorMessage = res.data?.message || res.data?.error || 'Failed to fetch orders.';
-                    setFetchError(errorMessage);
-                }
-            } catch (err) {
-                const message =
-                    err.response?.data?.message ||
-                    (err.response ? `Status: ${err.response.status}` :
-                        err.request ? 'No server response.' :
-                            err.message || 'Request error.');
-                setFetchError(message);
-            }
-            setLoading(false);
-        };
-        fetchOrders();
-    }, [backendUrl]);
-    
-    useEffect(() => {
-        if (orders) {
-            const pendingCount = orders.filter(order => order.status === 'Pending').length;
-            setPendingOrdersCount(pendingCount);
-        }
-    }, [orders]);
-
-    useEffect(() => {
-        const fetchMostOrdered = async () => {
-            try {
-                const response = await axios.get(`${backendUrl}/api/products/most-ordered`);
-                setMostOrderedProductsData(response.data);
-            } catch (error) {
-                console.error("Error fetching most ordered products:", error);
-            }
-        };
-        fetchMostOrdered();
+        const get = (path) => axios.get(`${backendUrl}${path}`, { withCredentials: true }).then((r) => r.data);
+        Promise.all([get('/api/orders/all'), get('/api/products/count'), get('/api/products/low-stock'), get('/api/products/most-ordered')])
+            .then(([orderData, count, low, top]) => {
+                setOrders(orderData.orders || []);
+                setProductCount(count.count || 0);
+                setLowStock(low);
+                setTopProducts(top);
+            })
+            .catch((err) => setError(err.response?.data?.message || 'Could not load the dashboard.'))
+            .finally(() => setLoading(false));
     }, []);
 
-    useEffect(() => {
-        const fetchOrders = async () => {
-            setLoading(true);
-            setFetchError(null);
-            try {
-                const res = await axios.get(`${backendUrl}/api/orders/all`, {
-                    withCredentials: true,
-                });
-                if (res.data?.success) {
-                    setOrders(res.data.orders);
-                    const calculatedTotalRevenue = res.data.orders.reduce((sum, order) => {
-                        return sum + (order.totalPoints || 0);
-                    }, 0);
-                    setTotalRevenue(calculatedTotalRevenue);
-                } else {
-                    const errorMessage = res.data?.message || res.data?.error || 'Failed to fetch orders.';
-                    setFetchError(errorMessage);
-                }
-            } catch (err) {
-                const message =
-                    err.response?.data?.message ||
-                    (err.response ? `Status: ${err.response.status}` :
-                        err.request ? 'No server response.' :
-                            err.message || 'Request error.');
-                setFetchError(message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchOrders();
-    }, [backendUrl]);
+    const stats = useMemo(() => summarise(orders), [orders]);
+    const muted = isDarkMode ? 'text-gray-300' : 'text-gray-700';
+    const link = `mt-4 inline-flex items-center text-sm hover:underline ${isDarkMode ? 'text-blue-300' : 'text-blue-700'}`;
+    const show = (value) => (loading ? '…' : value);
 
-    useEffect(() => {
-        const fetchWeeklyRevenueForChart = async () => {
-            setLoadingWeeklyRevenueChart(true);
-            setErrorWeeklyRevenueChart(null);
-            try {
-                const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    withCredentials: true,
-                });
-                if (response.data?.success && response.data.orders) {
-                    const now = new Date();
-                    const startOfWeek = new Date(now);
-                    startOfWeek.setDate(now.getDate() - now.getDay());
-                    startOfWeek.setHours(0, 0, 0, 0);
-                    const endOfWeek = new Date(startOfWeek);
-                    endOfWeek.setDate(startOfWeek.getDate() + 6);
-                    endOfWeek.setHours(23, 59, 59, 999);
-                    const weeklyRevenueByDay = Array(7).fill(0);
-                    response.data.orders.forEach(order => {
-                        const createdAt = new Date(order.createdAt);
-                        if (createdAt >= startOfWeek && createdAt <= endOfWeek) {
-                            const dayIndex = createdAt.getDay();
-                            weeklyRevenueByDay[dayIndex] += order.totalPoints || 0;
-                        }
-                    });
-
-                    const formattedData = weeklyRevenueByDay.map((revenue, index) => ({
-                        day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][index],
-                        revenue
-                    }));
-                    setWeeklyRevenueData(formattedData);
-                } else {
-                    setErrorWeeklyRevenueChart(response.data?.message || 'Failed to fetch orders for weekly revenue chart.');
-                }
-            } catch (error) {
-                console.error('Error fetching orders for weekly revenue chart:', error);
-                setErrorWeeklyRevenueChart(error?.message || 'An error occurred while fetching orders for weekly revenue chart.');
-            } finally {
-                setLoadingWeeklyRevenueChart(false);
-            }
-        };
-        fetchWeeklyRevenueForChart();
-    }, [backendUrl]);
-  
-    useEffect(() => {
-        if (orders && orders.length > 0) {
-            try {
-                const totalRevenueValue = orders.reduce((sum, order) => sum + (order.totalPoints || 0), 0);
-                const orderCount = orders.length;
-                const aov = totalRevenueValue / orderCount;
-                setAverageOrderValue(aov.toFixed(2));
-                setErrorAverageOrderValue(null);
-            } catch (error) {
-                console.error("Error calculating Average Order Value:", error);
-                setAverageOrderValue('Error');
-                setErrorAverageOrderValue("Failed to calculate Average Order Value.");
-            }
-        } else if (orders && orders.length === 0) {
-            setAverageOrderValue('0.00');
-            setErrorAverageOrderValue(null);
-        } else {
-            setAverageOrderValue('Loading...');
-            setErrorAverageOrderValue(null);
-        }
-    }, [orders]);
-
-    const recentOrders = orders ? orders.slice(0, 3) : [];
-    // profit per day since Sunday, from the orders themselves
-    const weekStart = new Date();
-    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-    weekStart.setHours(0, 0, 0, 0);
-    const profitTrendsThisWeek = Array(7).fill(0);
-    for (const order of orders || []) {
-        const createdAt = new Date(order.createdAt);
-        if (createdAt < weekStart) continue;
-        for (const item of order.items || []) {
-            profitTrendsThisWeek[createdAt.getDay()] += ((item.sellingPrice || 0) - (item.purchaseCost || 0)) * (item.quantity || 0);
-        }
-    }
-
-    const renderBarChart = (data, title) => {
-        if (loadingWeeklyRevenueChart) {
-            return <div className="text-center text-gray-500">Loading weekly revenue data...</div>;
-        }
-        if (errorWeeklyRevenueChart) {
-            return <div className="text-center text-red-500">Error loading weekly revenue data.</div>;
-        }
-        if (!data || data.length === 0) {
-            return <div className="text-center text-gray-400">No weekly revenue data available.</div>;
-        }
-        const chartHeight = 200;
-        const barWidth = 30;
-        const barGap = 20;
-        const maxRevenue = Math.max(...data.map(point => point.revenue), 100);
-        return (
-            <div className="h-[250px] w-full relative" ref={chartRef}>
-                <svg className="absolute inset-0 w-full h-full">
-                    <g transform="translate(2, 40)">
-                        {data.map((point, index) => {
-                            const barHeight = (point.revenue / maxRevenue) * 120;
-                            const x = index * (barWidth + barGap);
-                            const y = chartHeight - barHeight - 40;
-                            return (
-                                <g key={index}>
-                                    <text
-                                        x={x + barWidth / 2}
-                                        y={y - 10}
-                                        fontSize="12"
-                                        fontWeight="bold"
-                                        fill={isDarkMode ? "white" : "black"}
-                                        textAnchor="middle"
-                                    >
-                                        {point.revenue.toLocaleString('en-GB')}
-                                    </text>
-                                    <rect
-                                        x={x}
-                                        y={y}
-                                        width={barWidth}
-                                        height={barHeight}
-                                        fill="#A2574F"
-                                        rx="6"
-                                    />
-                                    <text
-                                        x={x + barWidth / 2}
-                                        y={y + barHeight / 2 + 5}
-                                        fontSize="10"
-                                        fill="white"
-                                        textAnchor="middle"
-                                    >
-                                        {point.day}
-                                    </text>
-                                </g>
-                            );
-                        })}
-                    </g>
-                </svg>
-            </div>
-        );
-    };
-    
-    const fixedColors = ['#FFD700', '#9B59B6', '#FF69B4', '#1E90FF', '#2ECC71'];
-    const renderDonutChart = (data, title) => {
-        if (!data || data.length === 0)
-            return <div className="text-gray-400 text-center">No data to display</div>;
-        const top5Data = data.slice(0, 5).map(item => ({
-            ...item,
-            orders: Number(item.orders) || 0,
-        }));
-        const total = top5Data.reduce((acc, item) => acc + item.orders, 0);
-        if (total === 0)
-            return <div className="text-gray-400 text-center">No orders to display</div>;
-        const chartRadius = 90;
-        const holeRadius = 35;
-        const svgWidth = chartRadius * 2;
-        const svgHeight = chartRadius * 2;
-        return (
-            <div className="relative w-full h-full top-2 pr-30 flex items-end justify-center">
-                <svg width={svgWidth} height={svgHeight}>
-                    {top5Data.map((item, index) => {
-                        const startAngle = (index === 0
-                            ? 0
-                            : top5Data.slice(0, index).reduce((acc, curr) => acc + curr.orders, 0) / total) * 360;
-                        const angle = (item.orders / total) * 360;
-                        const endAngle = startAngle + angle;
-                        const midAngle = (startAngle + endAngle) / 2;
-                        const percentage = ((item.orders / total) * 100).toFixed(1);
-                        const startX = chartRadius + chartRadius * Math.cos((startAngle - 90) * Math.PI / 180);
-                        const startY = chartRadius + chartRadius * Math.sin((startAngle - 90) * Math.PI / 180);
-                        const endX = chartRadius + chartRadius * Math.cos((endAngle - 90) * Math.PI / 180);
-                        const endY = chartRadius + chartRadius * Math.sin((endAngle - 90) * Math.PI / 180);
-                        const largeArcFlag = angle > 180 ? 1 : 0;
-                        const pathData = `
-                      M ${chartRadius} ${chartRadius}
-                      L ${startX} ${startY}
-                      A ${chartRadius} ${chartRadius} 0 ${largeArcFlag} 1 ${endX} ${endY}
-                      L ${chartRadius + holeRadius * Math.cos((endAngle - 90) * Math.PI / 180)} ${chartRadius + holeRadius * Math.sin((endAngle - 90) * Math.PI / 180)}
-                      A ${holeRadius} ${holeRadius} 0 ${largeArcFlag} 0 ${chartRadius + holeRadius * Math.cos((startAngle - 90) * Math.PI / 180)} ${chartRadius + holeRadius * Math.sin((startAngle - 90) * Math.PI / 180)}
-                      Z`;
-                        const percentageX = chartRadius + (chartRadius * 0.65) * Math.cos((midAngle - 90) * Math.PI / 180);
-                        const percentageY = chartRadius + (chartRadius * 0.65) * Math.sin((midAngle - 90) * Math.PI / 180);
-                        const color = fixedColors[index % fixedColors.length];
-                        return (
-                            <g key={index}>
-                                <path
-                                    d={pathData}
-                                    fill={color}
-                                    stroke="#f3f4f6"
-                                    strokeWidth="1"
-                                />
-                                {percentage > 0 && (
-                                    <text
-                                        x={percentageX}
-                                        y={percentageY}
-                                        textAnchor="middle"
-                                        fontSize="10"
-                                        fontWeight="bold"
-                                        fill="black"
-                                        style={{ pointerEvents: 'none' }}
-                                    >
-                                        {percentage}%
-                                    </text>
-                                )}
-                            </g>
-                        );
-                    })}
-                    <circle cx={chartRadius} cy={chartRadius} r={holeRadius} fill="white" />
-                </svg>
-                <div className={`absolute top-0 right-7 text-[10px] ${isDarkMode ? 'text-white' : 'text-black'}`}>
-                    {top5Data.map((item, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                            <div
-                                className="w-3 h-3 rounded-full"
-                                style={{ backgroundColor: fixedColors[index % fixedColors.length] }}
-                            ></div>
-                            <span>{item.name ? item.name.substring(0, 10) : `Product ${index + 1}`}</span>
-                        </div>
-                    ))}
-                </div></div>);
-    };
-    
-    const renderLineChart = (data, title) => {
-        const availableWidth = chartRef?.current?.offsetWidth || 200;
-        if (!chartRef.current) return null;
-        // a quiet week is all zeros, and dividing by zero draws nothing
-        const maxDataValue = Math.max(...data, 1);
-        const chartHeight = 150;
-        const dataPoints = data.length;
-        const xStep = availableWidth / (dataPoints - 1);
-        const points = data.map((value, index) => {
-            const x = index * xStep;
-            const y = chartHeight - (value / maxDataValue) * chartHeight;
-            return { x, y, value };
-        });
-        
-        let path = `M ${points[0].x} ${points[0].y}`;
-        for (let i = 1; i < dataPoints; i++) {
-            path += ` L ${points[i].x} ${points[i].y}`;
-        }
-        return (
-            <div className="h-30 top-7 w-full relative " ref={chartRef}>
-                <svg className="absolute inset-0 w-full h-full">
-                    <path
-                        d={path}
-                        stroke="#A2574F"
-                        strokeWidth="3"
-                        fill="none"
-                        className="stroke-dasharray-1000 stroke-dashoffset-1000"
-                        style={{
-                            animation: 'dash 2s ease-in-out forwards',
-                        }}
-                    />
-                    {points.map((point, index) => (
-                        <g key={index}>
-                            <circle
-                                cx={point.x}
-                                cy={point.y}
-                                r="6"
-                                fill="#A2574F"
-                                className="scale-0"
-                                style={{
-                                    animation: `scaleIn 0.5s ease-in-out forwards ${index * 0.2}s`,
-                                }}
-                            />
-                            <text
-                                x={point.x}
-                                y={point.y - 10}
-                                fontSize="12"
-                                fill="white"
-                                textAnchor="middle"
-                                className="opacity-0"
-                                style={{
-                                    animation: `fadeIn 0.5s ease-in-out forwards ${index * 0.2 + 0.5}s`,
-                                }}
-                            >
-                                {point.value}
-                            </text>
-                        </g>
-                    ))}
-                    <style>{`
-                        @keyframes dash {
-                            to {
-                                stroke-dashoffset: 0;
-                            }
-                        }
-                        @keyframes scaleIn {
-                            to {
-                                scale: 1;
-                            }
-                        }
-                        @keyframes fadeIn {
-                            to {
-                                opacity: 1;
-                            }
-                        }
-                    `}</style>
-                </svg>
-                <div className={`absolute bottom-0 left-0 w-full h-px ${isDarkMode ? 'bg-gray-700' : 'bg-white/20'}`}></div>
-            </div>
-        );
-    };
-
-    useEffect(() => {
-        const fetchProductCount = async () => {
-            try {
-                const response = await fetch(`${backendUrl}/api/products/count`, {
-                    method: 'GET',
-                    credentials: 'include',
-                });
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Failed to fetch product count: ${response.status} - ${errorText}`);
-                }
-                const data = await response.json();
-                setTotalProducts(data.count);
-            } catch (error) {
-                console.error("Error fetching product count:", error);
-                setTotalProducts(0);
-            }
-        };
-        fetchProductCount();
-    }, []);
-
-    useEffect(() => {
-        const fetchLowStockProducts = async () => {
-            try {
-                const response = await axios.get(`${backendUrl}/api/products/low-stock`, { withCredentials: true });
-                setLowStockProducts(response.data);
-            } catch (error) {
-                console.error("Error fetching low stock products:", error);
-                setLowStockProducts([]);
-            }
-        };
-        fetchLowStockProducts();
-    }, []);
-
-    useEffect(() => {
-        const fetchAllOrdersForRevenue = async () => {
-            setLoadingTotalRevenue(true);
-            setErrorTotalRevenue(null);
-            try {
-                const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    withCredentials: true,
-                });
-                if (response.data?.success && response.data.orders) {
-                    const fetchedOrders = response.data.orders;
-                    setOrders(fetchedOrders);
-                    let calculatedTotalRevenue = 0;
-                    let calculatedSales = 0;
-                    let calculatedOrderedPurchaseCost = 0;
-                    for (const order of fetchedOrders) {
-                        calculatedTotalRevenue += (order.totalPoints || 0);
-                        if (order.items && Array.isArray(order.items)) {
-                            for (const item of order.items) {
-                                calculatedSales += (item.sellingPrice || 0) * (item.quantity || 0);
-                                calculatedOrderedPurchaseCost += (item.purchaseCost || 0) * (item.quantity || 0);
-                            }
-                        }
-                    }
-                    setTotalRevenue(calculatedTotalRevenue);
-                    setOrderedPurchaseCost(calculatedOrderedPurchaseCost);
-                    setTotalProfit(calculatedSales - calculatedOrderedPurchaseCost);
-                } else {
-                    console.error("Failed to fetch orders. Response data:", response.data);
-                    setErrorTotalRevenue(response.data?.message || 'Failed to fetch orders.');
-                }
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-                setErrorTotalRevenue(error.message || 'An error occurred while fetching orders.');
-            } finally {
-                setLoadingTotalRevenue(false);
-            }
-        };
-        fetchAllOrdersForRevenue();
-    }, [backendUrl]);
-    useEffect(() => {
-        const fetchMonthlyRevenue = async () => {
-            setLoadingMonthlyRevenue(true);
-            setErrorMonthlyRevenue(null);
-            try {
-                const response = await axios.get(`${backendUrl}/api/orders/all`, {
-                    withCredentials: true,
-                });
-                if (response.data?.success && response.data.orders) {
-                    const now = new Date();
-                    const currentYear = now.getFullYear();
-                    const currentMonth = now.getMonth();
-                    const monthlyOrders = response.data.orders.filter(order => {
-                        const createdAt = new Date(order.createdAt);
-                        return createdAt.getFullYear() === currentYear && createdAt.getMonth() === currentMonth;
-                    });
-                    const calculatedMonthlyRevenue = monthlyOrders.reduce((sum, order) => sum + (order.totalPoints || 0), 0);
-                    setMonthlyRevenue(calculatedMonthlyRevenue);
-                } else {
-                    setErrorMonthlyRevenue(response.data?.message || 'Failed to fetch orders for monthly revenue calculation.');
-                }
-            } catch (error) {
-                console.error('Error fetching orders for monthly revenue:', error);
-                setErrorMonthlyRevenue(error?.message || 'An error occurred while fetching orders for monthly revenue.');
-            } finally {
-                setLoadingMonthlyRevenue(false);
-            }
-        };
-        fetchMonthlyRevenue();
-    }, []);
     return (
         <div className={`flex min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
             <AdminNavbar
                 isSidebarOpen={isSidebarOpen}
-                toggleSidebar={toggleSidebar}
+                toggleSidebar={() => setIsSidebarOpen((open) => !open)}
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
             />
 
-            <div className="flex-1 min-w-0 p-4 sm:p-6">
-                <AnimatePresence>
-                    {showDraggablePanel && (
-                        <DraggablePanel title="Dashboard Notes">
-                            <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                <AlertTriangle className="inline-block w-4 h-4 mr-1 text-yellow-400" />
-                                <span className="font-medium">Welcome back.</span> This is where the shop side of Pother Bondhu is run.
-                            </p>
-                            <ul className={`list-disc list-inside mt-2 space-y-1 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                                <li>Click a card to open the page behind it.</li>
-                                <li>All figures are in PetPoints and come from real orders.</li>
-                                <li>Profit leaves out donations, which go to rescues.</li>
-                            </ul>
-                            <button
-                                onClick={() => setShowDraggablePanel(false)}
-                                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                            >
-                                <CheckCircle className="w-4 h-4 mr-2 inline-block" />
-                                Got it!
-                            </button>
-                        </DraggablePanel>
-                    )}
-                </AnimatePresence>
-                    <>
-                        <div className="flex justify-center mb-8">
-                            <h2 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-                                <u>Admin Dashboard</u>
-                            </h2>
-                        </div>
-                        <div className="flex items-center justify-between mb-12">
-                            <div>
-                                <p className={`text-2xl font-bold ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                                    Orders, stock and the money side of Pother Bondhu.
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => setShowDraggablePanel(true)}
-                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                            >
-                                <ClipboardList className="w-4 h-4 mr-2 inline-block" />
-                                Show Notes
-                            </button>
-                        </div>
-                    
-                        {fetchError && (
-                            <div className={`mb-6 rounded-lg border px-4 py-3 text-sm ${isDarkMode ? 'bg-red-900/30 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-700'}`}>
-                                Could not load order data, so the figures below are incomplete. {fetchError}
-                            </div>
-                        )}
+            <main className="flex-1 min-w-0 p-4 sm:p-6">
+                <h2 className={`text-3xl font-bold text-center mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Admin Dashboard</h2>
+                <p className={`text-center mb-10 ${muted}`}>Orders, stock and the money side of Pother Bondhu. Profit leaves out donations, which go to rescues.</p>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                            <StyledLink to="/adminproducts">
-                                <OverviewCard
-                                    title="Total Products"
-                                    value={totalProducts}
-                                    icon={() => <Boxes className={isDarkMode ? 'text-blue-400 w-12 h-12' : 'text-blue-600 w-12 h-12'} />}
-                                />
-                            </StyledLink>
-                            <StyledLink to="/adminorders">
-                                <OverviewCard
-                                    title="Pending Orders"
-                                    value={loading ? 'Loading...' : pendingOrdersCount}
-                                    icon={() => <ShoppingCart className={isDarkMode ? 'text-yellow-200 w-11 h-11' : 'text-yellow-400 w-11 h-11'} />}
-                                />
-                            </StyledLink>
-                            <StyledLink to="/adminrevenue">
-                            <OverviewCard
-                                title="Monthly Revenue"
-                                value={loadingMonthlyRevenue ? 'Loading...' : errorMonthlyRevenue ? 'Error' : petPoints(monthlyRevenue)}
-                                icon={() => <CreditCard className={isDarkMode ? 'text-green-500 w-11 h-11' : 'text-green-600 w-11 h-11'} />}
-                            />
-                            </StyledLink>
-                            <StyledLink to="/adminrevenue">
-                            <OverviewCard
-                                title="Average Order Value"
-                                value={loading ? 'Loading...' : errorAverageOrderValue ? 'Error' : averageOrderValue !== 'Loading...' ? petPoints(averageOrderValue) : petPoints(0)}
-                                icon={Coins}
-                            />
-                            </StyledLink>
-                        </div>
-                    
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-10 mb-10">
-                            <AnalyticsCard title="Weekly Revenue" chartRef={chartRef}>
-                                {renderBarChart(weeklyRevenueData, 'Weekly Revenue')}
-                            </AnalyticsCard>
-                            <AnalyticsCard title="Most Ordered Products" chartRef={chartRef}>
-                                {renderDonutChart(mostOrderedProductsData, 'Most Ordered Products')}
-                            </AnalyticsCard>
-                            <AnalyticsCard title="Profit Trends This Week" chartRef={chartRef}>
-                                {renderLineChart(profitTrendsThisWeek, 'Profit Trends This Week')}
-                            </AnalyticsCard>
-                        </div>
-                    
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            <Card title={<span><span className="text-3xl mr-1">🛒</span> Recent Orders </span>} className="bg-gray-200">
-                                <ul className="space-y-3.5 mt-2">
-                                    {recentOrders.map(order => (
-                                        <li key={order._id} className={isDarkMode ? 'text-gray-300 text-sm' : 'text-gray-700 text-sm'}>
-                                            <span className="font-medium">#{order._id.slice(-6)} {order.userInfo?.name}</span>, {petPoints(order.totalPoints)} -{' '}
-                                            <span
-                                                className={
-                                                    order.status === 'Pending'
-                                                        ? 'text-yellow-500'
-                                                        : order.status === 'Out for Delivery'
-                                                            ? 'text-blue-500'
-                                                            : 'text-green-500'}>
-                                                {order.status}
-                                            </span>
-                                        </li>))}
-                                </ul>
-                                <StyledLink to="/adminorders" className="mt-4 inline-flex items-center text-sm">
-                                    View All Orders <ArrowRight className="w-4 h-4 ml-1" />
-                                </StyledLink>
-                            </Card>
-                            <Card title={<span><span className="text-2xl mr-1">🔴</span> Low Stock Alert </span>} className="bg-gray-200">
-                                <ul className="space-y-3.5 mt-2">
-                                    {lowStockProducts.map((alert, index) => (
-                                        <li key={index} className={isDarkMode ? 'text-gray-300 text-sm flex items-center' : 'text-gray-700 text-sm flex items-center'}>
-                                            <AlertTriangle className="w-6 h-6 mr-2 text-red-500 inline-block" />
-                                            <span className="font-medium">{alert.name}</span> -{' '}
-                                            {alert.stockQuantity} pcs!
-                                        </li>))}
-                                </ul>
-                                <StyledLink to="/adminproducts" className="mt-4 inline-flex items-center text-sm">
-                                    Manage Stock <ArrowRight className="w-4 h-4 ml-1" />
-                                </StyledLink>
-                            </Card>
-                            <Card title={<span><span className="text-3xl mr-1">💰</span> Financial Overview</span>} className="bg-gray-200">
-                                <ul className="space-y-3.5 mt-2">
-                                    <li className="flex items-center space-x-2">
-                                        <Coins className="w-6 h-6 text-red-600" />
-                                        <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700 text-sm flex items-center'}>
-                                            <span className="font-semibold">Ordered Purchase Cost</span>: {petPoints(orderedPurchaseCost)}
-                                        </span>
-                                    </li>
-                                    <li className="flex items-center space-x-2">
-                                        <TrendingUp className="w-6 h-6 text-green-500" />
-                                        <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700 text-sm flex items-center'}>
-                                            <span className="font-semibold">Total Paid In</span>: {typeof totalRevenue === 'number' ? petPoints(totalRevenue) : totalRevenue}
-                                        </span>
-                                    </li>
-                                    <li className="flex items-center space-x-2">
-                                        <PiggyBank className="w-6 h-6 text-purple-500" />
-                                        <span className={isDarkMode ? 'text-gray-300' : 'text-gray-700 text-sm flex items-center'}>
-                                            <span className="font-semibold">Net Profit</span>: {petPoints(totalProfit)}
-                                        </span>
-                                    </li>
-                                </ul>
-                                <StyledLink to="/adminrevenue" className="mt-4 inline-flex items-center text-sm font-medium hover:underline">
-                                    View Detailed Revenue <ArrowRight className="w-4 h-4 ml-1" />
-                                </StyledLink>
-                            </Card>
-                        </div>
-                    </>
-            </div>
-        </div >
+                {error && (
+                    <div className={`mb-6 rounded-lg border px-4 py-3 text-sm ${isDarkMode ? 'bg-red-900/30 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-700'}`}>
+                        {error}
+                    </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <Stat to="/adminproducts" title="Total Products" value={show(productCount)} icon={Boxes} iconClass={isDarkMode ? 'text-blue-400' : 'text-blue-600'} />
+                    <Stat to="/adminorders" title="Pending Orders" value={show(stats.pending)} icon={ShoppingCart} iconClass={isDarkMode ? 'text-yellow-200' : 'text-yellow-400'} />
+                    <Stat to="/adminrevenue" title="Monthly Revenue" value={show(petPoints(stats.month))} icon={CreditCard} iconClass={isDarkMode ? 'text-green-500' : 'text-green-600'} />
+                    <Stat to="/adminrevenue" title="Average Order Value" value={show(petPoints(stats.average.toFixed(2)))} icon={Coins} iconClass={isDarkMode ? 'text-gray-500' : 'text-blue-600'} />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-10">
+                    <Panel title="Weekly Revenue"><BarChart values={stats.revenueByDay} /></Panel>
+                    <Panel title="Most Ordered Products"><DonutChart items={topProducts} /></Panel>
+                    <Panel title="Profit Trends This Week"><LineChart values={stats.profitByDay} /></Panel>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <Panel title="Recent Orders">
+                        <ul className={`space-y-3.5 text-sm ${muted}`}>
+                            {orders.slice(0, 3).map((order) => (
+                                <li key={order._id}>
+                                    <span className="font-medium">#{order._id.slice(-6)} {order.userInfo?.name}</span>, {petPoints(order.totalPoints)} -{' '}
+                                    <span className={statusClass[order.status] || 'text-green-500'}>{order.status}</span>
+                                </li>
+                            ))}
+                        </ul>
+                        <Link to="/adminorders" className={link}>
+                            View All Orders <ArrowRight className="w-4 h-4 ml-1" />
+                        </Link>
+                    </Panel>
+                    <Panel title="Low Stock Alert">
+                        <ul className={`space-y-3.5 text-sm ${muted}`}>
+                            {lowStock.map((product) => (
+                                <li key={product.id} className="flex items-center">
+                                    <AlertTriangle className="w-5 h-5 mr-2 text-red-500" />
+                                    <span className="font-medium">{product.name}</span>&nbsp;- {product.stockQuantity} pcs
+                                </li>
+                            ))}
+                        </ul>
+                        <Link to="/adminproducts" className={link}>
+                            Manage Stock <ArrowRight className="w-4 h-4 ml-1" />
+                        </Link>
+                    </Panel>
+                    <Panel title="Financial Overview">
+                        <ul className={`space-y-3.5 text-sm ${muted}`}>
+                            <li className="flex items-center gap-2"><Coins className="w-5 h-5 text-red-600" /><span><b>Ordered Purchase Cost</b>: {petPoints(stats.cost)}</span></li>
+                            <li className="flex items-center gap-2"><TrendingUp className="w-5 h-5 text-green-500" /><span><b>Total Paid In</b>: {petPoints(stats.paidIn)}</span></li>
+                            <li className="flex items-center gap-2"><PiggyBank className="w-5 h-5 text-purple-500" /><span><b>Net Profit</b>: {petPoints(stats.profit)}</span></li>
+                        </ul>
+                        <Link to="/adminrevenue" className={link}>
+                            View Detailed Revenue <ArrowRight className="w-4 h-4 ml-1" />
+                        </Link>
+                    </Panel>
+                </div>
+            </main>
+        </div>
     );
 };
+
 export default AdminDashboard;
