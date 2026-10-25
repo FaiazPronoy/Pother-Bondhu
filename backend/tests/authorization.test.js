@@ -6,7 +6,7 @@ describe('admin-only routes', () => {
     ['GET', '/api/orders/all'],
     ['GET', '/api/products/count'],
     ['GET', '/api/products/low-stock'],
-    ['GET', '/api/products/total-purchase-cost'],
+    ['GET', '/api/products/most-ordered'],
   ];
 
   it.each(adminRoutes)('%s %s rejects anonymous callers', async (method, path) => {
@@ -52,6 +52,20 @@ describe('product catalogue writes', () => {
     const admin = await createUser({ role: 'admin' });
     const res = await api('POST', '/api/products', { body: newProduct(), cookie: admin.cookie });
     expect(res.status).toBe(201);
+  });
+
+  it('can be edited down to zero by an admin', async () => {
+    const admin = await createUser({ role: 'admin' });
+    const product = newProduct();
+    await api('POST', '/api/products', { body: product, cookie: admin.cookie });
+    const res = await api('PUT', `/api/products/${product.id}`, {
+      body: { purchaseCost: 0, stockQuantity: 0 },
+      cookie: admin.cookie,
+    });
+    expect(res.status).toBe(200);
+    expect(res.body.purchaseCost).toBe(0);
+    expect(res.body.stockQuantity).toBe(0);
+    expect(res.body.name).toBe(product.name);
   });
 
   it('cannot be deleted anonymously', async () => {
