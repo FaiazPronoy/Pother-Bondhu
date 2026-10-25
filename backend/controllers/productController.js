@@ -5,6 +5,8 @@ import Order from '../models/Order.js';
 const LOW_STOCK = 10;
 const EDITABLE = ['name', 'description', 'purchaseCost', 'sellingPrice', 'imageUrl', 'stockQuantity', 'category', 'features'];
 
+// @desc    Get all products
+// @route   GET /api/products
 export const getAllProducts = async (req, res) => {
   try {
     res.json(await Product.find());
@@ -18,12 +20,13 @@ export const getProductById = async (req, res) => {
     const key = req.params.id;
     let product = await Product.findOne({ id: key });
     if (!product && mongoose.Types.ObjectId.isValid(key)) {
+      // also allow lookup by Mongo _id as a fallback
       product = await Product.findById(key);
     }
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
-    res.json({ product });
+    res.json({ product }); // 👈 Adjust to match frontend expectation (ProductDetail.jsx uses data.product)
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -59,6 +62,8 @@ export const getMostOrderedProducts = async (req, res) => {
   }
 };
 
+// @desc    Create a new product
+// @route   POST /api/products
 export const createProduct = async (req, res) => {
   try {
     const fields = Object.fromEntries(EDITABLE.map((key) => [key, req.body[key]]));
@@ -75,6 +80,8 @@ export const createProduct = async (req, res) => {
   }
 };
 
+// @desc    Update a product
+// @route   PUT /api/products/:id
 export const updateProduct = async (req, res) => {
   try {
     const product = await Product.findOne({ id: req.params.id });
@@ -90,6 +97,8 @@ export const updateProduct = async (req, res) => {
   }
 };
 
+// @desc    Delete a product
+// @route   DELETE /api/products/:id
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findOneAndDelete({ id: req.params.id });

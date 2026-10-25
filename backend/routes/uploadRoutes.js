@@ -9,6 +9,8 @@ uploadRouter.get('/rescue', recentRescues);
 uploadRouter.get('/rescue/:id', serveImage);
 uploadRouter.post('/rescue', userAuth, upload.single('image'), uploadImage);
 
+// multer rejects bad files by throwing, which would otherwise return Express's
+// HTML error page to a caller expecting JSON
 uploadRouter.use((err, req, res, next) => {
   if (err) {
     return res.status(400).json({ success: false, message: err.message });

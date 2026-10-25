@@ -38,6 +38,7 @@ export const serveImage = async (req, res) => {
   res.send(image.data);
 };
 
+// the latest rescue posts from everyone, for the home page feed
 export const recentRescues = async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit, 10) || 9, 24);
   const posts = await RescueImage.find()

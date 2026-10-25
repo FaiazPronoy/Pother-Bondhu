@@ -5,6 +5,7 @@ import userModel from "../models/userModel.js";
 
 
 
+// Send invitations
 export const sendInvitations = async (req, res) => {
   try {
     const { teamId, volunteerIds } = req.body;
@@ -15,6 +16,7 @@ export const sendInvitations = async (req, res) => {
       return res.status(400).json({ error: 'Choose up to 20 volunteers to invite' });
     }
 
+    // Verify the user is the creator of the team
     const team = await Team.findById(teamId);
     if (!team) {
       return res.status(404).json({ error: 'Team not found' });
@@ -23,6 +25,7 @@ export const sendInvitations = async (req, res) => {
       return res.status(403).json({ error: 'Only team creator can send invitations' });
     }
 
+    // every invitee has to be a volunteer who is not you and not already in the team
     const ids = [...new Set(volunteerIds.map(String))];
     const invitees = await userModel.countDocuments({ _id: { $in: ids }, role: 'volunteer' });
     const members = new Set(team.members.map(String));
@@ -32,6 +35,7 @@ export const sendInvitations = async (req, res) => {
 
     const invitations = await Promise.all(
       ids.map(async (volunteerId) => {
+        // Check if invitation already exists
         const existingInvite = await TeamInvite.findOne({
           team: teamId,
           to: volunteerId,
@@ -58,6 +62,7 @@ export const sendInvitations = async (req, res) => {
   }
 };
 
+// Get user's pending invitations
 export const getMyInvitations = async (req, res) => {
   try {
     const invites = await TeamInvite.find({ 
@@ -71,6 +76,7 @@ export const getMyInvitations = async (req, res) => {
   }
 };
 
+// Respond to invitation
 export const respondToInvitation = async (req, res) => {
   try {
     const { status } = req.body;
@@ -97,6 +103,7 @@ export const respondToInvitation = async (req, res) => {
     await invite.save();
 
     if (status === 'accepted') {
+      // Add user to team if accepted
       await Team.updateOne({ _id: invite.team._id }, { $addToSet: { members: invite.to } });
     }
 

@@ -9,6 +9,7 @@ export const saveUserCart = async (req, res) => {
     return res.status(400).json({ message: 'items must be an array' });
   }
 
+  // only id and quantity get stored, the rest comes from the product
   const slimItems = items
     .map((item) => ({
       productId: item.id || item.productId,

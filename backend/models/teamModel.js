@@ -1,3 +1,4 @@
+// backend/models/TeamModel.js
 import mongoose from 'mongoose';
 
 const ActivitySchema = new mongoose.Schema(
@@ -6,7 +7,7 @@ const ActivitySchema = new mongoose.Schema(
 );
 
 const TeamSchema = new mongoose.Schema({
-  id: { type: String, index: true },
+  id: { type: String, index: true },          // optional custom/public id
   name: { type: String, required: true },
   slug: { type: String, unique: true, sparse: true },
   area: { type: String },
@@ -18,7 +19,7 @@ const TeamSchema = new mongoose.Schema({
 }, {
   timestamps: true,
   collation: { locale: 'en', strength: 2 },
-  collection: 'teams',
+  collection: 'teams',     // 👈 force collection name; avoids mismatches
 });
 
 TeamSchema.index({ name: 'text', slug: 'text', area: 'text', category: 'text' });

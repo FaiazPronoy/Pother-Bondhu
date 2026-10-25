@@ -21,16 +21,20 @@ import { publicStats } from "./controllers/statsController.js";
 const app = express();
 const port = process.env.PORT || 4000;
 
+// ✅ Database connect
 connectDB();
 
+// the site the API accepts cookies from; a comma separated list in production
 const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173,http://localhost:5175").split(",").map((s) => s.trim());
 
+// ✅ Middlewares
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 
+// ✅ API Endpoints
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/upload", uploadRouter);
@@ -42,6 +46,8 @@ app.use("/api/orders", orderRoutes);
 app.get("/api/stats", publicStats);
 app.use("/api", (req, res) => res.status(404).json({ success: false, message: "Not found" }));
 
+// on a host, the built frontend is served from here too, so the login cookie
+// stays on one address
 const dist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../frontend/dist");
 if (fs.existsSync(path.join(dist, "index.html"))) {
   app.set("trust proxy", 1);
@@ -51,4 +57,5 @@ if (fs.existsSync(path.join(dist, "index.html"))) {
   app.get("/", (req, res) => res.send("API Working"));
 }
 
+// ✅ Start server
 app.listen(port, () => console.log(`🚀 Server started on PORT: ${port}`));

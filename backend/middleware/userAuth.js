@@ -13,6 +13,7 @@ const userAuth = async (req, res, next) => {
       return res.status(401).json({ success: false, message: "Not Authorized. Login Again" });
     }
 
+    // read the role from the db, not the token
     const user = await userModel.findById(tokenDecode.id).select('email role');
     if (!user) {
       return res.status(401).json({ success: false, message: "Not Authorized. Login Again" });

@@ -1,5 +1,7 @@
 import multer from 'multer';
 
+// Photos are kept in memory and saved into MongoDB with their post, not on
+// disk: free hosts wipe the disk on every restart, which would lose them.
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 3 * 1024 * 1024 },
@@ -11,6 +13,7 @@ const upload = multer({
   },
 });
 
+// The browser's word for the type is only a claim; check the first bytes too.
 export function looksLikeImage(buffer) {
   if (!buffer || buffer.length < 12) return false;
   const jpeg = buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;

@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel.js';
 import transporter from '../config/nodemailer.js';
 
+// Five wrong passwords lock that email for fifteen minutes. Kept in memory,
+// which is enough for one server; it resets when the server restarts.
 const FAILS_ALLOWED = 5;
 const LOCK_MS = 15 * 60 * 1000;
 const failures = new Map();
@@ -53,6 +55,7 @@ export const register = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
+        //Sending Welcome Email
         const mailOptions = {
             from : process.env.SENDER_EMAIL,
             to : email,
@@ -60,6 +63,7 @@ export const register = async (req, res) => {
             text: "Welcome to Pother Bondhu. Your account is ready, and the strays of your area just got one more friend."
         }
 
+        // account is already saved, don't fail the signup if the mail bounces
         try {
             await transporter.sendMail(mailOptions)
         } catch (mailError) {
@@ -88,6 +92,7 @@ export const login = async (req, res) => {
             return res.status(429).json({success:false, message: "Too many wrong tries. Please wait 15 minutes."})
         }
 
+        // one message for both, so the form cannot be used to find out who has an account
         const user = await userModel.findOne({email})
         const isMatch = user ? await bcrypt.compare(password, user.password) : false
 
@@ -145,6 +150,8 @@ export const logout = async (req, res) => {
 
 
 
+// Asked on every page load, signed in or not, so a visitor gets a plain
+// "no" instead of a 401 that shows up as an error in the browser console.
 export const authStatus = async (req, res) => {
     const { token } = req.cookies;
     try {
