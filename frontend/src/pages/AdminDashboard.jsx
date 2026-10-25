@@ -541,9 +541,6 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchProductCount = async () => {
             try {
-                if (!backendUrl) {
-                    throw new Error("VITE_BACKEND_URL is not defined. Please configure your environment.");
-                }
                 const response = await fetch(`${backendUrl}/api/products/count`, {
                     method: 'GET',
                     credentials: 'include',
@@ -565,9 +562,6 @@ const AdminDashboard = () => {
     useEffect(() => {
         const fetchLowStockProducts = async () => {
             try {
-                if (!backendUrl) {
-                    throw new Error("VITE_BACKEND_URL is not defined. Please configure your environment.");
-                }
                 const response = await axios.get(`${backendUrl}/api/products/low-stock`, { withCredentials: true });
                 setLowStockProducts(response.data);
             } catch (error) {

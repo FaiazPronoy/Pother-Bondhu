@@ -1,4 +1,7 @@
 import express from "express";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import cors from "cors";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
@@ -33,7 +36,6 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 
 // ✅ API Endpoints
-app.get("/", (req, res) => res.send("API Working"));
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/upload", uploadRouter);
@@ -44,6 +46,18 @@ app.use("/api/teams", teamRouter);
 app.use("/api", inviteRoutes);
 app.use("/api/orders", orderRoutes);
 app.get("/api/stats", publicStats);
+app.use("/api", (req, res) => res.status(404).json({ success: false, message: "Not found" }));
+
+// on a host, the built frontend is served from here too, so the login cookie
+// stays on one address
+const dist = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../frontend/dist");
+if (fs.existsSync(path.join(dist, "index.html"))) {
+  app.set("trust proxy", 1);
+  app.use(express.static(dist, { index: false }));
+  app.get("/{*path}", (req, res) => res.sendFile(path.join(dist, "index.html")));
+} else {
+  app.get("/", (req, res) => res.send("API Working"));
+}
 
 // ✅ Start server
 app.listen(port, () => console.log(`🚀 Server started on PORT: ${port}`));
