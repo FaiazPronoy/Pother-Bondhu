@@ -14,6 +14,7 @@ with PetPoints and a small supplies shop.
 |---|---|
 | **Type** | Personal project (not for a course) |
 | **Made by** | Faiaz Abrar Zaman Pronoy and Sinthia Khandoker |
+| **Live demo** | https://pother-bondhu.onrender.com (free hosting, so the first visit can take up to a minute to wake it) |
 | **Versions** | [v1.0, the first version, and v2.0, the rebuild](../../releases) |
 | **History** | First built in Summer 2025 as **Save Paws**. Rebuilt as **Pother Bondhu** (v2.0) and published here in October 2026. |
 | **Languages** | Bangla and English, with a dark mode |
