@@ -2,33 +2,34 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Plus, Edit, Trash2, Save, X, PlusCircle, MinusCircle, Info } from 'lucide-react';
 import AdminNavbar from './AdminNavbar';
 import { DarkmodeContext } from '../context/DarkmodeContext';
+import { toast } from 'react-toastify';
 import { backendUrl } from '../config';
 import { petPoints } from './bits';
+
+const emptyProduct = () => ({
+    id: '',
+    name: '',
+    description: '',
+    purchaseCost: 0,
+    sellingPrice: 0,
+    imageUrl: '',
+    stockQuantity: 0,
+    category: '',
+    features: [],
+    productAddDate: new Date(),
+});
 
 const ProductPage = () => {
     const [products, setProducts] = useState([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
-    const [newProduct, setNewProduct] = useState({
-        id: '',
-        name: '',
-        description: '',
-        purchaseCost: 0,
-        sellingPrice: 0,
-        imageUrl: '',
-        stockQuantity: 0,
-        category: '', 
-        features: [],
-        productAddDate: new Date(), 
-    });
+    const [newProduct, setNewProduct] = useState(emptyProduct);
 
-    // start folded on a phone, where the open sidebar takes most of the screen
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 768);
     const [activeTab, setActiveTab] = useState('Products');
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
-    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [selectedProductDetails, setSelectedProductDetails] = useState(null);
     const { isDarkMode } = useContext(DarkmodeContext);
     const toggleSidebar = () => {
@@ -37,11 +38,9 @@ const ProductPage = () => {
 
     const openDetailsModal = (product) => {
         setSelectedProductDetails(product);
-        setIsDetailsModalOpen(true);
     };
 
     const closeDetailsModal = () => {
-        setIsDetailsModalOpen(false);
         setSelectedProductDetails(null);
     };
 
@@ -55,25 +54,14 @@ const ProductPage = () => {
                 const data = await response.json();
                 setProducts(data);
             } catch (error) {
-                console.error('Error fetching products:', error);
+                toast.error(error.message);
             }
         };
         fetchProducts();
     }, []);
     const handleAddProduct = () => {
         setIsEditing(false);
-        setNewProduct({
-            id: '',
-            name: '',
-            description: '',
-            purchaseCost: 0,
-            sellingPrice: 0,
-            imageUrl: '',
-            stockQuantity: 0,
-            category: '', 
-            features: [], 
-            productAddDate: new Date(), 
-        });
+        setNewProduct(emptyProduct());
         setIsDialogOpen(true);
     };
     const handleSaveProduct = async () => {
@@ -102,10 +90,10 @@ const ProductPage = () => {
             }
             setIsDialogOpen(false);
             setIsEditing(false);
-            setNewProduct({ id: '', name: '', description: '', purchaseCost: 0, sellingPrice: 0, imageUrl: '', stockQuantity: 0, category: '', features: [], productAddDate: new Date() });
+            setNewProduct(emptyProduct());
             setEditingProduct(null);
         } catch (error) {
-            console.error('Error saving product:', error);
+            toast.error(error.message);
         }
     };
     const handleEditProduct = (product) => {
@@ -131,7 +119,7 @@ const ProductPage = () => {
             setIsDeleteModalOpen(false);
             setProductToDelete(null);
         } catch (error) {
-            console.error('Error deleting product:', error);
+            toast.error(error.message);
         }
     };
     const cancelDeleteProduct = () => {
@@ -183,18 +171,7 @@ const ProductPage = () => {
     const handleCloseModal = () => {
         setIsDialogOpen(false);
         setIsEditing(false);
-        setNewProduct({
-            id: '',
-            name: '',
-            description: '',
-            purchaseCost: 0,
-            sellingPrice: 0,
-            imageUrl: '',
-            stockQuantity: 0,
-            category: '',
-            features: [],
-            productAddDate: new Date(),
-        });
+        setNewProduct(emptyProduct());
         setEditingProduct(null);
     };
     const handleIncreaseStock = async (productId) => {
@@ -229,12 +206,12 @@ const ProductPage = () => {
                 body: JSON.stringify({ stockQuantity: newQuantity }),
             });
             if (!response.ok) {
-                console.error(`Failed to update stock for product ${productId}: ${response.status}`);
+                toast.error('Could not update the stock.');
                 const originalProduct = products.find(p => p.id === productId);
                 setProducts(products.map(p => p.id === productId ? originalProduct : p));
             }
-        } catch (error) {
-            console.error('Error updating product stock:', error);
+        } catch {
+            toast.error('Could not update the stock.');
             const originalProduct = products.find(p => p.id === productId);
             setProducts(products.map(p => p.id === productId ? originalProduct : p));
         }
@@ -520,7 +497,7 @@ const ProductPage = () => {
                         </div>
                     </div>
                 </div>
-                <div className="fixed z-10 inset-0 overflow-y-auto" style={{ display: isDetailsModalOpen ? 'block' : 'none' }}>
+                <div className="fixed z-10 inset-0 overflow-y-auto" style={{ display: selectedProductDetails ? 'block' : 'none' }}>
                     <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0 backdrop-blur-md">
                         <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
                         <div className={`inline-block align-bottom rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full ${isDarkMode ? 'bg-gray-800' : 'bg-white'}`}>

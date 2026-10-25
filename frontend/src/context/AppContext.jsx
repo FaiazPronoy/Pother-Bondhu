@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, createContext } from "react";
+import React, { useState, useEffect, useRef, useCallback, createContext } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { backendUrl as configBackendUrl } from "../config";
+import { backendUrl } from "../config";
 import { useLang } from "./LangContext";
 
 export const AppContext = createContext();
@@ -15,7 +15,6 @@ const readLocalCart = () => {
 };
 
 export const AppContextProvider = (props) => {
-  const backendUrl = configBackendUrl;
   const { t } = useLang();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -26,13 +25,11 @@ export const AppContextProvider = (props) => {
   const [productData, setProductData] = useState([]);
   const [productLoading, setProductLoading] = useState(true);
 
-  // true once the saved cart has been fetched after sign in, so the first
-  // render does not overwrite the saved one with an empty list
   const cartSynced = useRef(false);
 
   axios.defaults.withCredentials = true;
 
-  const checkAuthStatus = async () => {
+  const checkAuthStatus = useCallback(async () => {
     try {
       const res = await axios.get(`${backendUrl}/api/auth/status`);
       if (res.data.success) {
@@ -48,12 +45,9 @@ export const AppContextProvider = (props) => {
     } finally {
       setAuthChecked(true);
     }
-  };
+  }, []);
 
-  // Products used to be cached in localStorage with no expiry, so prices and
-  // stock stayed wrong until the cache was cleared. They are small enough to
-  // just fetch each visit.
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setProductLoading(true);
     try {
       const res = await axios.get(`${backendUrl}/api/products`);
@@ -63,12 +57,15 @@ export const AppContextProvider = (props) => {
     } finally {
       setProductLoading(false);
     }
-  };
+  }, [t]);
 
   useEffect(() => {
     checkAuthStatus();
+  }, [checkAuthStatus]);
+
+  useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchProducts]);
 
   useEffect(() => {
     const slim = cart.map(({ id, _id, name, sellingPrice, imageUrl, stockQuantity, quantity }) =>
@@ -76,12 +73,9 @@ export const AppContextProvider = (props) => {
     try {
       localStorage.setItem("cart", JSON.stringify(slim));
     } catch {
-      // private mode or full storage; the cart still works for this visit
     }
   }, [cart]);
 
-  // after sign in: an empty cart picks up the one saved on the account,
-  // anything already in the cart is kept and saved to the account instead
   useEffect(() => {
     if (!isLoggedIn) {
       cartSynced.current = false;
@@ -89,16 +83,12 @@ export const AppContextProvider = (props) => {
     }
     (async () => {
       try {
-        if (cart.length === 0) {
-          const res = await axios.get(`${backendUrl}/api/user/cart`);
-          setCart(res.data.cart || []);
-        }
+        const res = await axios.get(`${backendUrl}/api/user/cart`);
+        setCart((current) => (current.length === 0 ? res.data.cart || [] : current));
       } catch {
-        // the local cart is still there
       }
       cartSynced.current = true;
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoggedIn]);
 
   useEffect(() => {
@@ -107,7 +97,7 @@ export const AppContextProvider = (props) => {
       axios.post(`${backendUrl}/api/user/cart`, { items: cart }).catch(() => {});
     }, 600);
     return () => clearTimeout(timer);
-  }, [cart, isLoggedIn, backendUrl]);
+  }, [cart, isLoggedIn]);
 
   const addToCart = (product, quantity = 1) => {
     const id = product.id || product._id;
@@ -139,7 +129,6 @@ export const AppContextProvider = (props) => {
     try {
       await axios.post(`${backendUrl}/api/auth/logout`);
     } catch {
-      // the cookie is gone either way once it expires
     }
     setIsLoggedIn(false);
     setUserData(null);

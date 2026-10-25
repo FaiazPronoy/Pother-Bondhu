@@ -4,7 +4,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Heart, Wallet } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
-import { DONATIONS } from './Cart';
+import { DONATIONS } from '../config';
 import { Empty, PageHeader, Points } from '../components/bits';
 import { useLang } from '../context/LangContext';
 
@@ -51,7 +51,6 @@ const CheckoutPage = () => {
 
   const products = mergedProducts();
 
-  // reaching /checkout directly, or refreshing it, loses what was being bought
   if (products.length === 0) {
     return (
       <Empty title={t('checkout.nothing')} action={<Link to="/cart" className="btn btn-clay">{t('checkout.goCart')}</Link>}>
@@ -94,9 +93,6 @@ const CheckoutPage = () => {
       if (response.data.success) {
         await checkAuthStatus();
         toast.success(effectiveDonation > 0 ? t('checkout.placedDonation', { n: effectiveDonation }) : t('checkout.placed'));
-        // leave first and empty the cart in the same render, or this page
-        // flashes its "nothing to check out" state on the way out.
-        // A buy-now order leaves the cart alone unless the cart was added to it.
         navigate('/products', { replace: true });
         if (from === 'cart' || includeCart) setCart([]);
       } else {

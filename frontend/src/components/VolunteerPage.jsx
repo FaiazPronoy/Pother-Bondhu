@@ -11,7 +11,6 @@ const VolunteerPage = () => {
     const [error, setError] = useState(null);
     const [locationFilter, setLocationFilter] = useState('');
     const [selectedVolunteer, setSelectedVolunteer] = useState(null);
-    // start folded on a phone, where the open sidebar takes most of the screen
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 768);
     const [activeTab, setActiveTab] = useState('Volunteers');
     const { isDarkMode } = useContext(DarkmodeContext);
@@ -29,7 +28,7 @@ const VolunteerPage = () => {
             }
         };
         fetchVolunteers();
-    }, [backendUrl]);
+    }, []);
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 

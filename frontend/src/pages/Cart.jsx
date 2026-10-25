@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -6,8 +6,7 @@ import { Minus, Plus, Trash2, Heart } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { Empty, PageHeader, Points } from '../components/bits';
 import { useLang } from '../context/LangContext';
-
-export const DONATIONS = [0, 20, 50, 100];
+import { DONATIONS } from '../config';
 
 const Cart = () => {
   const { cart, updateCartItemQuantity, removeFromCart, isLoggedIn, setCart, backendUrl } = useContext(AppContext);
@@ -16,13 +15,14 @@ const Cart = () => {
   const [donation, setDonation] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+  const stockChecked = useRef(false);
 
   const subtotal = cart.reduce((sum, item) => sum + item.sellingPrice * item.quantity, 0);
   const total = subtotal + donation;
 
-  // stock may have changed since things went into the cart, so check once on arrival
   useEffect(() => {
-    if (cart.length === 0) return;
+    if (stockChecked.current || cart.length === 0) return;
+    stockChecked.current = true;
     (async () => {
       const stock = {};
       const adjusted = [];
@@ -43,11 +43,9 @@ const Cart = () => {
         }
       }));
       setStockMap(stock);
-      // keep the cart's order
       setCart(cart.map((c) => adjusted.find((a) => a.id === c.id)).filter(Boolean));
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [cart, backendUrl, setCart, t]);
 
   const handleProceed = () => {
     if (!isLoggedIn) {

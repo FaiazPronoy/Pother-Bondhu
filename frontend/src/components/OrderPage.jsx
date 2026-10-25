@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 import { AppContext } from '../context/AppContext';
 import {Trash2, AlertTriangle, Info, Truck, CheckCircle, Clock } from 'lucide-react';
 import AdminNavbar from './AdminNavbar';
@@ -8,45 +9,19 @@ import { petPoints } from './bits';
 
 const OrderPage = () => {
     const [orders, setOrders] = useState([]);
-    const [newOrder, setNewOrder] = useState({
-        userId: '',
-        items: [],
-        userInfo: {
-            name: '',
-            phone: '',
-            address: '',
-            promo: '',
-            shipping: '',
-        },
-        donation: 0,
-        totalPoints: 0,
-        status: 'Pending',
-        id: '',
-        customerName: '',
-        total: 0,
-        orderDate: '',
-        deliveryDate: '',
-    });
-    const [error, setError] = useState('');
-    // start folded on a phone, where the open sidebar takes most of the screen
     const [isSidebarOpen, setIsSidebarOpen] = useState(() => window.innerWidth >= 768);
     const [activeTab, setActiveTab] = useState('Orders');
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [orderToDelete, setOrderToDelete] = useState(null);
     const [filterView, setFilterView] = useState('');
     const { isDarkMode } = useContext(DarkmodeContext);
-    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
     const [loading, setLoading] = useState(true);
     const [fetchError, setFetchError] = useState(null);
     const { backendUrl } = useContext(AppContext);
     const [statusUpdateLoading, setStatusUpdateLoading] = useState(null); 
 
-    useEffect(() => {
-        fetchOrders();
-    }, [backendUrl]);
-
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async () => {
         setLoading(true);
         setFetchError(null);
         try {
@@ -59,12 +34,15 @@ const OrderPage = () => {
                 setFetchError(response.data.message || 'Failed to fetch orders.');
             }
         } catch (error) {
-            console.error("Fetch error:", error);
             setFetchError(error.message || 'An unexpected error occurred while fetching orders.');
         } finally {
             setLoading(false);
         }
-    };
+    }, [backendUrl]);
+
+    useEffect(() => {
+        fetchOrders();
+    }, [fetchOrders]);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -72,11 +50,9 @@ const OrderPage = () => {
 
     const openDetailsModal = (order) => {
         setSelectedOrderDetails(order);
-        setIsDetailsModalOpen(true);
     };
 
     const closeDetailsModal = () => {
-        setIsDetailsModalOpen(false);
         setSelectedOrderDetails(null);
     };
 
@@ -108,12 +84,11 @@ const OrderPage = () => {
                 setIsDeleteModalOpen(false);
                 setOrderToDelete(null);
             } else {
-                setError(response.data.message || 'Failed to delete order.');
+                toast.error(response.data.message || 'Failed to delete order.');
             }
 
         } catch (error) {
-            console.error("Error deleting order:", error);
-            setError(error.message || 'Failed to delete order');
+            toast.error(error.message || 'Failed to delete order');
         }
     };
 
@@ -142,11 +117,10 @@ const OrderPage = () => {
                     order._id === orderId ? { ...order, status: newStatus, updatedAt: new Date().toISOString() } : order
                 ));
             } else {
-                setError(response.data.message || 'Failed to update order status.');
+                toast.error(response.data.message || 'Failed to update order status.');
             }
         } catch (error) {
-            console.error("Error updating order status:", error);
-            setError(error.message || 'An unexpected error occurred while updating order status.');
+            toast.error(error.message || 'An unexpected error occurred while updating order status.');
         } finally {
             setStatusUpdateLoading(null);
         }

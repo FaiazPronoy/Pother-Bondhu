@@ -34,7 +34,6 @@ const Teams = () => {
         const params = new URLSearchParams();
         if (debounced) params.set('search', debounced);
         if (filterType) params.set('type', filterType);
-        // /all populates members; the search route does not, but has the count
         const url = debounced
           ? `${backendUrl}/api/teams?${params}`
           : `${backendUrl}/api/teams/all${filterType ? `?type=${filterType}` : ''}`;
@@ -51,7 +50,7 @@ const Teams = () => {
     };
     fetchTeams();
     return () => abortRef.current?.abort();
-  }, [debounced, filterType, backendUrl]);
+  }, [debounced, filterType, backendUrl, t]);
 
   return (
     <>
