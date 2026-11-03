@@ -218,7 +218,7 @@ const AdminDashboard = () => {
 
             <main className="flex-1 min-w-0 p-4 sm:p-6">
                 <h2 className={`text-3xl font-bold text-center mb-2 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>Admin Dashboard</h2>
-                <p className={`text-center mb-10 ${muted}`}>Orders, stock and the money side of Pother Bondhu. Profit leaves out donations, which go to rescues.</p>
+                <p className={`text-center mb-10 ${muted}`}>Orders, stock and revenue. Profit does not include donations to rescues.</p>
 
                 {error && (
                     <div className={`mb-6 rounded-lg border px-4 py-3 text-sm ${isDarkMode ? 'bg-red-900/30 border-red-800 text-red-200' : 'bg-red-50 border-red-200 text-red-700'}`}>
