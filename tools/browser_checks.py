@@ -208,7 +208,7 @@ def main():
         check("a visitor asking for the admin panel is sent to sign in", page.url.endswith("/login"), page.url)
         page.goto(BASE + "/no-such-page")
         settle(page)
-        check("an unknown address shows the not found page", "trail goes cold" in page.inner_text("main"))
+        check("an unknown address shows the not found page", "Page not found" in page.inner_text("main"))
         page.close()
 
         print("\n=== contrast, WCAG AA ===")
