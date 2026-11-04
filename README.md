@@ -29,9 +29,17 @@ with PetPoints and a small supplies shop.
 
 **Rescue board**
 - Post a photo of an animal in trouble, with the area and a short note
-- Filter posts by area
+- Filter posts by area, or see them on a map of Dhaka with one pin per area
 - Each post has a status: Urgent, Needs vet, Being helped or Resolved. Urgent posts come first, and the poster or any volunteer can update it
 - Every post links to the person who posted it
+
+**Adoption**
+- Volunteers post animals that are ready for a home, with a photo, age, area and health notes
+- Anyone signed in can ask to adopt and leave a phone number, which only the volunteer can see
+- The volunteer accepts one request; the animal is marked as homed and the others are told no
+
+**Vets and rescue groups**
+- A short list of vet hospitals, rescue groups and shelters in Dhaka, each with the source of its details, on a map
 
 **Teams**
 - Volunteers start a team for their area (feeding route, night rescue, vaccination camp)
@@ -78,7 +86,7 @@ with PetPoints and a small supplies shop.
 | Part | Tools |
 |---|---|
 | Frontend | React 19, Vite, Tailwind CSS 4, React Router 7 |
-| Extras | Axios, react-toastify, lucide-react icons |
+| Extras | Axios, react-toastify, lucide-react icons, Leaflet with OpenStreetMap |
 | Backend | Node.js, Express 5, Mongoose |
 | Database | MongoDB (photos are stored in it too) |
 | Login | JWT in a secure cookie, bcrypt, lockout after 5 wrong passwords |
@@ -147,7 +155,7 @@ Copy `backend/.env.example` to `backend/.env`. The `.env` file is never committe
 
 ## Tests
 
-- `cd backend && npm test` runs **74 tests** against the real server and an in-memory database
+- `cd backend && npm test` runs **78 tests** against the real server and an in-memory database
 - They cover who can do what, orders, stock and points when many requests come at once, photo uploads, teams and the login lockout
 - `tools/browser_checks.py` signs in as each role, opens every page, and checks contrast in both themes, both languages and on a phone
 

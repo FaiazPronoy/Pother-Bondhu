@@ -6,6 +6,8 @@ import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import Login from './pages/Login';
 import Rescues from './pages/Rescues';
+import Adopt from './pages/Adopt';
+import Vets from './pages/Vets';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
@@ -53,6 +55,8 @@ const App = () => {
         <Route element={<Layout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/rescues" element={<Rescues />} />
+          <Route path="/adopt" element={<Adopt />} />
+          <Route path="/vets" element={<Vets />} />
           <Route path="/profile" element={<ProfilePage />} />
 
           <Route path="/products" element={<Products />} />

@@ -1,15 +1,17 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { ImagePlus, X, Send } from "lucide-react";
+import { ImagePlus, X, Send, LayoutGrid, Map as MapIcon, Stethoscope } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import RescueCard, { STATUSES } from "../components/RescueCard";
 import { AREAS, PageHeader, Empty, SignInPrompt } from "../components/bits";
 import { useLang } from "../context/LangContext";
+import AreaMap, { AREA_POINTS } from "../components/AreaMap";
 
 const MAX_BYTES = 3 * 1024 * 1024;
 const TYPES = ["image/jpeg", "image/png", "image/webp"];
+const STATUS_COLOR = { urgent: "#A52A2A", vet: "#E9A23B", helping: "#3F6B4E", resolved: "#8A7A6C" };
 
 function PostForm({ onPosted }) {
   const { backendUrl, userData } = useContext(AppContext);
@@ -123,6 +125,7 @@ export default function Rescues() {
   const { t, area: areaName } = useLang();
   const [posts, setPosts] = useState(null);
   const [area, setArea] = useState("");
+  const [view, setView] = useState("board");
   const location = useLocation();
 
   const load = () => {
@@ -146,6 +149,24 @@ export default function Rescues() {
     [posts]
   );
 
+  // one pin per area, coloured by the most pressing post there
+  const pins = useMemo(() => {
+    const byArea = {};
+    for (const p of posts || []) {
+      const a = p.area || p.volunteer?.location;
+      if (!AREA_POINTS[a]) continue;
+      (byArea[a] ||= []).push(p.status || "urgent");
+    }
+    return Object.entries(byArea).map(([a, list]) => {
+      const worst = STATUSES.find((s) => list.includes(s));
+      return {
+        key: a, at: AREA_POINTS[a], color: STATUS_COLOR[worst], size: 8 + Math.min(list.length, 6) * 2,
+        label: `${areaName(a)}: ${t(list.length === 1 ? "rescues.mapOne" : "rescues.mapCount", { n: list.length })}`,
+        onPick: () => { setArea(a); setView("board"); },
+      };
+    });
+  }, [posts, areaName, t]);
+
   return (
     <>
       <PageHeader eyebrow={t("rescues.eyebrow")} title={t("rescues.title")}>{t("rescues.lead")}</PageHeader>
@@ -154,7 +175,36 @@ export default function Rescues() {
         {isLoggedIn ? <PostForm onPosted={load} /> : <SignInPrompt>{t("rescues.signIn")}</SignInPrompt>}
       </section>
 
-      {areasInUse.length > 1 && (
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="inline-flex rounded-full border border-line p-1" role="group" aria-label={t("rescues.viewLabel")}>
+          {[["board", LayoutGrid], ["map", MapIcon]].map(([v, Icon]) => (
+            <button key={v} type="button" aria-pressed={view === v} onClick={() => setView(v)}
+              className={`inline-flex items-center gap-2 min-h-11 px-4 rounded-full font-semibold ${view === v ? "bg-ink text-paper" : "text-ink-2 hover:text-ink"}`}>
+              <Icon size={17} aria-hidden="true" /> {t(`rescues.view_${v}`)}
+            </button>
+          ))}
+        </div>
+        <Link to="/vets" className="inline-flex items-center gap-2 min-h-11 font-semibold text-clay underline underline-offset-4">
+          <Stethoscope size={17} aria-hidden="true" /> {t("rescues.vetsLink")}
+        </Link>
+      </div>
+
+      {view === "map" && (
+        <section className="mb-12" aria-labelledby="map-title">
+          <h2 id="map-title" className="sr-only">{t("rescues.view_map")}</h2>
+          <AreaMap pins={pins} label={t("rescues.mapLabel")} />
+          <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-ink-2">
+            {STATUSES.map((s) => (
+              <span key={s} className="inline-flex items-center gap-2">
+                <span className="w-3 h-3 rounded-full" style={{ background: STATUS_COLOR[s] }} aria-hidden="true" />{t(`rescue.status_${s}`)}
+              </span>
+            ))}
+            <span>{t("rescues.mapNote")}</span>
+          </div>
+        </section>
+      )}
+
+      {view === "board" && areasInUse.length > 1 && (
         <div className="flex flex-wrap justify-center gap-2 mb-10" role="group" aria-label={t("rescues.filter")}>
           <button type="button" className="chip" aria-pressed={!area} onClick={() => setArea("")}>{t("rescues.everywhere")}</button>
           {areasInUse.map((a) => (
@@ -163,7 +213,7 @@ export default function Rescues() {
         </div>
       )}
 
-      {posts === null ? (
+      {view === "map" ? null : posts === null ? (
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {[0, 1, 2].map((i) => <div key={i} className="skeleton aspect-[4/5]" />)}
         </div>

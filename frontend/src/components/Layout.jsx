@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-do
 import axios from "axios";
 import {
   HeartHandshake, Camera, Users, HandHeart, Flag, Mail, ShoppingBasket, ShoppingCart,
-  LogOut, Moon, Sun, Menu, X, Wallet, LayoutDashboard,
+  LogOut, Moon, Sun, Menu, X, Wallet, LayoutDashboard, PawPrint, Stethoscope,
 } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import { DarkmodeContext } from "../context/DarkmodeContext";
@@ -52,6 +52,8 @@ function SideNav({ invites, onNavigate }) {
   const items = [
     { to: "/", label: t("nav.desk"), icon: HeartHandshake, end: true },
     { to: "/rescues", label: t("nav.rescues"), icon: Camera },
+    { to: "/adopt", label: t("nav.adopt"), icon: PawPrint },
+    { to: "/vets", label: t("nav.vets"), icon: Stethoscope },
     { to: "/teams", label: t("nav.teams"), icon: Users },
     { to: "/volunteers", label: t("nav.volunteers"), icon: HandHeart },
     volunteer && { to: "/my-team", label: t("nav.myTeams"), icon: Flag },
@@ -188,6 +190,7 @@ function MemberShell({ children }) {
 
 const publicLinks = [
   { to: "/rescues", key: "nav.rescues" },
+  { to: "/adopt", key: "nav.adopt" },
   { to: "/teams", key: "nav.teams" },
   { to: "/volunteers", key: "nav.volunteers" },
   { to: "/products", key: "nav.shop" },
@@ -250,6 +253,7 @@ function Footer({ compact }) {
         )}
         <nav aria-label={t("nav.footer")} className="flex flex-wrap gap-x-6 gap-y-2 text-ink-2">
           {publicLinks.map((l) => <Link key={l.to} to={l.to} className="hover:text-ink">{t(l.key)}</Link>)}
+          <Link to="/vets" className="hover:text-ink">{t("nav.vets")}</Link>
         </nav>
         <div className="text-sm text-ink-2 space-y-1 md:max-w-xs">
           <p>

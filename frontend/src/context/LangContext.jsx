@@ -7,7 +7,7 @@ const dicts = { en, bn };
 const AREA_BN = {
   Badda: 'বাড্ডা', Banani: 'বনানী', Bashundhara: 'বসুন্ধরা', Dhanmondi: 'ধানমন্ডি',
   Gulshan: 'গুলশান', Mirpur: 'মিরপুর', Moghbazar: 'মগবাজার', Mohammadpur: 'মোহাম্মদপুর',
-  'Puran Dhaka': 'পুরান ঢাকা', Uttara: 'উত্তরা', Dhaka: 'ঢাকা',
+  'Puran Dhaka': 'পুরান ঢাকা', Uttara: 'উত্তরা', Dhaka: 'ঢাকা', Khilgaon: 'খিলগাঁও',
 };
 
 const lookup = (dict, key) => key.split('.').reduce((o, k) => (o == null ? o : o[k]), dict);

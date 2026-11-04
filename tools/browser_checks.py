@@ -38,7 +38,8 @@ def crawl(context, start, limit=60):
     errors = []
     page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
     page.on("pageerror", lambda e: errors.append(str(e)))
-    page.on("requestfailed", lambda r: errors.append("failed " + r.url))
+    # map tiles still loading when the crawler moves on are cancelled, not broken
+    page.on("requestfailed", lambda r: None if "tile.openstreetmap.org" in r.url else errors.append("failed " + r.url))
     seen, queue, result, per_shape = set(), [start], {}, {}
     while queue and len(result) < limit:
         url = queue.pop(0)
