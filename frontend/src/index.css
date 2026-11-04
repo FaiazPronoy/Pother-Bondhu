@@ -405,17 +405,6 @@
   color: var(--sb-ink);
 }
 
-/* the motto gets its own band above the title */
-.motto-band {
-  background: var(--sb-clay-lo);
-  border-bottom: 1px solid var(--sb-line);
-}
-.motto {
-  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
-  line-height: 1.3;
-  color: var(--sb-clay-hi);
-  font-weight: 600;
-}
 .report-btn {
   min-height: 60px;
   padding: 0 2rem;
