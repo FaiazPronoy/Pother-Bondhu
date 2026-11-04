@@ -70,8 +70,6 @@ const en = {
     join: 'Join Pother Bondhu',
     board: 'See the rescue board',
     already: '{n} volunteers have joined',
-    cap1: 'A helping hand',
-    cap2: 'Feeding time',
     statsLabel: 'Pother Bondhu so far',
     statRescues: 'rescues posted',
     statVolunteers: 'volunteers',

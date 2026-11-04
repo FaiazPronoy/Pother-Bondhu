@@ -89,13 +89,11 @@ function Hero({ latest }) {
 
         <div className="relative mx-auto w-full max-w-md h-[27rem] sm:h-[32rem] rise-2">
           <div className="absolute inset-6 rounded-full bg-clay-lo/70 blur-2xl" aria-hidden="true" />
-          <figure className="polaroid tape absolute left-0 bottom-6 w-[74%]" style={{ transform: "rotate(-4deg)" }} aria-hidden="true">
+          <figure className="polaroid tape absolute left-0 bottom-6 w-[74%] pb-2.5" style={{ transform: "rotate(-4deg)" }} aria-hidden="true">
             <img src="/img/hero-hand.jpg" alt="" className="w-full aspect-[4/5] object-cover" />
-            <figcaption className="font-display italic text-center py-3 text-lg">{t("landing.cap1")}</figcaption>
           </figure>
-          <figure className="polaroid absolute right-0 top-0 w-[48%] z-10" style={{ transform: "rotate(5deg)" }} aria-hidden="true">
+          <figure className="polaroid absolute right-0 top-0 w-[48%] z-10 pb-2.5" style={{ transform: "rotate(5deg)" }} aria-hidden="true">
             <img src="/img/feeding.jpg" alt="" className="w-full aspect-square object-cover" />
-            <figcaption className="font-display italic text-center py-2">{t("landing.cap2")}</figcaption>
           </figure>
           {latest && (
             <Link to="/rescues"
