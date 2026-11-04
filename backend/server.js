@@ -16,6 +16,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 
 import teamRouter from "./routes/teamRoutes.js";
 import inviteRoutes from "./routes/inviteRoutes.js";
+import adoptionRouter from "./routes/adoptionRoutes.js";
 import { publicStats } from "./controllers/statsController.js";
 
 const app = express();
@@ -43,6 +44,7 @@ app.use("/api/volunteers", volunteerRouter);
 app.use("/api/teams", teamRouter);
 app.use("/api", inviteRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/adoptions", adoptionRouter);
 app.get("/api/stats", publicStats);
 app.use("/api", (req, res) => res.status(404).json({ success: false, message: "Not found" }));
 

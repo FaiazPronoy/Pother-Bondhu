@@ -9,6 +9,7 @@ import Team from './models/teamModel.js';
 import RescueImage from './models/imageModel.js';
 import TeamInvite from './models/inviteModel.js';
 import Cart from './models/CartModel.js';
+import Adoption from './models/adoptionModel.js';
 import { readFileSync } from 'fs';
 
 const shop = '/img/shop';
@@ -88,6 +89,19 @@ function daysAgo(n) {
   return d;
 }
 
+const adoptions = [
+  { by: 'tanvir', file: 'seed-photos/white-kitten.jpg', name: 'Mishu', species: 'cat', age: 'About 2 months', sex: 'female', area: 'Uttara',
+    story: 'The kitten from under the CNG in Sector 7. Eats well now, uses the litter box and follows people around the room. Needs an indoor home.', vaccinated: false, neutered: false, h: 14,
+    asks: [['farhana', '01700000011', 'I work from home and already have one calm cat.']] },
+  { by: 'priya', file: '../frontend/public/img/waiting.jpg', name: 'Lalu', species: 'dog', age: 'About 3 years', sex: 'male', area: 'Mohammadpur',
+    story: 'লালু টাউন হল বাজারের সবার পরিচিত। শান্ত, বাচ্চাদের সাথে ভালো থাকে। টিকা দেওয়া আছে, একটা ছাদ বা উঠানওয়ালা বাসা হলে ভালো হয়।', vaccinated: true, neutered: true, h: 40, asks: [] },
+  { by: 'nabila', file: '../frontend/public/img/mother.jpg', name: 'Kalo and Dhola', species: 'dog', age: '4 months', sex: '', area: 'Dhanmondi',
+    story: 'Two of the four pups from the lake. Their mother stays on the route with us. They go together or one each, both fine. First vaccine done.', vaccinated: true, neutered: false, h: 70, asks: [] },
+  { by: 'sadia', file: 'seed-photos/calico.jpg', name: 'Tuni', species: 'cat', age: 'About 1 year', sex: 'female', area: 'Mirpur',
+    story: 'Vaccinated and spayed at the Mirpur camp, then went home with Mehedi. She sleeps on his laptop now.', vaccinated: true, neutered: true, h: 200,
+    asks: [['mehedi', '01700000012', 'Saw her at the camp and could not stop thinking about her.']], adopted: true },
+];
+
 const orderPlan = [
   { buyer: 'mehedi@potherbondhu.com', days: 2,  lines: [['SP-001', 1], ['SP-009', 2]], donation: 200, status: 'Delivered' },
   { buyer: 'farhana@potherbondhu.com', days: 4, lines: [['SP-006', 3]], donation: 0, status: 'Delivered' },
@@ -128,6 +142,7 @@ async function seed() {
     RescueImage.deleteMany({}),
     TeamInvite.deleteMany({}),
     Cart.deleteMany({}),
+    Adoption.deleteMany({}),
   ]);
   console.log('Cleared users, products, orders, teams, rescues and invitations');
 
@@ -172,6 +187,20 @@ async function seed() {
     }], { timestamps: false });
   }
   console.log(`Inserted ${rescues.length} rescue posts with photos`);
+
+  for (const a of adoptions) {
+    const _id = new mongoose.Types.ObjectId();
+    await Adoption.create([{
+      _id, name: a.name, species: a.species, age: a.age, sex: a.sex, area: a.area, story: a.story,
+      vaccinated: a.vaccinated, neutered: a.neutered, postedBy: byName(a.by)._id,
+      status: a.adopted ? 'adopted' : 'available',
+      imageUrl: `/api/adoptions/${_id}/photo`,
+      data: readFileSync(new URL(a.file, import.meta.url)), contentType: 'image/jpeg',
+      requests: a.asks.map(([who, phone, message]) => ({ user: byName(who)._id, phone, message, status: a.adopted ? 'accepted' : 'waiting' })),
+      createdAt: hoursAgo(a.h), updatedAt: hoursAgo(a.h),
+    }], { timestamps: false });
+  }
+  console.log(`Inserted ${adoptions.length} animals for adoption`);
 
   const orders = orderPlan.map((plan) => {
     const buyer = userByEmail.get(plan.buyer);
