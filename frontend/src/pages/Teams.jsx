@@ -108,7 +108,7 @@ const Teams = () => {
                 </div>
                 <h2 className="mt-4 text-xl font-semibold text-balance">{team.name}</h2>
                 <p className="mt-1 text-ink-2 inline-flex items-center justify-center gap-1"><MapPin size={15} aria-hidden="true" /> {area(team.area || 'Dhaka')}</p>
-                {team.description && <p className="mt-3 text-ink-2 line-clamp-2 text-balance">{team.description}</p>}
+                {team.description && <p className="mt-3 text-ink-2 text-pretty">{team.description}</p>}
                 {team.creator?.name && <p className="mt-auto pt-4 text-sm text-ink-2">{t('teams.startedBy', { name: team.creator.name })}</p>}
               </Link>
             </li>

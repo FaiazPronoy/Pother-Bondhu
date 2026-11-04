@@ -63,7 +63,7 @@ export default function VolunteersPage() {
                     <p className="text-ink-2 inline-flex items-center gap-1"><MapPin size={14} aria-hidden="true" /> {v.location ? areaName(v.location) : t('common.areaNotSet')}</p>
                   </div>
                 </div>
-                <p className="mt-3 text-ink-2 line-clamp-2 flex-1 text-balance">{v.bio || t('vols.noBio')}</p>
+                <p className="mt-3 text-ink-2 flex-1 text-pretty">{v.bio || t('vols.noBio')}</p>
                 <p className="mt-4 rounded-full bg-moss-lo px-4 py-1 text-sm text-moss-hi"><Points value={v.points} /></p>
               </Link>
             </li>

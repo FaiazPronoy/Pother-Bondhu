@@ -30,6 +30,7 @@ with PetPoints and a small supplies shop.
 **Rescue board**
 - Post a photo of an animal in trouble, with the area and a short note
 - Filter posts by area
+- Each post has a status: Urgent, Needs vet, Being helped or Resolved. Urgent posts come first, and the poster or any volunteer can update it
 - Every post links to the person who posted it
 
 **Teams**
@@ -146,7 +147,7 @@ Copy `backend/.env.example` to `backend/.env`. The `.env` file is never committe
 
 ## Tests
 
-- `cd backend && npm test` runs **71 tests** against the real server and an in-memory database
+- `cd backend && npm test` runs **74 tests** against the real server and an in-memory database
 - They cover who can do what, orders, stock and points when many requests come at once, photo uploads, teams and the login lockout
 - `tools/browser_checks.py` signs in as each role, opens every page, and checks contrast in both themes, both languages and on a phone
 

@@ -160,10 +160,13 @@ async function seed() {
   await TeamInvite.create({ team: catWatch._id, from: byName('rafiq')._id, to: byName('nabila')._id, status: 'pending', createdAt: hoursAgo(3) });
 
   const dir = new URL('./seed-photos/', import.meta.url);
-  for (const [who, file, area, caption, h] of rescues) {
+  // a mix of statuses, so the board shows every stage
+  const stages = ['urgent', 'vet', 'helping', 'resolved', 'urgent', 'helping', 'vet', 'resolved', 'helping', 'resolved'];
+  for (const [i, [who, file, area, caption, h]] of rescues.entries()) {
     const _id = new mongoose.Types.ObjectId();
     await RescueImage.create([{
       _id, userId: byName(who)._id, imageUrl: `/api/upload/rescue/${_id}`, caption, area,
+      status: stages[i % stages.length],
       data: readFileSync(new URL(file, dir)), contentType: 'image/jpeg',
       createdAt: hoursAgo(h), updatedAt: hoursAgo(h),
     }], { timestamps: false });

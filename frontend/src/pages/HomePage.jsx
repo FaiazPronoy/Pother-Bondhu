@@ -3,12 +3,11 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import {
-  Camera, Stethoscope, Coins, ArrowRight, ShoppingBasket, HandHeart, Flag, MapPin, Check, X,
-  Dog, Cat, Bird,
+  Camera, Coins, ArrowRight, ShoppingBasket, HandHeart, Flag, MapPin, Check, X,
 } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import { useLang } from "../context/LangContext";
-import RescueCard from "../components/RescueCard";
+import RescueCard, { StatusTag } from "../components/RescueCard";
 import { Avatar, Points } from "../components/bits";
 
 function useRescues(limit) {
@@ -41,83 +40,53 @@ function RescueGrid({ posts, cols = "sm:grid-cols-2 lg:grid-cols-3" }) {
   );
 }
 
-function Hero({ stats, latest, faces }) {
+function Hero({ latest }) {
   const { t, lang, area, ago } = useLang();
-  const step = lang === "bn" ? "sm:text-right" : "sm:pl-[1.9em]";
   const size = lang === "bn"
-    ? "text-[2.3rem] leading-[1.35] sm:text-5xl lg:text-[3.5rem]"
-    : "text-[2.35rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]";
+    ? "text-[2.3rem] leading-[1.35] sm:text-5xl lg:text-[3.4rem]"
+    : "text-[2.35rem] leading-[1.08] sm:text-5xl lg:text-[3.5rem]";
+  const lines = [...t("landing.title1").split("|"), t("landing.title2a"), t("landing.title2b")];
   return (
     <section className="paw-trail relative overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-16 lg:pt-16 lg:pb-24 grid gap-14 lg:grid-cols-[1.08fr_.92fr] items-center">
-        <div className="rise flex flex-col items-center text-center lg:items-start lg:text-left">
-          <figure className="grid sm:grid-cols-[auto_auto] items-center justify-items-center sm:justify-items-start gap-x-3 gap-y-1.5 text-center sm:text-left">
-            <span className="flex -space-x-2 sm:row-span-2" aria-hidden="true">
-              <span className="w-9 h-9 rounded-full bg-clay text-on-clay grid place-items-center ring-[3px] ring-paper"><Dog size={18} /></span>
-              <span className="w-9 h-9 rounded-full bg-moss text-on-clay grid place-items-center ring-[3px] ring-paper"><Cat size={18} /></span>
-              <span className="w-9 h-9 rounded-full bg-sun text-[#2B2019] grid place-items-center ring-[3px] ring-paper"><Bird size={18} /></span>
-            </span>
-            <blockquote lang="bn" className="bn text-[1.3rem] sm:text-2xl leading-tight text-clay whitespace-nowrap">
-              ওরা কথা বলতে পারে না, আমরা পারি।
-            </blockquote>
-            {lang === "en" && (
-              <figcaption className="font-display italic text-ink-2 leading-snug">{t("landing.mottoGloss")}</figcaption>
-            )}
-          </figure>
+      <div className="motto-band">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row sm:items-baseline gap-x-4 gap-y-1 text-center sm:text-left">
+          <p lang="bn" className="bn motto">ওরা কথা বলতে পারে না, আমরা পারি।</p>
+          {lang === "en" && <p className="font-display italic text-ink-2">{t("landing.mottoGloss")}</p>}
+        </div>
+      </div>
 
-          <h1 className={`mt-7 font-semibold sm:w-fit sm:text-left ${size}`}>
-            {[...t("landing.title1").split("|"), t("landing.title2a"), t("landing.title2b")].map((line, i) => (
-              <span key={line} className={`block ${i > 0 ? "mt-1" : ""} ${i % 2 ? step : ""} ${i > 1 ? "italic text-clay" : ""}`}>
-                {i > 1 ? <span className="squiggle">{line}</span> : line}
-              </span>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-16 lg:pt-14 lg:pb-20 grid gap-12 lg:grid-cols-[1.1fr_.9fr] items-center">
+        <div className="rise flex flex-col items-center text-center lg:items-start lg:text-left">
+          <h1 className={`font-semibold ${size}`}>
+            {lines.map((line, i) => (
+              <span key={line} className={`block ${i > 1 ? "italic text-clay" : ""}`}>{line}</span>
             ))}
           </h1>
 
           <p className="mt-6 text-lg sm:text-xl text-ink-2 max-w-[34rem] text-pretty">{t("landing.lead")}</p>
 
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-            <Link to="/login?mode=signup" className="btn btn-clay text-base px-6">
-              {t("landing.join")} <ArrowRight size={18} aria-hidden="true" />
-            </Link>
-            <Link to="/rescues" className="btn btn-line text-base px-6">{t("landing.board")}</Link>
+          <Link to="/rescues#post" className="btn btn-clay report-btn mt-8">
+            <Camera size={24} aria-hidden="true" /> {t("landing.report")}
+          </Link>
+          <div className="mt-4 flex flex-wrap justify-center lg:justify-start gap-x-5 gap-y-2 font-semibold">
+            <Link to="/login?mode=signup" className="text-clay underline underline-offset-4 inline-flex items-center gap-1">
+              <HandHeart size={18} aria-hidden="true" /> {t("landing.volunteer")}</Link>
+            <Link to="/volunteers" className="text-clay underline underline-offset-4 inline-flex items-center gap-1">
+              <Coins size={18} aria-hidden="true" /> {t("landing.donate")}</Link>
+            <Link to="/rescues" className="text-ink-2 underline underline-offset-4">{t("landing.board")}</Link>
           </div>
-
-          {stats && faces.length > 0 && (
-            <div className="mt-8 flex items-center gap-3">
-              <span className="flex -space-x-2" aria-hidden="true">
-                {faces.map((f, i) => (
-                  <span key={f._id} className="ring-2 ring-paper rounded-full">
-                    <Avatar name={f.name} size="w-9 h-9 text-xs" tone={["clay", "moss", "sun"][i % 3]} />
-                  </span>
-                ))}
-              </span>
-              <p className="text-sm font-semibold text-ink-2 text-left">{t("landing.already", { n: stats.volunteers })}</p>
-            </div>
-          )}
         </div>
 
-        <div className="relative mx-auto w-full max-w-md h-[27rem] sm:h-[32rem] rise-2">
-          <div className="absolute inset-6 rounded-full bg-clay-lo/70 blur-2xl" aria-hidden="true" />
-          <figure className="polaroid tape absolute left-0 bottom-6 w-[74%]" style={{ transform: "rotate(-4deg)" }} aria-hidden="true">
+        <div className="rise-2 mx-auto w-full max-w-md">
+          <figure className="polaroid" style={{ transform: "rotate(-2deg)" }}>
             <img src="/img/hero-hand.jpg" alt="" className="w-full aspect-[4/5] object-cover" />
             <figcaption className="font-display italic text-center py-3 text-lg">{t("landing.cap1")}</figcaption>
           </figure>
-          <figure className="polaroid absolute right-0 top-0 w-[48%] z-10" style={{ transform: "rotate(5deg)" }} aria-hidden="true">
-            <img src="/img/feeding.jpg" alt="" className="w-full aspect-square object-cover" />
-            <figcaption className="font-display italic text-center py-2">{t("landing.cap2")}</figcaption>
-          </figure>
           {latest && (
-            <Link to="/rescues"
-              className="absolute left-0 top-2 z-20 max-w-[15rem] card !rounded-2xl p-3 flex items-center gap-3 hover:border-line-2">
-              <span className="relative flex w-3 h-3 shrink-0" aria-hidden="true">
-                <span className="absolute inset-0 rounded-full bg-clay animate-ping opacity-60" />
-                <span className="relative w-3 h-3 rounded-full bg-clay" />
-              </span>
-              <span className="min-w-0 text-left">
-                <span className="block text-xs font-bold uppercase tracking-wide text-clay">{t("landing.boardTitle")}</span>
-                <span className="block text-sm font-semibold truncate">
-                  <MapPin size={13} className="inline -mt-0.5" aria-hidden="true" /> {area(latest.area || latest.volunteer?.location || "Dhaka")} · {ago(latest.createdAt)}
-                </span>
+            <Link to="/rescues" className="card !rounded-2xl p-3 mt-5 flex items-center gap-3 hover:border-line-2">
+              <StatusTag status={latest.status || "urgent"} />
+              <span className="min-w-0 text-left text-sm font-semibold truncate">
+                <MapPin size={13} className="inline -mt-0.5" aria-hidden="true" /> {area(latest.area || latest.volunteer?.location || "Dhaka")}, {ago(latest.createdAt)}
               </span>
             </Link>
           )}
@@ -129,74 +98,22 @@ function Hero({ stats, latest, faces }) {
 
 function Landing() {
   const { backendUrl } = useContext(AppContext);
-  const { t, num, area } = useLang();
+  const { t, area } = useLang();
   const posts = useRescues(6);
-  const [stats, setStats] = useState(null);
   const [teams, setTeams] = useState([]);
-  const [faces, setFaces] = useState([]);
 
   useEffect(() => {
-    axios.get(`${backendUrl}/api/stats`).then((r) => setStats(r.data)).catch(() => {});
     axios.get(`${backendUrl}/api/teams/all`).then((r) => setTeams(r.data.slice(0, 3))).catch(() => {});
-    axios.get(`${backendUrl}/api/volunteers/top?limit=4`).then((r) => setFaces(r.data)).catch(() => {});
   }, [backendUrl]);
-
-  const steps = [
-    { icon: Camera, img: "/img/waiting.jpg", title: "landing.s1Title", text: "landing.s1Text" },
-    { icon: Stethoscope, img: "/img/vet.jpg", title: "landing.s2Title", text: "landing.s2Text" },
-    { icon: Coins, img: "/img/feeding.jpg", title: "landing.s3Title", text: "landing.s3Text" },
-  ];
 
   return (
     <>
-      <Hero stats={stats} latest={posts?.[0]} faces={faces} />
-
-      {stats && (
-        <section aria-label={t("landing.statsLabel")} className="border-y border-line bg-card">
-          <dl className="max-w-6xl mx-auto px-4 sm:px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              [stats.rescues, "landing.statRescues"],
-              [stats.volunteers, "landing.statVolunteers"],
-              [stats.teams, "landing.statTeams"],
-              [stats.donated, "landing.statDonated"],
-            ].map(([n, label]) => (
-              <div key={label}>
-                <dt className="sr-only">{t(label)}</dt>
-                <dd className="font-display text-4xl font-semibold text-clay tabular-nums">{num(n)}</dd>
-                <dd className="text-ink-2 mt-1">{t(label)}</dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      )}
-
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <p className="eyebrow">{t("landing.howEyebrow")}</p>
-          <h2 className="mt-2 text-3xl sm:text-4xl font-semibold text-balance">{t("landing.howTitle")}</h2>
-        </div>
-        <ol className="grid gap-10 md:grid-cols-3">
-          {steps.map(({ icon: Icon, img, title, text }, i) => (
-            <li key={title} className="text-center">
-              <div className="relative mx-auto w-56">
-                <img src={img} alt="" className="w-56 h-56 object-cover rounded-[42%_58%_55%_45%/48%_42%_58%_52%] shadow-lg" />
-                <span className="absolute -bottom-2 -right-1 w-14 h-14 rounded-full bg-sun text-[#2B2019] grid place-items-center shadow">
-                  <Icon size={24} aria-hidden="true" />
-                </span>
-              </div>
-              <p className="mt-6 text-sm font-bold text-clay">{t("landing.step", { n: i + 1 })}</p>
-              <h3 className="mt-1 text-2xl font-semibold text-balance">{t(title)}</h3>
-              <p className="mt-2 text-ink-2 max-w-xs mx-auto text-pretty">{t(text)}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+      <Hero latest={posts?.[0]} />
 
       <section className="bg-sunken/60 border-y border-line">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 text-center sm:text-left">
             <div>
-              <p className="eyebrow">{t("landing.boardEyebrow")}</p>
               <h2 className="mt-2 text-3xl sm:text-4xl font-semibold">{t("landing.boardTitle")}</h2>
             </div>
             <Link to="/rescues" className="btn btn-line self-center sm:self-auto">{t("landing.boardAll")} <ArrowRight size={18} aria-hidden="true" /></Link>
@@ -208,8 +125,7 @@ function Landing() {
       {teams.length > 0 && (
         <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
           <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="eyebrow">{t("landing.teamsEyebrow")}</p>
-            <h2 className="mt-2 text-3xl sm:text-4xl font-semibold">{t("landing.teamsTitle")}</h2>
+            <h2 className=" text-3xl sm:text-4xl font-semibold">{t("landing.teamsTitle")}</h2>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             {teams.map((team) => (
@@ -217,7 +133,7 @@ function Landing() {
                 <span className={`tag ${team.category === "Medical" ? "tag-moss" : "tag-clay"}`}>{t(`teamType.${team.category}`)}</span>
                 <h3 className="mt-3 text-xl font-semibold">{team.name}</h3>
                 <p className="mt-1 text-ink-2 inline-flex items-center gap-1"><MapPin size={15} aria-hidden="true" /> {area(team.area || "Dhaka")}</p>
-                {team.description && <p className="mt-3 text-ink-2 line-clamp-2">{team.description}</p>}
+                {team.description && <p className="mt-3 text-ink-2 text-pretty">{team.description}</p>}
                 <p className="mt-4 text-sm font-semibold">{t("common.members", { n: team.members?.length || 0 })}</p>
               </Link>
             ))}

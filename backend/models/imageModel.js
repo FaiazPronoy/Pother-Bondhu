@@ -5,6 +5,8 @@ const rescueImageSchema = new mongoose.Schema({
   imageUrl: { type: String, required: true },
   caption: { type: String, maxlength: [500, 'Caption cannot exceed 500 characters'] },
   area: { type: String, maxlength: 60, default: '' },
+  // posts from before statuses existed have none; they are read as urgent
+  status: { type: String, enum: ['urgent', 'vet', 'helping', 'resolved'], default: 'urgent' },
   // the photo itself; left out of queries unless asked for
   data: { type: Buffer, select: false },
   contentType: { type: String, select: false },

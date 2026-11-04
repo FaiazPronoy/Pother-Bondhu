@@ -1,6 +1,6 @@
 import express from 'express';
 import userAuth from '../middleware/userAuth.js';
-import { uploadImage, serveImage, recentRescues } from '../controllers/uploadController.js';
+import { uploadImage, serveImage, recentRescues, setRescueStatus } from '../controllers/uploadController.js';
 import upload from '../utils/upload.js';
 
 const uploadRouter = express.Router();
@@ -8,6 +8,7 @@ const uploadRouter = express.Router();
 uploadRouter.get('/rescue', recentRescues);
 uploadRouter.get('/rescue/:id', serveImage);
 uploadRouter.post('/rescue', userAuth, upload.single('image'), uploadImage);
+uploadRouter.patch('/rescue/:id/status', userAuth, setRescueStatus);
 
 // multer rejects bad files by throwing, which would otherwise return Express's
 // HTML error page to a caller expecting JSON

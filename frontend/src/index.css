@@ -368,3 +368,63 @@
   color: var(--sb-ink);
   border: 1px solid var(--sb-line);
 }
+
+/* rescue status: a word and a colour, never the colour alone */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #FFF8F0;
+  color: #2B2019;
+  font-size: 0.8rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px -2px rgb(43 32 25 / 0.35);
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.status-urgent { background: #A52A2A; color: #FFF8F0; }
+.status-urgent .status-dot { background: #FFF8F0; }
+.status-vet .status-dot { background: #E9A23B; }
+.status-helping .status-dot { background: #3F6B4E; }
+.status-resolved .status-dot { background: #8A7A6C; }
+.status-resolved { color: #5B4A3D; }
+.polaroid.is-urgent {
+  box-shadow: inset 4px 0 0 #A52A2A, 0 10px 24px -14px rgb(var(--sb-shadow) / 0.5);
+}
+.status-pick {
+  min-height: 36px;
+  padding: 2px 8px;
+  border: 1px solid var(--sb-line-2);
+  border-radius: 8px;
+  background: var(--sb-card);
+  color: var(--sb-ink);
+}
+
+/* the motto gets its own band above the title */
+.motto-band {
+  background: var(--sb-clay-lo);
+  border-bottom: 1px solid var(--sb-line);
+}
+.motto {
+  font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
+  line-height: 1.3;
+  color: var(--sb-clay-hi);
+  font-weight: 600;
+}
+.report-btn {
+  min-height: 60px;
+  padding: 0 2rem;
+  font-size: 1.2rem;
+  border-radius: 999px;
+  gap: 10px;
+}
+@media (max-width: 640px) {
+  .report-btn {
+    width: 100%;
+  }
+}

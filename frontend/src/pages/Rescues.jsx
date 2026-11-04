@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { ImagePlus, X, Send } from "lucide-react";
 import { AppContext } from "../context/AppContext";
-import RescueCard from "../components/RescueCard";
+import RescueCard, { STATUSES } from "../components/RescueCard";
 import { AREAS, PageHeader, Empty, SignInPrompt } from "../components/bits";
 import { useLang } from "../context/LangContext";
 
@@ -17,6 +17,7 @@ function PostForm({ onPosted }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState("");
   const [caption, setCaption] = useState("");
+  const [status, setStatus] = useState("urgent");
   const [area, setArea] = useState(AREAS.includes(userData.location) ? userData.location : "");
   const [sending, setSending] = useState(false);
   const input = useRef(null);
@@ -44,6 +45,7 @@ function PostForm({ onPosted }) {
     form.append("image", file);
     form.append("caption", caption.trim());
     form.append("area", area);
+    form.append("status", status);
     setSending(true);
     try {
       await axios.post(`${backendUrl}/api/upload/rescue`, form);
@@ -91,6 +93,12 @@ function PostForm({ onPosted }) {
           <select id="area" value={area} onChange={(e) => setArea(e.target.value)} className="field">
             <option value="">{t("common.somewhere")}</option>
             {AREAS.map((a) => <option key={a} value={a}>{areaName(a)}</option>)}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="status" className="label">{t("rescue.statusLabel")}</label>
+          <select id="status" value={status} onChange={(e) => setStatus(e.target.value)} className="field">
+            {STATUSES.filter((s) => s !== "resolved").map((s) => <option key={s} value={s}>{t(`rescue.status_${s}`)}</option>)}
           </select>
         </div>
         <div>

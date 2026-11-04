@@ -59,6 +59,9 @@ const en = {
     madeBy: 'Made by Faiaz Abrar Zaman Pronoy and Sinthia Khandoker. All rights reserved.',
   },
   landing: {
+    report: 'Report an animal',
+    volunteer: 'Volunteer',
+    donate: 'Donate PetPoints',
     title1: 'A little care,|a little light,',
     title2a: 'can make their',
     title2b: 'world feel right.',
@@ -125,6 +128,13 @@ const en = {
     thankSub: 'Volunteers with the most PetPoints.',
   },
   rescue: {
+    status_urgent: 'Urgent',
+    status_vet: 'Needs vet',
+    status_helping: 'Being helped',
+    status_resolved: 'Resolved',
+    statusLabel: 'Status',
+    statusSaved: 'Status updated',
+    statusFail: 'Could not change the status',
     noNote: 'No note with this one.',
     alt: 'Rescue photo: {caption}',
     altPlain: 'Rescue photo',
