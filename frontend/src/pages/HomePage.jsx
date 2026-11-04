@@ -57,7 +57,7 @@ function Hero({ latest }) {
               <span className="w-9 h-9 rounded-full bg-moss text-on-clay grid place-items-center ring-[3px] ring-paper"><Cat size={18} /></span>
               <span className="w-9 h-9 rounded-full bg-sun text-[#2B2019] grid place-items-center ring-[3px] ring-paper"><Bird size={18} /></span>
             </span>
-            <blockquote lang="bn" className="bn text-[1.45rem] sm:text-[1.9rem] font-semibold leading-tight text-clay whitespace-nowrap">
+            <blockquote lang="bn" className="bn text-[clamp(1.15rem,6.2vw,1.45rem)] sm:text-[1.9rem] font-semibold leading-tight text-clay whitespace-nowrap">
               ওরা কথা বলতে পারে না, আমরা পারি।
             </blockquote>
             {lang === "en" && (
