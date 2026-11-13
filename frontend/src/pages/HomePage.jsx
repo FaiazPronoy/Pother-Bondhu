@@ -52,13 +52,13 @@ function Hero() {
             ওরা কথা বলতে পারে না, আমরা পারি।
           </blockquote>
           {lang === "en" && (
-            <figcaption className="mt-1 font-display italic text-ink-2 !text-left">{t("landing.mottoGloss")}</figcaption>
+            <figcaption className="mt-1 text-ink-2 !text-left">{t("landing.mottoGloss")}</figcaption>
           )}
         </figure>
 
         <h1 className={`mt-6 font-semibold tracking-[-0.02em] ${size}`}>
           {lines.map((line, i) => (
-            <span key={line} className={`block ${i % 2 ? "sm:pl-[1.6em]" : ""} ${i > 1 ? "italic" : ""}`}>{line}</span>
+            <span key={line} className={`block ${i % 2 ? "sm:pl-[1.6em]" : ""} ${i > 1 ? "font-normal" : "font-bold"}`}>{line}</span>
           ))}
         </h1>
 
@@ -92,27 +92,33 @@ function Landing() {
   const needing = posts && posts.filter(open).slice(0, 3);
 
   const steps = [
-    { img: "/img/waiting.jpg", title: "landing.s1Title", text: "landing.s1Text" },
-    { img: "/img/vet.jpg", title: "landing.s2Title", text: "landing.s2Text" },
-    { img: "/img/feeding.jpg", title: "landing.s3Title", text: "landing.s3Text" },
+    { title: "landing.s1Title", text: "landing.s1Text" },
+    { title: "landing.s2Title", text: "landing.s2Text" },
+    { title: "landing.s3Title", text: "landing.s3Text" },
   ];
 
   return (
     <>
       <Hero />
 
+      {/* one photo of a vet visit beside the real sequence, read top to bottom like a notice */}
       <section className="border-t border-line">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
-          <h2 className="text-3xl sm:text-4xl font-semibold">{t("landing.howEyebrow")}</h2>
-          <ol className="mt-8 grid gap-10 md:grid-cols-3 md:gap-8">
-            {steps.map(({ img, title, text }, i) => (
-              <li key={title}>
-                <img src={img} alt="" className="w-full aspect-[4/3] object-cover rounded-[14px]" />
-                <h3 className="mt-4 text-2xl font-semibold"><span className="text-clay">{i + 1}.</span> {t(title)}</h3>
-                <p className="mt-1.5 text-ink-2">{t(text)}</p>
-              </li>
-            ))}
-          </ol>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20 grid gap-10 lg:grid-cols-[.9fr_1.1fr] lg:gap-16 items-center">
+          <img src="/img/vet.jpg" alt="" className="w-full aspect-[4/3] lg:aspect-[4/5] object-cover rounded-[4px]" />
+          <div>
+            <h2 className="text-3xl sm:text-4xl font-semibold">{t("landing.howEyebrow")}</h2>
+            <ol className="mt-6 border-t-2 border-ink">
+              {steps.map(({ title, text }, i) => (
+                <li key={title} className="grid grid-cols-[3rem_1fr] gap-x-4 py-5 border-b border-line">
+                  <span className="font-display text-4xl font-bold leading-none text-clay tabular-nums" aria-hidden="true">{i + 1}</span>
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-semibold">{t(title)}</h3>
+                    <p className="mt-1 text-ink-2">{t(text)}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </section>
 
@@ -219,7 +225,7 @@ function Desk() {
             <h2 id="inv-title" className="text-xl font-semibold">{t("desk.invited")}</h2>
             <ul className="mt-3 space-y-3">
               {invites.map((inv) => (
-                <li key={inv._id} className="rounded-[14px] bg-clay-lo p-3.5 !text-left">
+                <li key={inv._id} className="rounded-[6px] bg-clay-lo p-3.5 !text-left">
                   <p className="!text-left"><span className="font-semibold">{inv.team?.name}</span>, <span className="text-ink-2">{t("desk.from", { name: inv.from?.name || "" })}</span></p>
                   <div className="mt-2.5 flex gap-2">
                     <button onClick={() => answer(inv, "accepted")} className="btn btn-moss flex-1"><Check size={16} aria-hidden="true" /> {t("desk.join")}</button>
@@ -276,7 +282,7 @@ function Desk() {
               <ul className="mt-2 space-y-1">
                 {top.map((v, i) => (
                   <li key={v._id}>
-                    <Link to={`/volunteers/${v._id}`} className="flex items-center gap-3 rounded-[10px] p-1.5 -mx-1.5 hover:bg-sunken">
+                    <Link to={`/volunteers/${v._id}`} className="flex items-center gap-3 rounded-[4px] p-1.5 -mx-1.5 hover:bg-sunken">
                       <Avatar name={v.name} size="w-8 h-8 text-xs" tone={["clay", "moss", "sun"][i % 3]} />
                       <span className="flex-1 font-medium truncate">{v.name}</span>
                       <Points value={v.points} className="text-sm text-ink-2" />

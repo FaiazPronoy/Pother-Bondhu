@@ -71,7 +71,7 @@ function PostForm({ onPosted }) {
 
       {preview ? (
         <div className="relative">
-          <img src={preview} alt={t("rescues.picked")} className="w-full aspect-[4/3] object-cover rounded-[14px]" />
+          <img src={preview} alt={t("rescues.picked")} className="w-full aspect-[4/3] object-cover rounded-[6px]" />
           <button type="button" onClick={clear} aria-label={t("rescues.removePhoto")}
             className="absolute top-2 right-2 w-11 h-11 grid place-items-center rounded-full bg-[#1A1411]/75 text-white hover:bg-[#1A1411]">
             <X size={20} />
@@ -79,7 +79,7 @@ function PostForm({ onPosted }) {
         </div>
       ) : (
         <label
-          className="grid place-items-center content-center gap-2 aspect-[4/3] rounded-[14px] border-2 border-dashed border-line-2 bg-sunken text-ink-2 cursor-pointer hover:border-clay hover:text-clay text-center px-4"
+          className="grid place-items-center content-center gap-2 aspect-[4/3] rounded-[6px] border-2 border-dashed border-line-2 bg-sunken text-ink-2 cursor-pointer hover:border-clay hover:text-clay text-center px-4"
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => { e.preventDefault(); pick(e.dataTransfer.files[0]); }}
         >
@@ -203,10 +203,10 @@ export default function Rescues() {
       </PageHeader>
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div className="inline-flex rounded-[10px] border border-line-2 p-1" role="group" aria-label={t("rescues.viewLabel")}>
+        <div className="inline-flex rounded-[4px] border border-line-2 p-1" role="group" aria-label={t("rescues.viewLabel")}>
           {[["board", LayoutGrid], ["map", MapIcon]].map(([v, Icon]) => (
             <button key={v} type="button" aria-pressed={view === v} onClick={() => setView(v)}
-              className={`inline-flex items-center gap-2 min-h-10 px-4 rounded-[7px] font-semibold ${view === v ? "bg-ink text-paper" : "text-ink-2 hover:text-ink"}`}>
+              className={`inline-flex items-center gap-2 min-h-10 px-4 rounded-[3px] font-semibold ${view === v ? "bg-ink text-paper" : "text-ink-2 hover:text-ink"}`}>
               <Icon size={17} aria-hidden="true" /> {t(`rescues.view_${v}`)}
             </button>
           ))}

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { MapPin, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { AREAS, Avatar, Empty, PageHeader, Points } from '../components/bits';
 import { useLang } from '../context/LangContext';
@@ -60,7 +60,7 @@ export default function VolunteersPage() {
                   <Avatar name={v.name} size="w-14 h-14 text-lg" tone={['clay', 'moss', 'sun'][i % 3]} />
                   <div className="min-w-0">
                     <h2 className="text-xl font-semibold">{v.name}</h2>
-                    <p className="text-ink-2 inline-flex items-center gap-1"><MapPin size={14} aria-hidden="true" /> {v.location ? areaName(v.location) : t('common.areaNotSet')}</p>
+                    <p className="text-ink-2">{v.location ? areaName(v.location) : t('common.areaNotSet')}</p>
                   </div>
                 </div>
                 <p className="mt-3 text-ink-2 flex-1">{v.bio || t('vols.noBio')}</p>

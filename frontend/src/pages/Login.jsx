@@ -105,7 +105,7 @@ const Login = () => {
         <div className="absolute inset-x-0 bottom-0 p-12 text-[#FFF8F0]">
           <div className="max-w-md">
             <p lang="bn" className="bn text-4xl leading-snug">ওরা কথা বলতে পারে না,<br /><span className="text-[#F2B659]">আমরা পারি।</span></p>
-            {lang === "en" && <p className="mt-2 font-display italic text-xl text-[#F2B659]">{t("landing.mottoGloss")}</p>}
+            {lang === "en" && <p className="mt-2 text-xl text-[#F2B659]">{t("landing.mottoGloss")}</p>}
             <span className="mt-6 block h-0.5 w-14 rounded-full bg-[#F2B659]" aria-hidden="true" />
             <p className="mt-5 text-lg text-[#EADBC8] text-balance">{t("login.quote")}</p>
           </div>
@@ -127,10 +127,10 @@ const Login = () => {
               {state === "Login" ? t("login.welcomeSub") : t("login.joinSub")}
             </p>
 
-            <div className="mt-8 grid grid-cols-2 p-1 rounded-[10px] bg-sunken border border-line" role="tablist" aria-label={t("login.tabs")}>
+            <div className="mt-8 grid grid-cols-2 p-1 rounded-[4px] bg-sunken border border-line" role="tablist" aria-label={t("login.tabs")}>
               {[["Login", "login.tabIn"], ["Sign Up", "login.tabUp"]].map(([key, label]) => (
                 <button key={key} type="button" role="tab" aria-selected={state === key} onClick={() => switchTo(key)}
-                  className={`min-h-11 rounded-[7px] font-semibold transition-colors ${state === key ? "bg-card text-ink border border-line" : "text-ink-2 hover:text-ink"}`}>
+                  className={`min-h-11 rounded-[3px] font-semibold transition-colors ${state === key ? "bg-card text-ink border border-line" : "text-ink-2 hover:text-ink"}`}>
                   {t(label)}
                 </button>
               ))}

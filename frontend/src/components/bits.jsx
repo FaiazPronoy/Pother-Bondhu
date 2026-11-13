@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Eye, EyeOff, PawPrint, Languages } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useLang } from "../context/LangContext";
 
 export const AREAS = [
@@ -15,7 +15,7 @@ export function Wordmark({ className = "", size = "text-2xl" }) {
     <span className={`inline-flex items-center gap-2 ${className}`} lang={lang}>
       <img src="/paw-heart.svg" alt="" className="w-9 h-9 shrink-0" />
       <span className={`font-display font-semibold tracking-tight leading-none ${size}`}>
-        <span className={lang === "bn" ? "font-bold" : "italic font-normal"}>{first}</span>
+        <span className={lang === "bn" ? "font-bold" : "font-medium"}>{first}</span>
         <span className={`text-clay ml-[.3em] ${lang === "bn" ? "font-bold" : ""}`}>{second}</span>
       </span>
     </span>
@@ -27,7 +27,6 @@ export function LangButton({ className = "" }) {
   return (
     <button type="button" onClick={toggle} aria-label={t("common.toOtherLang")}
       className={`inline-flex items-center gap-1.5 min-h-11 px-3 rounded-full font-semibold text-ink-2 hover:text-ink hover:bg-sunken ${className}`}>
-      <Languages size={18} aria-hidden="true" />
       <span>{t("common.otherLang")}</span>
     </button>
   );
@@ -64,7 +63,6 @@ export function PageHeader({ eyebrow, title, children, action }) {
 export function Empty({ title, children, action }) {
   return (
     <div className="card p-8 sm:p-10 text-center">
-      <PawPrint className="mx-auto mb-3 text-line-2" size={36} aria-hidden="true" />
       <h3 className="text-xl font-semibold">{title}</h3>
       {children && <p className="mt-2 text-ink-2 max-w-md mx-auto text-center">{children}</p>}
       {action && <div className="mt-5">{action}</div>}

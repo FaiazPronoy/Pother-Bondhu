@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, Plus, Users } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { PageHeader, Empty } from '../components/bits';
 import { useLang } from '../context/LangContext';
@@ -102,12 +102,10 @@ const Teams = () => {
                   <span className={`tag ${team.category === 'Medical' ? 'tag-moss' : team.category === 'Other' ? 'tag-sun' : 'tag-clay'}`}>
                     {t(`teamType.${team.category || 'Rescue'}`)}
                   </span>
-                  <span className="text-sm text-ink-2 inline-flex items-center gap-1">
-                    <Users size={15} aria-hidden="true" /> {t('common.members', { n: team.members?.length || 0 })}
-                  </span>
+                  <span className="text-sm text-ink-2">{t('common.members', { n: team.members?.length || 0 })}</span>
                 </div>
                 <h2 className="mt-4 text-xl font-semibold">{team.name}</h2>
-                <p className="mt-1 text-ink-2 inline-flex items-center gap-1"><MapPin size={15} aria-hidden="true" /> {area(team.area || 'Dhaka')}</p>
+                <p className="mt-1 text-ink-2">{area(team.area || 'Dhaka')}</p>
                 {team.description && <p className="mt-3 text-ink-2">{team.description}</p>}
                 {team.creator?.name && <p className="mt-auto pt-4 text-sm text-ink-2">{t('teams.startedBy', { name: team.creator.name })}</p>}
               </Link>

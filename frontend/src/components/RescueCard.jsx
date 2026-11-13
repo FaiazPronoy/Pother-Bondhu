@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { MapPin, TriangleAlert, Stethoscope, Footprints, Check } from "lucide-react";
+import { TriangleAlert, Stethoscope, Footprints, Check } from "lucide-react";
 import { backendUrl } from "../config";
 import { AppContext } from "../context/AppContext";
 import { useLang } from "../context/LangContext";
@@ -48,7 +48,7 @@ export default function RescueCard({ post }) {
   };
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-[14px] border border-line bg-card">
+    <article className="flex flex-col overflow-hidden rounded-[6px] border border-line bg-card">
       <div className="relative">
         <img
           src={`${backendUrl}${post.imageUrl}`}
@@ -61,9 +61,7 @@ export default function RescueCard({ post }) {
       <div className="flex flex-col gap-1.5 px-3.5 pt-3 pb-3.5">
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-2 !text-left">
           {where && (
-            <span className="inline-flex items-center gap-1 font-bold text-ink">
-              <MapPin size={15} aria-hidden="true" /> {area(where)}
-            </span>
+            <span className="font-bold text-ink">{area(where)}</span>
           )}
           <span>{ago(post.createdAt)}</span>
         </p>

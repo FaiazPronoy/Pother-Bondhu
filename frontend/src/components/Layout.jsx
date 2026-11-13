@@ -1,10 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  HeartHandshake, Camera, Users, HandHeart, Flag, Mail, ShoppingBasket, ShoppingCart,
-  LogOut, Moon, Sun, Menu, X, Wallet, LayoutDashboard, PawPrint, Stethoscope, LayoutGrid,
-} from "lucide-react";
+import { Camera, ShoppingCart, Menu, X } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import { DarkmodeContext } from "../context/DarkmodeContext";
 import { Wordmark, Avatar, Points, LangButton } from "./bits";
@@ -14,13 +11,9 @@ function ThemeButton({ className = "" }) {
   const { isDarkMode, toggleDarkMode } = useContext(DarkmodeContext);
   const { t } = useLang();
   return (
-    <button
-      type="button"
-      onClick={toggleDarkMode}
-      className={`w-11 h-11 grid place-items-center rounded-full text-ink-2 hover:text-ink hover:bg-sunken ${className}`}
-      aria-label={isDarkMode ? t("common.toLight") : t("common.toDark")}
-    >
-      {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+    <button type="button" onClick={toggleDarkMode}
+      className={`min-h-11 text-left underline underline-offset-2 hover:text-ink ${className}`}>
+      {isDarkMode ? t("common.toLight") : t("common.toDark")}
     </button>
   );
 }
@@ -50,24 +43,24 @@ function SideNav({ invites, onNavigate }) {
   const cartCount = cart.reduce((n, i) => n + i.quantity, 0);
 
   const items = [
-    { to: "/", label: t("nav.desk"), icon: HeartHandshake, end: true },
-    { to: "/rescues", label: t("nav.rescues"), icon: LayoutGrid },
-    { to: "/adopt", label: t("nav.adopt"), icon: PawPrint },
-    { to: "/vets", label: t("nav.vets"), icon: Stethoscope },
-    { to: "/teams", label: t("nav.teams"), icon: Users },
-    { to: "/volunteers", label: t("nav.volunteers"), icon: HandHeart },
-    volunteer && { to: "/my-team", label: t("nav.myTeams"), icon: Flag },
-    volunteer && { to: "/team-invitations", label: t("nav.invitations"), icon: Mail, count: invites },
-    userData.role === "admin" && { to: "/admindashboard", label: t("nav.admin"), icon: LayoutDashboard },
+    { to: "/", label: t("nav.desk"), end: true },
+    { to: "/rescues", label: t("nav.rescues") },
+    { to: "/adopt", label: t("nav.adopt") },
+    { to: "/vets", label: t("nav.vets") },
+    { to: "/teams", label: t("nav.teams") },
+    { to: "/volunteers", label: t("nav.volunteers") },
+    volunteer && { to: "/my-team", label: t("nav.myTeams") },
+    volunteer && { to: "/team-invitations", label: t("nav.invitations"), count: invites },
+    userData.role === "admin" && { to: "/admindashboard", label: t("nav.admin") },
   ].filter(Boolean);
   const support = [
-    { to: "/profile?tab=wallet", label: <Points value={userData.points} />, icon: Wallet },
-    { to: "/products", label: t("nav.shop"), icon: ShoppingBasket },
-    { to: "/cart", label: t("common.cart"), icon: ShoppingCart, count: cartCount },
+    { to: "/profile?tab=wallet", label: <Points value={userData.points} /> },
+    { to: "/products", label: t("nav.shop") },
+    { to: "/cart", label: t("common.cart"), count: cartCount },
   ];
   const linkClass = ({ isActive }) =>
-    `flex items-center gap-3 min-h-11 px-3 rounded-[10px] font-medium transition-colors ${
-      isActive ? "bg-sunken text-ink font-bold" : "text-ink-2 hover:text-ink hover:bg-sunken"
+    `flex items-center gap-3 min-h-11 px-3 border-l-2 font-medium transition-colors ${
+      isActive ? "border-clay text-ink font-bold" : "border-transparent text-ink-2 hover:text-ink hover:border-line-2"
     }`;
   const badge = (count) => count > 0 && (
     <span className="min-w-6 h-6 px-1.5 rounded-md bg-clay text-on-clay text-xs font-bold grid place-items-center">
@@ -87,9 +80,8 @@ function SideNav({ invites, onNavigate }) {
       </Link>
 
       <nav aria-label={t("nav.main")} className="space-y-0.5">
-        {items.map(({ to, label, icon: Icon, end, count }) => (
+        {items.map(({ to, label, end, count }) => (
           <NavLink key={to} to={to} end={end} onClick={onNavigate} className={linkClass}>
-            <Icon size={19} aria-hidden="true" />
             <span className="flex-1">{label}</span>
             {badge(count)}
           </NavLink>
@@ -99,9 +91,8 @@ function SideNav({ invites, onNavigate }) {
       <div className="mt-5 pt-4 border-t border-line">
         <p className="px-3 pb-1.5 text-sm text-ink-2 !text-left">{t("nav.support")}</p>
         <nav aria-label={t("nav.support")} className="space-y-0.5">
-          {support.map(({ to, label, icon: Icon, count }) => (
+          {support.map(({ to, label, count }) => (
             <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
-              <Icon size={19} aria-hidden="true" />
               <span className="flex-1">{label}</span>
               {badge(count)}
             </NavLink>
@@ -122,10 +113,9 @@ function SideNav({ invites, onNavigate }) {
             <span className="block text-sm text-ink-2">{t(`role.${userData.role}`)}</span>
           </span>
         </Link>
-        <ThemeButton />
-        <button type="button" onClick={signOut} aria-label={t("common.signOut")}
-          className="w-11 h-11 grid place-items-center rounded-[10px] text-ink-2 hover:text-danger hover:bg-sunken">
-          <LogOut size={19} />
+        <button type="button" onClick={signOut}
+          className="min-h-11 px-2 text-sm font-semibold text-ink-2 underline underline-offset-2 hover:text-danger">
+          {t("common.signOut")}
         </button>
       </div>
     </div>
@@ -215,7 +205,7 @@ function VisitorShell({ children, wide }) {
   const { t } = useLang();
   const [open, setOpen] = useState(false);
   const linkClass = ({ isActive }) =>
-    `px-3 py-2 rounded-[10px] font-medium ${isActive ? "text-clay" : "text-ink-2 hover:text-ink"}`;
+    `px-3 py-2 rounded-[4px] font-medium ${isActive ? "text-clay" : "text-ink-2 hover:text-ink"}`;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -226,7 +216,6 @@ function VisitorShell({ children, wide }) {
             {publicLinks.map((l) => <NavLink key={l.to} to={l.to} className={linkClass}>{t(l.key)}</NavLink>)}
           </nav>
           <LangButton className="!px-2 sm:!px-3" />
-          <ThemeButton className="hidden sm:grid" />
           <CartLink />
           <Link to="/login" className="btn btn-clay btn-pill hidden sm:inline-flex">{t("common.signIn")}</Link>
           <button type="button" onClick={() => setOpen((o) => !o)} aria-label={open ? t("common.closeMenu") : t("common.openMenu")} aria-expanded={open}
@@ -241,7 +230,6 @@ function VisitorShell({ children, wide }) {
             ))}
             <div className="flex items-center gap-2 pt-2">
               <Link to="/login" onClick={() => setOpen(false)} className="btn btn-clay flex-1">{t("common.signIn")}</Link>
-              <ThemeButton />
             </div>
           </nav>
         )}
@@ -276,6 +264,7 @@ function Footer({ compact }) {
             <a href="https://unsplash.com" className="underline underline-offset-2 hover:text-ink" rel="noreferrer" target="_blank">Unsplash</a>
           </p>
           <p>{t("footer.madeBy")}</p>
+          <ThemeButton />
         </div>
       </div>
     </footer>
