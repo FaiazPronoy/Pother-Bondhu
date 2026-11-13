@@ -94,7 +94,7 @@ with PetPoints and a small supplies shop.
 | Uploads | Multer, with each photo checked by its real file type |
 | Tests | Vitest with an in-memory MongoDB, Playwright |
 
-Fonts: Fraunces, Figtree and Tiro Bangla.
+Fonts: Anek Bangla for headings in both languages, Figtree for text and Tiro Bangla for the motto.
 
 ---
 
