@@ -23,6 +23,7 @@ import TeamDetails from './pages/TeamDetails';
 import NotFound from './pages/NotFound';
 import ProtectedAdminRoute from './components/ProtectAdminRoute';
 import { useLang } from './context/LangContext';
+import ViewTransitions from './components/ViewTransitions';
 
 const OrderPage = lazy(() => import('./components/OrderPage'));
 const ProductPage = lazy(() => import('./components/ProductPage'));
@@ -43,6 +44,7 @@ const App = () => {
         {t("common.skip")}
       </a>
       <ToastContainer position="top-center" autoClose={3000} />
+      <ViewTransitions />
       <Routes>
         <Route path="/login" element={<Login />} />
 
