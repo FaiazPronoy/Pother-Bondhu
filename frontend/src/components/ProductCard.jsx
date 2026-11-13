@@ -19,9 +19,9 @@ const ProductCard = ({ product }) => {
         {few && <span className="absolute top-3 left-3 tag tag-sun">{t("shop.few", { n: product.stockQuantity })}</span>}
       </Link>
       <div className="p-4 flex flex-col flex-1">
-        <p className="text-xs font-bold uppercase tracking-wider text-ink-2">{t(`shopCat.${product.category}`)}</p>
-        <h3 className="mt-1 text-lg font-semibold leading-snug">
-          <Link to={`/products/${product.id || product._id}`} className="hover:text-clay">{product.name}</Link>
+        <p className="text-sm font-semibold text-ink-2 !text-left text-balance">{t(`shopCat.${product.category}`)}</p>
+        <h3 className="mt-1 text-lg font-semibold leading-snug text-balance">
+          <Link to={`/products/${product.id || product._id}`} className="hover:text-clay">{product.name.replace(/ (\S+)$/, " $1")}</Link>
         </h3>
         <p className="mt-1 text-sm text-ink-2 line-clamp-2 flex-1">{product.description}</p>
         <div className="mt-4 flex items-center justify-between gap-2">

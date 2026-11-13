@@ -47,32 +47,26 @@ export function Avatar({ name = "", size = "w-10 h-10 text-sm", tone = "clay" })
   );
 }
 
+// eyebrow is still accepted so callers do not break, but it is not shown: the title carries the page
+// eslint-disable-next-line no-unused-vars
 export function PageHeader({ eyebrow, title, children, action }) {
   return (
-    <header className="mb-10 text-center">
-      {eyebrow && (
-        <p className="eyebrow inline-flex items-center gap-1.5 rounded-full bg-clay-lo/70 px-3 py-1">
-          <PawPrint size={13} aria-hidden="true" /> {eyebrow}
-        </p>
-      )}
-      <h1 className="mt-3 mx-auto max-w-3xl text-3xl sm:text-[2.6rem] font-semibold text-balance">{title}</h1>
-      {children && <p className="mt-3 mx-auto max-w-2xl text-ink-2 text-lg text-balance">{children}</p>}
-      <span className="mt-5 flex justify-center gap-1.5" aria-hidden="true">
-        <span className="w-1.5 h-1.5 rounded-full bg-clay" />
-        <span className="w-1.5 h-1.5 rounded-full bg-sun" />
-        <span className="w-1.5 h-1.5 rounded-full bg-moss" />
-      </span>
-      {action && <div className="mt-5 flex justify-center">{action}</div>}
+    <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="max-w-2xl">
+        <h1 className="text-[1.9rem] sm:text-[2.4rem] font-semibold">{title}</h1>
+        {children && <p className="mt-2 text-ink-2 text-lg">{children}</p>}
+      </div>
+      {action && <div className="shrink-0">{action}</div>}
     </header>
   );
 }
 
 export function Empty({ title, children, action }) {
   return (
-    <div className="card p-10 text-center">
-      <PawPrint className="mx-auto mb-3 text-line-2" size={40} aria-hidden="true" />
+    <div className="card p-8 sm:p-10 text-center">
+      <PawPrint className="mx-auto mb-3 text-line-2" size={36} aria-hidden="true" />
       <h3 className="text-xl font-semibold">{title}</h3>
-      {children && <p className="mt-2 text-ink-2 max-w-md mx-auto text-pretty">{children}</p>}
+      {children && <p className="mt-2 text-ink-2 max-w-md mx-auto text-center">{children}</p>}
       {action && <div className="mt-5">{action}</div>}
     </div>
   );
