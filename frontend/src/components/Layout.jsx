@@ -3,7 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-do
 import axios from "axios";
 import {
   HeartHandshake, Camera, Users, HandHeart, Flag, Mail, ShoppingBasket, ShoppingCart,
-  LogOut, Moon, Sun, Menu, X, Wallet, LayoutDashboard, PawPrint, Stethoscope,
+  LogOut, Moon, Sun, Menu, X, Wallet, LayoutDashboard, PawPrint, Stethoscope, LayoutGrid,
 } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import { DarkmodeContext } from "../context/DarkmodeContext";
@@ -51,17 +51,29 @@ function SideNav({ invites, onNavigate }) {
 
   const items = [
     { to: "/", label: t("nav.desk"), icon: HeartHandshake, end: true },
-    { to: "/rescues", label: t("nav.rescues"), icon: Camera },
+    { to: "/rescues", label: t("nav.rescues"), icon: LayoutGrid },
     { to: "/adopt", label: t("nav.adopt"), icon: PawPrint },
     { to: "/vets", label: t("nav.vets"), icon: Stethoscope },
     { to: "/teams", label: t("nav.teams"), icon: Users },
     { to: "/volunteers", label: t("nav.volunteers"), icon: HandHeart },
     volunteer && { to: "/my-team", label: t("nav.myTeams"), icon: Flag },
     volunteer && { to: "/team-invitations", label: t("nav.invitations"), icon: Mail, count: invites },
-    { to: "/products", label: t("nav.shop"), icon: ShoppingBasket },
-    { to: "/cart", label: t("common.cart"), icon: ShoppingCart, count: cartCount },
     userData.role === "admin" && { to: "/admindashboard", label: t("nav.admin"), icon: LayoutDashboard },
   ].filter(Boolean);
+  const support = [
+    { to: "/profile?tab=wallet", label: <Points value={userData.points} />, icon: Wallet },
+    { to: "/products", label: t("nav.shop"), icon: ShoppingBasket },
+    { to: "/cart", label: t("common.cart"), icon: ShoppingCart, count: cartCount },
+  ];
+  const linkClass = ({ isActive }) =>
+    `flex items-center gap-3 min-h-11 px-3 rounded-[10px] font-medium transition-colors ${
+      isActive ? "bg-sunken text-ink font-bold" : "text-ink-2 hover:text-ink hover:bg-sunken"
+    }`;
+  const badge = (count) => count > 0 && (
+    <span className="min-w-6 h-6 px-1.5 rounded-md bg-clay text-on-clay text-xs font-bold grid place-items-center">
+      {num(count)}
+    </span>
+  );
 
   const signOut = async () => {
     await logout();
@@ -70,40 +82,37 @@ function SideNav({ invites, onNavigate }) {
 
   return (
     <div className="flex flex-col h-full">
-      <nav aria-label={t("nav.main")} className="flex-1 space-y-1">
+      <Link to="/rescues#post" onClick={onNavigate} className="btn btn-clay w-full min-h-12 mb-5">
+        <Camera size={19} aria-hidden="true" /> {t("landing.report")}
+      </Link>
+
+      <nav aria-label={t("nav.main")} className="space-y-0.5">
         {items.map(({ to, label, icon: Icon, end, count }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={end}
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              `flex items-center gap-3 min-h-11 px-3 rounded-xl font-medium transition-colors ${
-                isActive ? "bg-ink text-paper" : "text-ink-2 hover:text-ink hover:bg-sunken"
-              }`
-            }
-          >
+          <NavLink key={to} to={to} end={end} onClick={onNavigate} className={linkClass}>
             <Icon size={19} aria-hidden="true" />
             <span className="flex-1">{label}</span>
-            {count > 0 && (
-              <span className="min-w-6 h-6 px-1.5 rounded-full bg-clay text-on-clay text-xs font-bold grid place-items-center">
-                {num(count)}
-              </span>
-            )}
+            {badge(count)}
           </NavLink>
         ))}
       </nav>
 
-      <div className="mt-6 rounded-2xl bg-moss text-on-clay p-4">
-        <p className="text-sm opacity-90 flex items-center gap-2"><Wallet size={16} aria-hidden="true" /> {t("nav.wallet")}</p>
-        <p className="text-2xl font-display mt-1"><Points value={userData.points} /></p>
-        <Link to="/profile?tab=wallet" onClick={onNavigate}
-          className="mt-3 inline-flex items-center gap-1 text-sm font-semibold underline underline-offset-4">
-          {t("nav.topUp")}
-        </Link>
+      <div className="mt-5 pt-4 border-t border-line">
+        <p className="px-3 pb-1.5 text-sm text-ink-2 !text-left">{t("nav.support")}</p>
+        <nav aria-label={t("nav.support")} className="space-y-0.5">
+          {support.map(({ to, label, icon: Icon, count }) => (
+            <NavLink key={to} to={to} onClick={onNavigate} className={linkClass}>
+              <Icon size={19} aria-hidden="true" />
+              <span className="flex-1">{label}</span>
+              {badge(count)}
+            </NavLink>
+          ))}
+        </nav>
       </div>
 
-      <LangButton className="mt-3 self-start" />
+      <p lang="bn" className="bn mt-5 px-3 text-clay !text-left">ওরা কথা বলতে পারে না, আমরা পারি।</p>
+
+      <div className="flex-1" />
+      <LangButton className="mt-4 self-start" />
 
       <div className="mt-3 flex items-center gap-2 border-t border-line pt-4">
         <Link to="/profile" onClick={onNavigate} className="flex items-center gap-3 flex-1 min-w-0 rounded-xl p-1 hover:bg-sunken">
@@ -115,7 +124,7 @@ function SideNav({ invites, onNavigate }) {
         </Link>
         <ThemeButton />
         <button type="button" onClick={signOut} aria-label={t("common.signOut")}
-          className="w-11 h-11 grid place-items-center rounded-full text-ink-2 hover:text-danger hover:bg-sunken">
+          className="w-11 h-11 grid place-items-center rounded-[10px] text-ink-2 hover:text-danger hover:bg-sunken">
           <LogOut size={19} />
         </button>
       </div>
@@ -129,6 +138,7 @@ function MemberShell({ children }) {
   const [open, setOpen] = useState(false);
   const [invites, setInvites] = useState(0);
   const location = useLocation();
+  const reporting = location.pathname === "/rescues" && location.hash === "#post";
 
   useEffect(() => {
     if (userData.role !== "volunteer") return;
@@ -148,7 +158,7 @@ function MemberShell({ children }) {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[272px_1fr]">
       <aside className="hidden lg:flex flex-col sticky top-0 h-screen border-r border-line bg-card px-4 py-6 overflow-y-auto">
-        <Link to="/" className="px-2 mb-8"><Wordmark /></Link>
+        <Link to="/" className="px-2 mb-6"><Wordmark /></Link>
         <SideNav invites={invites} />
       </aside>
 
@@ -165,7 +175,7 @@ function MemberShell({ children }) {
       {open && (
         <div className="lg:hidden fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label={t("common.menu")}>
           <div className="absolute inset-0 bg-black/45" onClick={() => setOpen(false)} />
-          <div className="absolute inset-y-0 left-0 w-[86%] max-w-80 bg-card px-4 py-5 overflow-y-auto rise">
+          <div className="absolute inset-y-0 left-0 w-[86%] max-w-80 bg-card px-4 py-5 overflow-y-auto flex flex-col">
             <div className="flex items-center justify-between mb-6">
               <Wordmark size="text-xl" />
               <button type="button" onClick={() => setOpen(false)} aria-label={t("common.closeMenu")}
@@ -173,17 +183,22 @@ function MemberShell({ children }) {
                 <X size={22} />
               </button>
             </div>
-            <SideNav invites={invites} onNavigate={() => setOpen(false)} />
+            <div className="flex-1 flex flex-col"><SideNav invites={invites} onNavigate={() => setOpen(false)} /></div>
           </div>
         </div>
       )}
 
       <div className="min-w-0 flex flex-col">
-        <main id="main" className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 py-8 lg:py-10">
+        <main id="main" className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 pt-6 pb-28 lg:py-10">
           {children}
         </main>
         <Footer compact />
       </div>
+      {!reporting && (
+        <Link to="/rescues#post" className="btn btn-clay report-bar">
+          <Camera size={21} aria-hidden="true" /> {t("landing.report")}
+        </Link>
+      )}
     </div>
   );
 }
@@ -200,7 +215,7 @@ function VisitorShell({ children, wide }) {
   const { t } = useLang();
   const [open, setOpen] = useState(false);
   const linkClass = ({ isActive }) =>
-    `px-3 py-2 rounded-full font-medium ${isActive ? "text-clay" : "text-ink-2 hover:text-ink"}`;
+    `px-3 py-2 rounded-[10px] font-medium ${isActive ? "text-clay" : "text-ink-2 hover:text-ink"}`;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -213,7 +228,7 @@ function VisitorShell({ children, wide }) {
           <LangButton className="!px-2 sm:!px-3" />
           <ThemeButton className="hidden sm:grid" />
           <CartLink />
-          <Link to="/login" className="btn btn-clay hidden sm:inline-flex">{t("common.signIn")}</Link>
+          <Link to="/login" className="btn btn-clay btn-pill hidden sm:inline-flex">{t("common.signIn")}</Link>
           <button type="button" onClick={() => setOpen((o) => !o)} aria-label={open ? t("common.closeMenu") : t("common.openMenu")} aria-expanded={open}
             className="lg:hidden w-11 h-11 grid place-items-center rounded-full hover:bg-sunken -mr-2">
             {open ? <X size={22} /> : <Menu size={22} />}
@@ -247,7 +262,7 @@ function Footer({ compact }) {
         {!compact && (
           <div className="max-w-sm">
             <Wordmark />
-            <p className="mt-3 text-ink-2">{t("footer.blurb")}</p>
+            <p className="mt-3 text-ink-2 !text-left">{t("footer.blurb")}</p>
             <p lang="bn" className="mt-2 bn text-lg text-clay">ওরা কথা বলতে পারে না, আমরা পারি।</p>
           </div>
         )}
@@ -255,7 +270,7 @@ function Footer({ compact }) {
           {publicLinks.map((l) => <Link key={l.to} to={l.to} className="hover:text-ink">{t(l.key)}</Link>)}
           <Link to="/vets" className="hover:text-ink">{t("nav.vets")}</Link>
         </nav>
-        <div className="text-sm text-ink-2 space-y-1 md:max-w-xs">
+        <div className="text-sm text-ink-2 space-y-1 md:max-w-xs [&_p]:!text-left">
           <p>
             © {new Date().getFullYear()} {t("common.brand")} · {t("footer.photos")}{" "}
             <a href="https://unsplash.com" className="underline underline-offset-2 hover:text-ink" rel="noreferrer" target="_blank">Unsplash</a>

@@ -1,15 +1,12 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import {
-  Camera, Stethoscope, Coins, ArrowRight, ShoppingBasket, HandHeart, Flag, MapPin, Check, X,
-  Dog, Cat, Bird,
-} from "lucide-react";
+import { Camera, Check, X } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import { useLang } from "../context/LangContext";
-import RescueCard, { StatusTag } from "../components/RescueCard";
-import { Avatar, Points } from "../components/bits";
+import RescueCard, { StatusTag, STATUSES } from "../components/RescueCard";
+import { AREAS, Avatar, Points } from "../components/bits";
 
 function useRescues(limit) {
   const { backendUrl } = useContext(AppContext);
@@ -22,214 +19,128 @@ function useRescues(limit) {
   return posts;
 }
 
-function RescueGrid({ posts, cols = "sm:grid-cols-2 lg:grid-cols-3" }) {
-  const { t } = useLang();
+const whereOf = (p) => p.area || p.volunteer?.location;
+const open = (p) => (p.status || "urgent") !== "resolved";
+
+function CaseGrid({ posts, empty, cols = "sm:grid-cols-2 lg:grid-cols-3" }) {
   if (posts === null) {
     return (
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div className={`grid gap-5 ${cols}`}>
         {[0, 1, 2].map((i) => <div key={i} className="skeleton aspect-[4/5]" />)}
       </div>
     );
   }
-  if (posts.length === 0) {
-    return <p className="text-ink-2">{t("landing.boardEmpty")}</p>;
-  }
+  if (posts.length === 0) return <p className="text-ink-2">{empty}</p>;
   return (
-    <div className={`grid gap-x-8 gap-y-10 ${cols}`}>
+    <div className={`grid gap-5 ${cols}`}>
       {posts.map((p) => <RescueCard key={p._id} post={p} />)}
     </div>
   );
 }
 
-function Hero({ latest }) {
-  const { t, lang, area, ago } = useLang();
-  const step = lang === "bn" ? "sm:text-right" : "sm:pl-[1.9em]";
+function Hero() {
+  const { t, lang } = useLang();
   const size = lang === "bn"
-    ? "text-[2.3rem] leading-[1.35] sm:text-5xl lg:text-[3.5rem]"
-    : "text-[2.35rem] leading-[1.1] sm:text-5xl lg:text-[3.6rem]";
+    ? "text-[2.2rem] leading-[1.35] sm:text-5xl lg:text-[3.4rem]"
+    : "text-[2.3rem] leading-[1.08] sm:text-5xl lg:text-[3.6rem]";
+  const lines = [...t("landing.title1").split("|"), t("landing.title2a"), t("landing.title2b")];
   return (
-    <section className="paw-trail relative overflow-hidden">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 pb-16 lg:pt-16 lg:pb-24 grid gap-14 lg:grid-cols-[1.08fr_.92fr] items-center">
-        <div className="rise flex flex-col items-center text-center lg:items-start lg:text-left">
-          <figure className="grid sm:grid-cols-[auto_auto] items-center justify-items-center sm:justify-items-start gap-x-3 gap-y-1.5 text-center sm:text-left">
-            <span className="flex -space-x-2 sm:row-span-2" aria-hidden="true">
-              <span className="w-9 h-9 rounded-full bg-clay text-on-clay grid place-items-center ring-[3px] ring-paper"><Dog size={18} /></span>
-              <span className="w-9 h-9 rounded-full bg-moss text-on-clay grid place-items-center ring-[3px] ring-paper"><Cat size={18} /></span>
-              <span className="w-9 h-9 rounded-full bg-sun text-[#2B2019] grid place-items-center ring-[3px] ring-paper"><Bird size={18} /></span>
-            </span>
-            <blockquote lang="bn" className="bn text-[clamp(1.15rem,6.2vw,1.45rem)] sm:text-[1.9rem] font-semibold leading-tight text-clay whitespace-nowrap">
-              ওরা কথা বলতে পারে না, আমরা পারি।
-            </blockquote>
-            {lang === "en" && (
-              <figcaption className="font-display italic text-ink-2 leading-snug">{t("landing.mottoGloss")}</figcaption>
-            )}
-          </figure>
-
-          <h1 className={`mt-7 font-semibold sm:w-fit sm:text-left ${size}`}>
-            {[...t("landing.title1").split("|"), t("landing.title2a"), t("landing.title2b")].map((line, i) => (
-              <span key={line} className={`block ${i > 0 ? "mt-1" : ""} ${i % 2 ? step : ""} ${i > 1 ? "italic text-clay" : ""}`}>
-                {i > 1 ? <span className="squiggle">{line}</span> : line}
-              </span>
-            ))}
-          </h1>
-
-          <p className="mt-6 text-lg sm:text-xl text-ink-2 max-w-[34rem] text-pretty">{t("landing.lead")}</p>
-
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-            <Link to="/rescues#post" className="btn btn-clay report-btn">
-              <Camera size={22} aria-hidden="true" /> {t("landing.report")}
-            </Link>
-            <Link to="/login?mode=signup" className="btn btn-line text-base px-6">
-              {t("landing.join")} <ArrowRight size={18} aria-hidden="true" />
-            </Link>
-          </div>
-          <Link to="/rescues" className="mt-4 text-clay font-semibold underline underline-offset-4">{t("landing.board")}</Link>
-
-        </div>
-
-        <div className="relative mx-auto w-full max-w-md h-[27rem] sm:h-[32rem] rise-2">
-          <div className="absolute inset-6 rounded-full bg-clay-lo/70 blur-2xl" aria-hidden="true" />
-          <figure className="polaroid tape absolute left-0 bottom-6 w-[74%] pb-2.5" style={{ transform: "rotate(-4deg)" }} aria-hidden="true">
-            <img src="/img/hero-hand.jpg" alt="" className="w-full aspect-[4/5] object-cover" />
-          </figure>
-          <figure className="polaroid absolute right-0 top-0 w-[48%] z-10 pb-2.5" style={{ transform: "rotate(5deg)" }} aria-hidden="true">
-            <img src="/img/feeding.jpg" alt="" className="w-full aspect-square object-cover" />
-          </figure>
-          {latest && (
-            <Link to="/rescues"
-              className="absolute left-0 top-2 z-20 max-w-[18rem] card !rounded-2xl p-3 flex items-center gap-3 hover:border-line-2">
-              <StatusTag status={latest.status || "urgent"} />
-              <span className="min-w-0 text-left">
-                <span className="block text-xs font-bold uppercase tracking-wide text-clay">{t("landing.boardTitle")}</span>
-                <span className="block text-sm font-semibold truncate">
-                  <MapPin size={13} className="inline -mt-0.5" aria-hidden="true" /> {area(latest.area || latest.volunteer?.location || "Dhaka")} · {ago(latest.createdAt)}
-                </span>
-              </span>
-            </Link>
+    <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-14 lg:pt-16 lg:pb-24 grid gap-12 lg:grid-cols-[1.1fr_.9fr] items-center">
+      <div>
+        <figure className="m-0">
+          <blockquote lang="bn" className="bn !text-left text-[clamp(1.3rem,6.2vw,2rem)] leading-snug text-clay">
+            ওরা কথা বলতে পারে না, আমরা পারি।
+          </blockquote>
+          {lang === "en" && (
+            <figcaption className="mt-1 font-display italic text-ink-2 !text-left">{t("landing.mottoGloss")}</figcaption>
           )}
+        </figure>
+
+        <h1 className={`mt-6 font-semibold tracking-[-0.02em] ${size}`}>
+          {lines.map((line, i) => (
+            <span key={line} className={`block ${i % 2 ? "sm:pl-[1.6em]" : ""} ${i > 1 ? "italic" : ""}`}>{line}</span>
+          ))}
+        </h1>
+
+        <p className="mt-6 text-lg sm:text-xl text-ink-2 max-w-[34rem]">{t("landing.lead")}</p>
+
+        <div className="mt-8 flex flex-col sm:flex-row gap-3">
+          <Link to="/rescues#post" className="btn btn-clay btn-pill min-h-14 px-7 text-[1.06rem]">
+            <Camera size={21} aria-hidden="true" /> {t("landing.report")}
+          </Link>
+          <Link to="/login?mode=signup" className="btn btn-line btn-pill min-h-14 px-7 text-[1.06rem]">
+            {t("landing.join")}
+          </Link>
         </div>
+      </div>
+
+      <div className="relative mx-auto w-full max-w-md h-[22rem] sm:h-[29rem]" aria-hidden="true">
+        <figure className="print left-0 bottom-0 w-[72%] -rotate-2">
+          <img src="/img/hero-hand.jpg" alt="" className="aspect-[4/5]" />
+        </figure>
+        <figure className="print right-0 top-0 w-[50%] rotate-2">
+          <img src="/img/feeding.jpg" alt="" className="aspect-square" />
+        </figure>
       </div>
     </section>
   );
 }
 
 function Landing() {
-  const { backendUrl } = useContext(AppContext);
-  const { t, area } = useLang();
-  const posts = useRescues(6);
-  const [teams, setTeams] = useState([]);
-
-  useEffect(() => {
-    axios.get(`${backendUrl}/api/teams/all`).then((r) => setTeams(r.data.slice(0, 3))).catch(() => {});
-  }, [backendUrl]);
+  const { t } = useLang();
+  const posts = useRescues(12);
+  const needing = posts && posts.filter(open).slice(0, 3);
 
   const steps = [
-    { icon: Camera, img: "/img/waiting.jpg", title: "landing.s1Title", text: "landing.s1Text" },
-    { icon: Stethoscope, img: "/img/vet.jpg", title: "landing.s2Title", text: "landing.s2Text" },
-    { icon: Coins, img: "/img/feeding.jpg", title: "landing.s3Title", text: "landing.s3Text" },
+    { img: "/img/waiting.jpg", title: "landing.s1Title", text: "landing.s1Text" },
+    { img: "/img/vet.jpg", title: "landing.s2Title", text: "landing.s2Text" },
+    { img: "/img/feeding.jpg", title: "landing.s3Title", text: "landing.s3Text" },
   ];
 
   return (
     <>
-      <Hero latest={posts?.[0]} />
+      <Hero />
 
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <p className="eyebrow">{t("landing.howEyebrow")}</p>
-          <h2 className="mt-2 text-3xl sm:text-4xl font-semibold text-balance">{t("landing.howTitle")}</h2>
-        </div>
-        <ol className="grid gap-10 md:grid-cols-3">
-          {steps.map(({ icon: Icon, img, title, text }, i) => (
-            <li key={title} className="text-center">
-              <div className="relative mx-auto w-56">
-                <img src={img} alt="" className="w-56 h-56 object-cover rounded-[42%_58%_55%_45%/48%_42%_58%_52%] shadow-lg" />
-                <span className="absolute -bottom-2 -right-1 w-14 h-14 rounded-full bg-sun text-[#2B2019] grid place-items-center shadow">
-                  <Icon size={24} aria-hidden="true" />
-                </span>
-              </div>
-              <p className="mt-6 text-sm font-bold text-clay">{t("landing.step", { n: i + 1 })}</p>
-              <h3 className="mt-1 text-2xl font-semibold text-balance">{t(title)}</h3>
-              <p className="mt-2 text-ink-2 max-w-xs mx-auto text-pretty">{t(text)}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section className="bg-sunken/60 border-y border-line">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12 text-center sm:text-left">
-            <div>
-              <p className="eyebrow">{t("landing.boardEyebrow")}</p>
-              <h2 className="mt-2 text-3xl sm:text-4xl font-semibold">{t("landing.boardTitle")}</h2>
-            </div>
-            <Link to="/rescues" className="btn btn-line self-center sm:self-auto">{t("landing.boardAll")} <ArrowRight size={18} aria-hidden="true" /></Link>
-          </div>
-          <RescueGrid posts={posts} />
-        </div>
-      </section>
-
-      {teams.length > 0 && (
-        <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <p className="eyebrow">{t("landing.teamsEyebrow")}</p>
-            <h2 className="mt-2 text-3xl sm:text-4xl font-semibold">{t("landing.teamsTitle")}</h2>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {teams.map((team) => (
-              <Link key={team._id} to={`/teams/${team._id}`} className="card p-6 hover:border-line-2 transition-colors">
-                <span className={`tag ${team.category === "Medical" ? "tag-moss" : "tag-clay"}`}>{t(`teamType.${team.category}`)}</span>
-                <h3 className="mt-3 text-xl font-semibold">{team.name}</h3>
-                <p className="mt-1 text-ink-2 inline-flex items-center gap-1"><MapPin size={15} aria-hidden="true" /> {area(team.area || "Dhaka")}</p>
-                {team.description && <p className="mt-3 text-ink-2 text-pretty">{team.description}</p>}
-                <p className="mt-4 text-sm font-semibold">{t("common.members", { n: team.members?.length || 0 })}</p>
-              </Link>
+      <section className="border-t border-line">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+          <h2 className="text-3xl sm:text-4xl font-semibold">{t("landing.howEyebrow")}</h2>
+          <ol className="mt-8 grid gap-10 md:grid-cols-3 md:gap-8">
+            {steps.map(({ img, title, text }, i) => (
+              <li key={title}>
+                <img src={img} alt="" className="w-full aspect-[4/3] object-cover rounded-[14px]" />
+                <h3 className="mt-4 text-2xl font-semibold"><span className="text-clay">{i + 1}.</span> {t(title)}</h3>
+                <p className="mt-1.5 text-ink-2">{t(text)}</p>
+              </li>
             ))}
-          </div>
-        </section>
-      )}
+          </ol>
+        </div>
+      </section>
 
-      <section className="relative isolate overflow-hidden bg-[#1A1411]">
-        <img src="/img/mother.jpg" alt="" className="absolute inset-0 -z-10 w-full h-full object-cover" />
-        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#1A1411]/90 via-[#1A1411]/75 to-[#1A1411]/40" />
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
-          <div className="max-w-3xl mx-auto sm:mx-0 text-center sm:text-left">
-            <p className="flex items-center justify-center sm:justify-start gap-3 font-display italic text-xl sm:text-2xl text-[#FBE9C8]">
-              <span className="hidden sm:block h-0.5 w-10 rounded-full bg-[#E9A23B]" aria-hidden="true" />
-              {t("landing.endKicker")}
-            </p>
-            <h2 className="mt-5 font-semibold text-[#FFF8F0] text-3xl sm:text-5xl leading-tight text-balance">
-              <span className="block">{t("landing.endTitle1")}</span>
-              <span className="block mt-2 sm:pl-[1.5em] italic text-[#F2B659]">{t("landing.endTitle2")}</span>
-            </h2>
-            <div className="mt-8 sm:ml-[4.5rem] sm:border-l-2 sm:border-[#E9A23B]/70 sm:pl-6">
-              <p className="text-lg text-[#EADBC8] max-w-xl mx-auto sm:mx-0 text-pretty">{t("landing.endText")}</p>
-              <Link to="/login?mode=signup" className="btn mt-6 bg-[#E9A23B] text-[#2B2019] hover:bg-[#F2B659] text-base px-6">
-                {t("landing.endCta")} <ArrowRight size={18} aria-hidden="true" />
-              </Link>
-            </div>
+      <section className="border-t border-line">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+          <div className="flex items-center justify-between gap-4 mb-8">
+            <h2 className="text-3xl sm:text-4xl font-semibold">{t("desk.needAll")}</h2>
+            <Link to="/rescues" className="shrink-0 min-h-11 inline-flex items-center font-semibold text-clay underline underline-offset-4">
+              {t("desk.allRescues")}
+            </Link>
           </div>
+          <CaseGrid posts={needing} empty={t("landing.boardEmpty")} />
         </div>
       </section>
     </>
   );
 }
 
-function greetingKey() {
-  const h = new Date().getHours();
-  if (h < 5) return "desk.late";
-  if (h < 12) return "desk.morning";
-  if (h < 17) return "desk.afternoon";
-  return "desk.evening";
-}
-
 function Desk() {
   const { userData, backendUrl } = useContext(AppContext);
-  const { t, apiError } = useLang();
-  const posts = useRescues(6);
+  const { t, lang, area, ago, apiError } = useLang();
+  const stop = lang === "bn" ? "।" : ".";
+  const posts = useRescues(24);
   const [myTeams, setMyTeams] = useState(null);
   const [invites, setInvites] = useState([]);
   const [top, setTop] = useState([]);
   const volunteer = userData.role === "volunteer";
+  const home = AREAS.includes(userData.location) ? userData.location : null;
 
   useEffect(() => {
     axios.get(`${backendUrl}/api/volunteers/top?limit=5`).then((r) => setTop(r.data)).catch(() => {});
@@ -238,6 +149,16 @@ function Desk() {
       axios.get(`${backendUrl}/api/invites/me`).then((r) => setInvites(r.data)).catch(() => {});
     }
   }, [backendUrl, volunteer]);
+
+  // open cases, the user's own area first, then by how pressing they are, then newest
+  const near = useMemo(() => {
+    if (!posts) return null;
+    const rank = (p) => STATUSES.indexOf(p.status || "urgent");
+    return posts.filter(open).sort((a, b) =>
+      (whereOf(b) === home) - (whereOf(a) === home) || rank(a) - rank(b) || new Date(b.createdAt) - new Date(a.createdAt)
+    ).slice(0, 6);
+  }, [posts, home]);
+  const mine = useMemo(() => (posts || []).filter((p) => p.volunteer?._id === userData._id), [posts, userData._id]);
 
   const answer = async (invite, status) => {
     try {
@@ -254,108 +175,119 @@ function Desk() {
     }
   };
 
-  const actions = [
-    { to: "/rescues#post", icon: Camera, title: "desk.postTitle", text: "desk.postText", tone: "bg-clay text-on-clay" },
-    volunteer
-      ? { to: "/createteam", icon: Flag, title: "desk.startTitle", text: "desk.startText", tone: "bg-moss text-on-clay" }
-      : { to: "/profile", icon: HandHeart, title: "desk.becomeTitle", text: "desk.becomeText", tone: "bg-moss text-on-clay" },
-    { to: "/volunteers", icon: Coins, title: "desk.supportTitle", text: "desk.supportText", tone: "bg-sun text-[#2B2019]" },
-    { to: "/products", icon: ShoppingBasket, title: "desk.buyTitle", text: "desk.buyText", tone: "bg-ink text-paper" },
-  ];
+  const panel = "pt-6 mt-6 border-t border-line first:mt-0 first:pt-0 first:border-0";
 
   return (
-    <div className="space-y-10">
-      <header className="rise relative overflow-hidden rounded-3xl border border-line bg-gradient-to-br from-clay-lo/80 via-card to-sun-lo/70 px-6 py-8 sm:px-10 text-center sm:text-left paw-trail">
-        <p className="font-display italic text-lg text-clay-hi">{t("desk.ask")}</p>
-        <h1 className="mt-1 text-3xl sm:text-[2.6rem] font-semibold text-balance">{t(greetingKey(), { name: userData.name.split(" ")[0] })}</h1>
-        <p className="mt-2 text-ink-2 text-lg text-balance">{t("desk.sub")}</p>
-        <p lang="bn" className="bn mt-4 text-clay-hi hidden sm:block" aria-hidden="true">ওরা কথা বলতে পারে না, আমরা পারি।</p>
-      </header>
-
-      <nav aria-label={t("desk.quick")} className="grid grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 rise-2">
-        {actions.map(({ to, icon: Icon, title, text, tone }) => (
-          <Link key={title} to={to} className={`${tone} rounded-2xl p-4 sm:p-5 flex flex-col gap-3 hover:-translate-y-0.5 transition-transform`}>
-            <Icon size={26} aria-hidden="true" />
-            <span>
-              <span className="block font-semibold text-lg leading-tight">{t(title)}</span>
-              <span className="block text-sm opacity-90 mt-0.5">{t(text)}</span>
-            </span>
-          </Link>
-        ))}
-      </nav>
-
-      <div className="grid gap-10 xl:grid-cols-[1fr_320px]">
-        <section aria-labelledby="board-title">
-          <div className="flex items-end justify-between gap-4 mb-8">
-            <h2 id="board-title" className="text-2xl font-semibold">{t("desk.board")}</h2>
-            <Link to="/rescues" className="text-clay font-semibold inline-flex items-center gap-1 hover:underline">
-              {t("desk.allRescues")} <ArrowRight size={16} aria-hidden="true" />
-            </Link>
+    <div className="grid gap-10 xl:grid-cols-[1fr_300px] xl:gap-12">
+      <section aria-labelledby="near-title">
+        <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 mb-6">
+          <div>
+            <h1 id="near-title" className="text-[1.9rem] sm:text-[2.3rem] font-semibold">{t(home ? "desk.needNear" : "desk.needAll")}</h1>
+            {home && <p className="mt-1 text-ink-2 !text-left">{t("desk.nearNote", { area: area(home) })}</p>}
           </div>
-          <RescueGrid posts={posts} cols="sm:grid-cols-2 2xl:grid-cols-3" />
+          <Link to="/rescues" className="min-h-11 inline-flex items-center font-semibold text-clay underline underline-offset-4">
+            {t("desk.allRescues")}
+          </Link>
+        </div>
+        <CaseGrid posts={near} empty={t("desk.allClear")} cols="sm:grid-cols-2 2xl:grid-cols-3" />
+      </section>
+
+      <aside>
+        <section className={panel} aria-labelledby="mine-title">
+          <h2 id="mine-title" className="text-xl font-semibold">{t("desk.mine")}</h2>
+          {mine.length === 0 ? (
+            <p className="mt-2 text-ink-2">{t("desk.mineEmpty")}</p>
+          ) : (
+            <ul className="mt-3 space-y-3">
+              {mine.slice(0, 4).map((p) => (
+                <li key={p._id} className="grid grid-cols-[56px_1fr] gap-3 items-center !text-left">
+                  <img src={`${backendUrl}${p.imageUrl}`} alt="" className="w-14 h-14 rounded-lg object-cover bg-sunken" />
+                  <div className="min-w-0">
+                    <p className="font-semibold truncate !text-left">{p.caption || area(whereOf(p) || "Dhaka")}</p>
+                    <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-ink-2 !text-left">
+                      <StatusTag status={p.status || "urgent"} /> {ago(p.createdAt)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
-        <aside className="space-y-6">
-          {volunteer && invites.length > 0 && (
-            <section className="card p-5 border-clay/40" aria-labelledby="inv-title">
-              <h2 id="inv-title" className="text-lg font-semibold">{t("desk.invited")}</h2>
-              <ul className="mt-3 space-y-3">
-                {invites.map((inv) => (
-                  <li key={inv._id} className="rounded-xl bg-sunken p-3">
-                    <p className="font-semibold">{inv.team?.name}</p>
-                    <p className="text-sm text-ink-2">{t("desk.from", { name: inv.from?.name || "" })}</p>
-                    <div className="mt-2 flex gap-2">
-                      <button onClick={() => answer(inv, "accepted")} className="btn btn-moss !min-h-9 !py-1 text-sm flex-1"><Check size={16} aria-hidden="true" /> {t("desk.join")}</button>
-                      <button onClick={() => answer(inv, "rejected")} className="btn btn-line !min-h-9 !py-1 text-sm flex-1"><X size={16} aria-hidden="true" /> {t("desk.decline")}</button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {volunteer && (
-            <section className="card p-5" aria-labelledby="teams-title">
-              <div className="flex items-center justify-between">
-                <h2 id="teams-title" className="text-lg font-semibold">{t("desk.yourTeams")}</h2>
-                <Link to="/my-team" className="text-sm font-semibold text-clay hover:underline">{t("desk.manage")}</Link>
-              </div>
-              {myTeams === null ? (
-                <div className="skeleton h-16 mt-3" />
-              ) : myTeams.length === 0 ? (
-                <p className="mt-2 text-ink-2">{t("desk.noTeam")} <Link to="/teams" className="text-clay font-semibold underline">{t("desk.findOne")}</Link> {t("desk.orStart")}</p>
-              ) : (
-                <ul className="mt-3 divide-y divide-line">
-                  {myTeams.map((team) => (
-                    <li key={team._id}>
-                      <Link to={`/teams/${team._id}`} className="flex items-center justify-between gap-3 py-2.5 hover:text-clay">
-                        <span className="font-medium">{team.name}</span>
-                        <span className="text-sm text-ink-2 shrink-0">{t("common.members", { n: team.members.length })}</span>
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          )}
-
-          <section className="card p-5" aria-labelledby="top-title">
-            <h2 id="top-title" className="text-lg font-semibold">{t("desk.thank")}</h2>
-            <p className="text-sm text-ink-2">{t("desk.thankSub")}</p>
-            <ul className="mt-3 space-y-2">
-              {top.map((v, i) => (
-                <li key={v._id}>
-                  <Link to={`/volunteers/${v._id}`} className="flex items-center gap-3 rounded-xl p-1.5 hover:bg-sunken">
-                    <Avatar name={v.name} size="w-9 h-9 text-xs" tone={["clay", "moss", "sun"][i % 3]} />
-                    <span className="flex-1 font-medium truncate">{v.name}</span>
-                    <Points value={v.points} className="text-sm text-ink-2" />
-                  </Link>
+        {volunteer && invites.length > 0 && (
+          <section className={panel} aria-labelledby="inv-title">
+            <h2 id="inv-title" className="text-xl font-semibold">{t("desk.invited")}</h2>
+            <ul className="mt-3 space-y-3">
+              {invites.map((inv) => (
+                <li key={inv._id} className="rounded-[14px] bg-clay-lo p-3.5 !text-left">
+                  <p className="!text-left"><span className="font-semibold">{inv.team?.name}</span>, <span className="text-ink-2">{t("desk.from", { name: inv.from?.name || "" })}</span></p>
+                  <div className="mt-2.5 flex gap-2">
+                    <button onClick={() => answer(inv, "accepted")} className="btn btn-moss flex-1"><Check size={16} aria-hidden="true" /> {t("desk.join")}</button>
+                    <button onClick={() => answer(inv, "rejected")} className="btn btn-line flex-1"><X size={16} aria-hidden="true" /> {t("desk.decline")}</button>
+                  </div>
                 </li>
               ))}
             </ul>
           </section>
-        </aside>
-      </div>
+        )}
+
+        {volunteer && (
+          <section className={panel} aria-labelledby="teams-title">
+            <div className="flex items-center justify-between gap-3">
+              <h2 id="teams-title" className="text-xl font-semibold">{t("desk.yourTeams")}</h2>
+              <Link to="/my-team" className="min-h-11 inline-flex items-center text-sm font-semibold text-clay underline underline-offset-4">{t("desk.manage")}</Link>
+            </div>
+            {myTeams === null ? (
+              <div className="skeleton h-12 mt-2" />
+            ) : myTeams.length === 0 ? (
+              <p className="mt-1 text-ink-2">
+                {t("desk.noTeam")} <Link to="/teams" className="text-clay font-semibold underline">{t("desk.findOne")}</Link>{" "}
+                <Link to="/createteam" className="underline">{t("desk.orStart")}</Link>
+              </p>
+            ) : (
+              <ul className="divide-y divide-line">
+                {myTeams.map((team) => (
+                  <li key={team._id}>
+                    <Link to={`/teams/${team._id}`} className="flex items-center justify-between gap-3 py-2.5 hover:text-clay">
+                      <span className="font-medium">{team.name}</span>
+                      <span className="text-sm text-ink-2 shrink-0">{t("common.members", { n: team.members.length })}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
+
+        <section className={panel} aria-labelledby="support-title">
+          <h2 id="support-title" className="text-xl font-semibold">{t("desk.support")}</h2>
+          <p className="mt-2 text-ink-2 !text-left">
+            {t("desk.youHave")} <Points value={userData.points} className="text-ink" />{stop}{" "}
+            <Link to="/volunteers" className="font-semibold text-ink underline underline-offset-2">{t("desk.sendPoints")}</Link>{" "}
+            {t("desk.or")}{" "}
+            <Link to="/products" className="font-semibold text-ink underline underline-offset-2">{t("desk.buySupplies")}</Link>{stop}
+          </p>
+          {!volunteer && (
+            <p className="mt-2 !text-left"><Link to="/profile" className="font-semibold text-clay underline underline-offset-2">{t("desk.becomeTitle")}</Link></p>
+          )}
+          {top.length > 0 && (
+            <>
+              <h3 className="mt-5 font-sans text-base font-semibold">{t("desk.thank")}</h3>
+              <ul className="mt-2 space-y-1">
+                {top.map((v, i) => (
+                  <li key={v._id}>
+                    <Link to={`/volunteers/${v._id}`} className="flex items-center gap-3 rounded-[10px] p-1.5 -mx-1.5 hover:bg-sunken">
+                      <Avatar name={v.name} size="w-8 h-8 text-xs" tone={["clay", "moss", "sun"][i % 3]} />
+                      <span className="flex-1 font-medium truncate">{v.name}</span>
+                      <Points value={v.points} className="text-sm text-ink-2" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
+      </aside>
     </div>
   );
 }

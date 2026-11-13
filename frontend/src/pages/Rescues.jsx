@@ -1,8 +1,8 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { ImagePlus, X, Send, LayoutGrid, Map as MapIcon, Stethoscope } from "lucide-react";
+import { Camera, X, Send, LayoutGrid, Map as MapIcon, Stethoscope, ChevronDown, LoaderCircle } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import RescueCard, { STATUSES } from "../components/RescueCard";
 import { AREAS, PageHeader, Empty, SignInPrompt } from "../components/bits";
@@ -63,59 +63,71 @@ function PostForm({ onPosted }) {
   };
 
   return (
-    <form onSubmit={submit} className="card p-5 sm:p-6 grid gap-5 md:grid-cols-[240px_1fr]" aria-labelledby="post-title">
+    <form onSubmit={submit} className="grid gap-5" aria-labelledby="post-title">
+      <header>
+        <h1 id="post-title" className="text-[1.9rem] sm:text-[2.3rem] font-semibold">{t("rescues.reportTitle")}</h1>
+        <p className="mt-1 text-ink-2 !text-left">{t("rescues.reportLead")}</p>
+      </header>
+
+      {preview ? (
+        <div className="relative">
+          <img src={preview} alt={t("rescues.picked")} className="w-full aspect-[4/3] object-cover rounded-[14px]" />
+          <button type="button" onClick={clear} aria-label={t("rescues.removePhoto")}
+            className="absolute top-2 right-2 w-11 h-11 grid place-items-center rounded-full bg-[#1A1411]/75 text-white hover:bg-[#1A1411]">
+            <X size={20} />
+          </button>
+        </div>
+      ) : (
+        <label
+          className="grid place-items-center content-center gap-2 aspect-[4/3] rounded-[14px] border-2 border-dashed border-line-2 bg-sunken text-ink-2 cursor-pointer hover:border-clay hover:text-clay text-center px-4"
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => { e.preventDefault(); pick(e.dataTransfer.files[0]); }}
+        >
+          <Camera size={36} aria-hidden="true" />
+          <span className="font-semibold text-lg text-ink">{t("rescues.takePhoto")}</span>
+          <span className="text-sm">{t("rescues.photoRules")}</span>
+          <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" capture="environment" className="sr-only"
+            onChange={(e) => pick(e.target.files[0])} />
+        </label>
+      )}
+
       <div>
-        {preview ? (
-          <div className="relative">
-            <img src={preview} alt={t("rescues.picked")} className="w-full aspect-[4/3] object-cover rounded-xl" />
-            <button type="button" onClick={clear} aria-label={t("rescues.removePhoto")}
-              className="absolute top-2 right-2 w-9 h-9 grid place-items-center rounded-full bg-[#1A1411]/75 text-white hover:bg-[#1A1411]">
-              <X size={18} />
-            </button>
-          </div>
-        ) : (
-          <label
-            className="flex flex-col items-center justify-center gap-2 aspect-[4/3] rounded-xl border-2 border-dashed border-line-2 bg-sunken text-ink-2 cursor-pointer hover:border-clay hover:text-clay text-center px-4"
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => { e.preventDefault(); pick(e.dataTransfer.files[0]); }}
-          >
-            <ImagePlus size={32} aria-hidden="true" />
-            <span className="font-semibold">{t("rescues.addPhoto")}</span>
-            <span className="text-sm">{t("rescues.photoRules")}</span>
-            <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only"
-              onChange={(e) => pick(e.target.files[0])} />
-          </label>
-        )}
+        <label htmlFor="area" className="label">{t("rescues.where")}</label>
+        <select id="area" value={area} onChange={(e) => setArea(e.target.value)} className="field">
+          <option value="">{t("common.somewhere")}</option>
+          {AREAS.map((a) => <option key={a} value={a}>{areaName(a)}</option>)}
+        </select>
       </div>
 
-      <div className="flex flex-col gap-4">
-        <h2 id="post-title" className="text-xl font-semibold">{t("rescues.formTitle")}</h2>
-        <div>
-          <label htmlFor="area" className="label">{t("rescues.where")}</label>
-          <select id="area" value={area} onChange={(e) => setArea(e.target.value)} className="field">
-            <option value="">{t("common.somewhere")}</option>
-            {AREAS.map((a) => <option key={a} value={a}>{areaName(a)}</option>)}
-          </select>
-        </div>
-        <div>
+      <div>
+        <label htmlFor="caption" className="label">{t("rescues.what")}</label>
+        <textarea id="caption" value={caption} maxLength={500} onChange={(e) => setCaption(e.target.value)} className="field"
+          placeholder={t("rescues.whatHint")} aria-describedby="caption-note" />
+        <p className="mt-1 flex justify-between gap-3 text-sm text-ink-2">
+          <span id="caption-note">{t("rescues.langNote")}</span>
+          <span className="tabular-nums shrink-0">{caption.length}/500</span>
+        </p>
+      </div>
+
+      <details className="group border-t border-line pt-2">
+        <summary className="flex items-center gap-2 min-h-11 cursor-pointer font-semibold list-none [&::-webkit-details-marker]:hidden">
+          {t("rescues.howUrgent")}
+          <ChevronDown size={18} aria-hidden="true" className="transition-transform group-open:rotate-180" />
+        </summary>
+        <div className="pt-2">
           <label htmlFor="status" className="label">{t("rescue.statusLabel")}</label>
           <select id="status" value={status} onChange={(e) => setStatus(e.target.value)} className="field">
             {STATUSES.filter((s) => s !== "resolved").map((s) => <option key={s} value={s}>{t(`rescue.status_${s}`)}</option>)}
           </select>
+          <p className="mt-1 text-sm text-ink-2">{t("rescues.urgentNote")}</p>
         </div>
-        <div>
-          <label htmlFor="caption" className="label">{t("rescues.what")}</label>
-          <textarea id="caption" value={caption} maxLength={500} onChange={(e) => setCaption(e.target.value)} className="field"
-            placeholder={t("rescues.whatHint")} aria-describedby="caption-note" />
-          <p className="mt-1 flex justify-between gap-3 text-sm text-ink-2">
-            <span id="caption-note">{t("rescues.langNote")}</span>
-            <span className="tabular-nums shrink-0">{caption.length}/500</span>
-          </p>
-        </div>
-        <button type="submit" disabled={sending} className="btn btn-clay self-start">
-          <Send size={17} aria-hidden="true" /> {sending ? t("rescues.posting") : t("rescues.post")}
-        </button>
-      </div>
+      </details>
+
+      <button type="submit" disabled={sending} className="btn btn-clay w-full min-h-14 text-[1.06rem]">
+        {sending
+          ? <><LoaderCircle size={20} className="animate-spin" aria-hidden="true" /> {t("rescues.sending")}</>
+          : <><Send size={19} aria-hidden="true" /> {t("rescues.send")}</>}
+      </button>
     </form>
   );
 }
@@ -127,6 +139,8 @@ export default function Rescues() {
   const [area, setArea] = useState("");
   const [view, setView] = useState("board");
   const location = useLocation();
+  const navigate = useNavigate();
+  const reporting = location.hash === "#post";
 
   const load = () => {
     axios.get(`${backendUrl}/api/upload/rescue?limit=24`)
@@ -136,9 +150,7 @@ export default function Rescues() {
 
   useEffect(load, [backendUrl]);
 
-  useEffect(() => {
-    if (location.hash === "#post") document.getElementById("post")?.scrollIntoView({ behavior: "smooth" });
-  }, [location.hash]);
+  useEffect(() => { window.scrollTo(0, 0); }, [reporting]);
 
   const shown = useMemo(
     () => (posts || []).filter((p) => !area || (p.area || p.volunteer?.location) === area),
@@ -167,19 +179,34 @@ export default function Rescues() {
     });
   }, [posts, areaName, t]);
 
+  if (reporting) {
+    return (
+      <section id="post" className="max-w-xl mx-auto">
+        {isLoggedIn
+          ? <PostForm onPosted={() => { load(); navigate("/rescues"); }} />
+          : (
+            <>
+              <h1 className="text-[1.9rem] sm:text-[2.3rem] font-semibold mb-5">{t("rescues.reportTitle")}</h1>
+              <SignInPrompt>{t("rescues.signIn")}</SignInPrompt>
+            </>
+          )}
+        <p className="mt-6 text-center"><Link to="/rescues" className="font-semibold text-clay underline underline-offset-4">{t("rescues.seeBoard")}</Link></p>
+      </section>
+    );
+  }
+
   return (
     <>
-      <PageHeader eyebrow={t("rescues.eyebrow")} title={t("rescues.title")}>{t("rescues.lead")}</PageHeader>
-
-      <section id="post" className="mb-12 scroll-mt-24">
-        {isLoggedIn ? <PostForm onPosted={load} /> : <SignInPrompt>{t("rescues.signIn")}</SignInPrompt>}
-      </section>
+      <PageHeader title={t("rescues.title")}
+        action={<Link to="/rescues#post" className="btn btn-clay min-h-12 hidden lg:inline-flex"><Camera size={19} aria-hidden="true" /> {t("landing.report")}</Link>}>
+        {t("rescues.lead")}
+      </PageHeader>
 
       <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <div className="inline-flex rounded-full border border-line p-1" role="group" aria-label={t("rescues.viewLabel")}>
+        <div className="inline-flex rounded-[10px] border border-line-2 p-1" role="group" aria-label={t("rescues.viewLabel")}>
           {[["board", LayoutGrid], ["map", MapIcon]].map(([v, Icon]) => (
             <button key={v} type="button" aria-pressed={view === v} onClick={() => setView(v)}
-              className={`inline-flex items-center gap-2 min-h-11 px-4 rounded-full font-semibold ${view === v ? "bg-ink text-paper" : "text-ink-2 hover:text-ink"}`}>
+              className={`inline-flex items-center gap-2 min-h-10 px-4 rounded-[7px] font-semibold ${view === v ? "bg-ink text-paper" : "text-ink-2 hover:text-ink"}`}>
               <Icon size={17} aria-hidden="true" /> {t(`rescues.view_${v}`)}
             </button>
           ))}
@@ -205,7 +232,7 @@ export default function Rescues() {
       )}
 
       {view === "board" && areasInUse.length > 1 && (
-        <div className="flex flex-wrap justify-center gap-2 mb-10" role="group" aria-label={t("rescues.filter")}>
+        <div className="flex flex-wrap gap-2 mb-8" role="group" aria-label={t("rescues.filter")}>
           <button type="button" className="chip" aria-pressed={!area} onClick={() => setArea("")}>{t("rescues.everywhere")}</button>
           {areasInUse.map((a) => (
             <button key={a} type="button" className="chip" aria-pressed={area === a} onClick={() => setArea(a)}>{areaName(a)}</button>
@@ -214,13 +241,13 @@ export default function Rescues() {
       )}
 
       {view === "map" ? null : posts === null ? (
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {[0, 1, 2].map((i) => <div key={i} className="skeleton aspect-[4/5]" />)}
         </div>
       ) : shown.length === 0 ? (
         <Empty title={t("rescues.emptyTitle")}>{t("rescues.emptyText")}</Empty>
       ) : (
-        <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {shown.map((p) => <RescueCard key={p._id} post={p} />)}
         </div>
       )}
