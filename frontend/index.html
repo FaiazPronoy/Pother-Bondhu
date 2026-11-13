@@ -14,6 +14,43 @@
       href="https://fonts.googleapis.com/css2?family=Anek+Bangla:wdth,wght@75..125,400..800&family=Figtree:wght@400;500;600;700&family=Tiro+Bangla:ital@0;1&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap"
     />
     <title>Pother Bondhu | An Animal Rescue Network</title>
+
+    <!-- link previews on Facebook, WhatsApp, Messenger and X -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Pother Bondhu" />
+    <meta property="og:title" content="Pother Bondhu | An animal rescue network for Dhaka" />
+    <meta property="og:description" content="See a street animal that needs help? Post a photo with the area. Volunteers in that area see it and go to help." />
+    <meta property="og:url" content="https://pother-bondhu.onrender.com/" />
+    <meta property="og:image" content="https://pother-bondhu.onrender.com/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Pother Bondhu: a hand reaching out to a street dog, with the motto ওরা কথা বলতে পারে না, আমরা পারি।" />
+    <meta property="og:locale" content="en_GB" />
+    <meta property="og:locale:alternate" content="bn_BD" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- the page's own address as canonical, so /rescues or /teams is never marked a copy of the home page -->
+    <link rel="canonical" href="https://pother-bondhu.onrender.com/" id="canonical" />
+    <script>
+      try { document.getElementById('canonical').href = 'https://pother-bondhu.onrender.com' + location.pathname; } catch (e) {}
+    </script>
+
+    <!-- who runs this site, for search engines and AI assistants -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Pother Bondhu",
+        "alternateName": "পথের বন্ধু",
+        "url": "https://pother-bondhu.onrender.com/",
+        "logo": "https://pother-bondhu.onrender.com/paw-heart.svg",
+        "image": "https://pother-bondhu.onrender.com/og.jpg",
+        "slogan": "ওরা কথা বলতে পারে না, আমরা পারি।",
+        "description": "An animal rescue network for Dhaka. People post a photo of a street animal in trouble, and volunteers nearby go to help. Supporters fund the work with PetPoints and a small supplies shop.",
+        "areaServed": { "@type": "City", "name": "Dhaka" }
+      }
+    </script>
+
     <script>
       try {
         if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
@@ -22,7 +59,26 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- readable before the app loads, and by crawlers that do not run JavaScript. React replaces it on start. -->
+    <div id="root">
+      <main style="max-width:44rem;margin:0 auto;padding:2.5rem 1.25rem;font-family:Figtree,system-ui,sans-serif;color:var(--sb-ink,#2B2019);line-height:1.6">
+        <p lang="bn" style="color:var(--sb-clay,#B4441F);font-size:1.4rem;margin:0">ওরা কথা বলতে পারে না, আমরা পারি।</p>
+        <p style="margin:.25rem 0 0;color:var(--sb-ink-2,#634F40)">They have no voice, so we lend them ours.</p>
+        <h1 style="font-size:2.2rem;line-height:1.1;margin:1.25rem 0 0">Pother Bondhu: an animal rescue network for Dhaka</h1>
+        <p style="color:var(--sb-ink-2,#634F40)">See a street animal that needs help? Post a photo with the area. Volunteers in that area see it and go to help.</p>
+        <p><a href="/rescues#post" style="color:var(--sb-clay,#B4441F);font-weight:600">Report an animal</a> or <a href="/login?mode=signup" style="color:var(--sb-clay,#B4441F);font-weight:600">join as a volunteer</a>.</p>
+        <h2 style="font-size:1.3rem;margin:1.75rem 0 .5rem">What you can do here</h2>
+        <ul style="padding-left:1.2rem;color:var(--sb-ink-2,#634F40)">
+          <li><a href="/rescues">Rescue board</a>: photos of street animals in trouble, filtered by area or shown on a map of Dhaka, each marked Urgent, Needs vet, Being helped or Resolved.</li>
+          <li><a href="/adopt">Adoption</a>: animals volunteers have looked after that now need a home.</li>
+          <li><a href="/vets">Vets and rescue groups</a>: vet hospitals, rescue groups and shelters in Dhaka, with the source of each detail.</li>
+          <li><a href="/teams">Teams</a>: volunteer teams for feeding routes, night rescue and vaccination camps.</li>
+          <li><a href="/volunteers">Volunteers</a>: a public list of volunteers by area, who you can support with PetPoints.</li>
+          <li><a href="/products">Supplies shop</a>: food, bowls and beds for street animals, paid in PetPoints.</li>
+        </ul>
+        <p style="color:var(--sb-ink-2,#634F40)">Made by Faiaz Abrar Zaman Pronoy and Sinthia Khandoker. Available in Bangla and English.</p>
+      </main>
+    </div>
     <noscript>
       <p style="font-family:sans-serif;padding:2rem;text-align:center">
         Pother Bondhu needs JavaScript switched on to load rescues and teams.<br />রেসকিউ আর টিম দেখতে JavaScript চালু করুন।
