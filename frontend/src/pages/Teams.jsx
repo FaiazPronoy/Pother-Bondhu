@@ -64,8 +64,8 @@ const Teams = () => {
         {t('teams.lead')}
       </PageHeader>
 
-      <div className="flex flex-col items-center gap-4 mb-10">
-        <div className="relative w-full max-w-lg">
+      <div className="flex flex-col gap-3 mb-8 lg:flex-row lg:items-center">
+        <div className="relative w-full lg:max-w-sm">
           <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-2" aria-hidden="true" />
           <input
             type="search"
@@ -76,7 +76,7 @@ const Teams = () => {
             aria-label={t('teams.searchLabel')}
           />
         </div>
-        <div className="flex flex-wrap justify-center gap-2" role="group" aria-label={t('teams.type')}>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t('teams.type')}>
           {TYPES.map((value) => (
             <button key={value || 'all'} type="button" className="chip" aria-pressed={filterType === value} onClick={() => setFilterType(value)}>
               {value ? t(`teamType.${value}`) : t('teams.all')}
@@ -97,7 +97,7 @@ const Teams = () => {
         <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {teams.map((team) => (
             <li key={team._id}>
-              <Link to={`/teams/${team._id}`} className="card p-6 h-full flex flex-col text-center hover:border-line-2 hover:-translate-y-0.5 transition">
+              <Link to={`/teams/${team._id}`} className="card p-5 sm:p-6 h-full flex flex-col hover:border-line-2 transition-colors">
                 <div className="flex items-center justify-between gap-2">
                   <span className={`tag ${team.category === 'Medical' ? 'tag-moss' : team.category === 'Other' ? 'tag-sun' : 'tag-clay'}`}>
                     {t(`teamType.${team.category || 'Rescue'}`)}
@@ -106,9 +106,9 @@ const Teams = () => {
                     <Users size={15} aria-hidden="true" /> {t('common.members', { n: team.members?.length || 0 })}
                   </span>
                 </div>
-                <h2 className="mt-4 text-xl font-semibold text-balance">{team.name}</h2>
-                <p className="mt-1 text-ink-2 inline-flex items-center justify-center gap-1"><MapPin size={15} aria-hidden="true" /> {area(team.area || 'Dhaka')}</p>
-                {team.description && <p className="mt-3 text-ink-2 text-pretty">{team.description}</p>}
+                <h2 className="mt-4 text-xl font-semibold">{team.name}</h2>
+                <p className="mt-1 text-ink-2 inline-flex items-center gap-1"><MapPin size={15} aria-hidden="true" /> {area(team.area || 'Dhaka')}</p>
+                {team.description && <p className="mt-3 text-ink-2">{team.description}</p>}
                 {team.creator?.name && <p className="mt-auto pt-4 text-sm text-ink-2">{t('teams.startedBy', { name: team.creator.name })}</p>}
               </Link>
             </li>

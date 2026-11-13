@@ -59,10 +59,13 @@ export default function Vets() {
                 {p.email && <a href={`mailto:${p.email}`} className="btn btn-line !min-h-11"><Mail size={16} aria-hidden="true" /> {t("vets.email")}</a>}
               </div>
               <p className="mt-3 text-sm text-ink-2">
-                {area(p.area)}. {t("vets.source")}{" "}
-                <a href={p.source} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-ink inline-flex items-center gap-1">
-                  {p.sourceName} <ExternalLink size={13} aria-hidden="true" />
-                </a>
+                {area(p.area)}.{" "}
+                <span className="whitespace-nowrap">
+                  {t("vets.source")}{" "}
+                  <a href={p.source} target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-ink inline-flex items-center gap-1">
+                    {p.sourceName} <ExternalLink size={13} aria-hidden="true" />
+                  </a>
+                </span>
               </p>
             </li>
           ))}

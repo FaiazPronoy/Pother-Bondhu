@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { MapPin, Heart, Check, X, Plus, ImagePlus } from "lucide-react";
 import { AppContext } from "../context/AppContext";
-import { AREAS, PageHeader, Empty } from "../components/bits";
+import { AREAS, PageHeader, Empty, Busy } from "../components/bits";
 import { useLang } from "../context/LangContext";
 
 const MAX_BYTES = 3 * 1024 * 1024;
@@ -44,7 +44,7 @@ function AskForm({ animal, onDone }) {
       </div>
       <p className="text-sm text-ink-2">{t("adopt.phoneNote")}</p>
       <button type="submit" disabled={sending} className="btn btn-clay self-start">
-        {sending ? t("adopt.sending") : t("adopt.send")}
+        <Busy on={sending} busy={t("adopt.sending")} idle={t("adopt.send")} />
       </button>
     </form>
   );
@@ -185,7 +185,7 @@ function PostAnimal({ onPosted }) {
         <label className="inline-flex items-center gap-2 min-h-11">
           <input type="checkbox" checked={form.neutered} onChange={set("neutered")} className="w-5 h-5 accent-[var(--sb-clay)]" /> {t("adopt.neutered")}
         </label>
-        <button type="submit" disabled={sending} className="btn btn-clay self-start">{sending ? t("adopt.sending") : t("adopt.postBtn")}</button>
+        <button type="submit" disabled={sending} className="btn btn-clay self-start"><Busy on={sending} busy={t("adopt.sending")} idle={t("adopt.postBtn")} /></button>
       </form>
     </details>
   );
@@ -278,7 +278,7 @@ export default function Adopt() {
       {canPost && <PostAnimal onPosted={load} />}
       {mine && <MyRequests mine={mine} onChanged={load} />}
 
-      <div className="flex flex-wrap justify-center gap-2 mb-8" role="group" aria-label={t("adopt.filter")}>
+      <div className="flex flex-wrap gap-2 mb-8" role="group" aria-label={t("adopt.filter")}>
         {[["", "adopt.all"], ["dog", "adopt.dogs"], ["cat", "adopt.cats"]].map(([k, label]) => (
           <button key={k} type="button" className="chip" aria-pressed={kind === k} onClick={() => setKind(k)}>{t(label)}</button>
         ))}
