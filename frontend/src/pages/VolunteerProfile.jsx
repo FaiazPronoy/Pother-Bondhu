@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { ArrowLeft, MapPin, HandHeart } from "lucide-react";
 import { AppContext } from "../context/AppContext";
 import RescueCard from "../components/RescueCard";
-import { Avatar, Empty, Loading, Points, SignInPrompt } from "../components/bits";
+import { Avatar, Empty, Loading, Points, SignInPrompt, Busy } from "../components/bits";
 import { useLang } from "../context/LangContext";
 
 const PRESETS = [50, 100, 250, 500];
@@ -46,7 +46,7 @@ function Donate({ volunteer, onDone }) {
       <label htmlFor="amount" className="label mt-3">{t("vol.typeAmount")}</label>
       <input id="amount" type="number" min="1" step="1" inputMode="numeric" value={amount}
         onChange={(e) => setAmount(e.target.value)} className="field" />
-      <button type="submit" disabled={sending} className="btn btn-clay w-full mt-3">{sending ? t("vol.sending") : t("vol.sendBtn")}</button>
+      <button type="submit" disabled={sending} className="btn btn-clay w-full mt-3"><Busy on={sending} busy={t("vol.sending")} idle={t("vol.sendBtn")} /></button>
     </form>
   );
 }

@@ -60,11 +60,10 @@ export default function TeamDetails() {
       </Link>
 
       <header className="card p-6 sm:p-8 mb-8 relative overflow-hidden">
-        <div className="absolute -right-10 -top-10 w-44 h-44 rounded-full bg-clay-lo" aria-hidden="true" />
         <div className="relative">
           <span className={`tag ${team.category === "Medical" ? "tag-moss" : team.category === "Other" ? "tag-sun" : "tag-clay"}`}>{t(`teamType.${team.category}`)}</span>
           <h1 className="mt-3 text-3xl sm:text-4xl font-semibold">{team.name}</h1>
-          <p className="mt-2 text-ink-2 inline-flex items-center gap-1"><MapPin size={16} aria-hidden="true" /> {area(team.area || "Dhaka")} · {t("team.startedBy", { name: team.creator?.name || t("team.aVolunteer") })}</p>
+          <p className="mt-2 text-ink-2 inline-flex items-center gap-1"><MapPin size={16} aria-hidden="true" /> {area(team.area || "Dhaka")}, {t("team.startedBy", { name: team.creator?.name || t("team.aVolunteer") })}</p>
           {team.description && <p className="mt-4 text-lg max-w-2xl">{team.description}</p>}
           {isCreator && (
             <Link to={`/my-team?team=${team._id}`} className="btn btn-moss mt-6"><UserPlus size={18} aria-hidden="true" /> {t("team.invite")}</Link>
@@ -96,7 +95,7 @@ export default function TeamDetails() {
                 <li key={i} className="pl-6 relative">
                   <span className="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-sun border-4 border-paper" aria-hidden="true" />
                   <p className="text-sm text-ink-2">
-                    {a.by && <span className="font-semibold text-ink">{a.by} · </span>}
+                    {a.by && <span className="font-semibold text-ink">{a.by}, </span>}
                     {a.createdAt ? ago(a.createdAt) : ""}
                   </p>
                   <p className="mt-0.5">{a.message}</p>

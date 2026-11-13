@@ -55,7 +55,7 @@ const TeamInvitations = () => {
                   ) : (
                     <p className="text-lg font-semibold">{t('invites.aTeam')}</p>
                   )}
-                  <p className="text-ink-2">{t('invites.invitedYou', { name: inv.from?.name || t('invites.aLead') })} · {ago(inv.createdAt)}</p>
+                  <p className="text-ink-2">{t('invites.invitedYou', { name: inv.from?.name || t('invites.aLead') })}, {ago(inv.createdAt)}</p>
                 </div>
                 {done ? (
                   <span className={`tag ${done === 'accepted' ? 'tag-moss' : 'tag-sun'}`}>{done === 'accepted' ? t('invites.joined') : t('invites.declined')}</span>

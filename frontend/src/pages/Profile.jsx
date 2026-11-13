@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { HandHeart, Heart, Package, Wallet, UserRound } from "lucide-react";
 import { AppContext } from "../context/AppContext";
-import { AREAS, Avatar, Empty, Loading, Points, SignInPrompt } from "../components/bits";
+import { AREAS, Avatar, Empty, Loading, Points, SignInPrompt, Busy } from "../components/bits";
 import { useLang } from "../context/LangContext";
 
 const TOPUPS = [500, 1000, 2000];
@@ -80,7 +80,7 @@ function AccountForm({ user, onSaved }) {
         </fieldset>
       )}
 
-      <button type="submit" disabled={saving} className="btn btn-clay">{saving ? t("common.saving") : t("common.save")}</button>
+      <button type="submit" disabled={saving} className="btn btn-clay"><Busy on={saving} busy={t("common.saving")} idle={t("common.save")} /></button>
     </form>
   );
 }
@@ -139,7 +139,7 @@ function WalletPanel({ user, onToppedUp }) {
           <input id="bkash" type="tel" inputMode="numeric" placeholder="017XXXXXXXX" value={bkashNumber}
             onChange={(e) => setBkashNumber(e.target.value)} className="field" />
         </div>
-        <button type="submit" disabled={busy} className="btn btn-moss w-full">{busy ? t("profile.adding") : t("profile.add")}</button>
+        <button type="submit" disabled={busy} className="btn btn-moss w-full"><Busy on={busy} busy={t("profile.adding")} idle={t("profile.add")} /></button>
       </form>
     </div>
   );
@@ -189,7 +189,7 @@ function OrdersPanel() {
             </ol>
             <p className="mt-3 text-sm text-ink-2 text-pretty">
               {o.items.map((it) => `${it.name} × ${num(it.quantity)}`).join(", ")}
-              {o.donation > 0 && ` · ${t("orders.gave", { n: o.donation })}`}
+              {o.donation > 0 && `, ${t("orders.gave", { n: o.donation })}`}
             </p>
           </li>
         );

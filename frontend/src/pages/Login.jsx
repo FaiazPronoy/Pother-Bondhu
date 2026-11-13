@@ -5,7 +5,7 @@ import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import { useLang } from "../context/LangContext";
 import { HandHeart, Heart, LayoutDashboard } from "lucide-react";
-import { Wordmark, PasswordField, LangButton } from "../components/bits";
+import { Wordmark, PasswordField, LangButton, Busy } from "../components/bits";
 
 const DEMO = [
   { key: "volunteer", email: "nabila@potherbondhu.com", password: "Volunteer@123", icon: HandHeart },
@@ -112,7 +112,7 @@ const Login = () => {
         </div>
       </aside>
 
-      <main id="main" className="min-h-screen flex flex-col px-5 sm:px-10 py-8 paw-trail">
+      <main id="main" className="min-h-screen flex flex-col px-5 sm:px-10 py-8">
         <div className="flex items-center justify-between gap-3">
           <Link to="/" aria-label={t("login.home")}><Wordmark /></Link>
           <LangButton />
@@ -123,14 +123,14 @@ const Login = () => {
             <h1 className="text-3xl sm:text-4xl font-semibold text-center">
               {state === "Login" ? t("login.welcome") : t("login.joinTitle")}
             </h1>
-            <p className="mt-2 text-center text-ink-2 text-pretty">
+            <p className="mt-2 !text-center text-ink-2">
               {state === "Login" ? t("login.welcomeSub") : t("login.joinSub")}
             </p>
 
-            <div className="mt-8 grid grid-cols-2 p-1 rounded-full bg-sunken border border-line" role="tablist" aria-label={t("login.tabs")}>
+            <div className="mt-8 grid grid-cols-2 p-1 rounded-[10px] bg-sunken border border-line" role="tablist" aria-label={t("login.tabs")}>
               {[["Login", "login.tabIn"], ["Sign Up", "login.tabUp"]].map(([key, label]) => (
                 <button key={key} type="button" role="tab" aria-selected={state === key} onClick={() => switchTo(key)}
-                  className={`min-h-11 rounded-full font-semibold transition-colors ${state === key ? "bg-card text-ink shadow" : "text-ink-2 hover:text-ink"}`}>
+                  className={`min-h-11 rounded-[7px] font-semibold transition-colors ${state === key ? "bg-card text-ink border border-line" : "text-ink-2 hover:text-ink"}`}>
                   {t(label)}
                 </button>
               ))}
@@ -145,7 +145,7 @@ const Login = () => {
                 </div>
                 <PasswordField id="loginPassword" label={t("login.password")} value={loginData.password} onChange={handleLoginInputChange} />
                 <button type="submit" disabled={busy} className="btn btn-clay w-full text-base">
-                  {busy ? t("login.signingIn") : t("login.tabIn")}
+                  <Busy on={busy} busy={t("login.signingIn")} idle={t("login.tabIn")} />
                 </button>
               </form>
             ) : null}
@@ -153,7 +153,7 @@ const Login = () => {
             {state === "Login" && (
               <section className="mt-8 text-center" aria-labelledby="demo-title">
                 <h2 id="demo-title" className="font-display text-lg">{t("login.demoTitle")}</h2>
-                <p className="text-sm text-ink-2">{t("login.demoText")}</p>
+                <p className="text-sm text-ink-2 !text-center">{t("login.demoText")}</p>
                 <div className="mt-4 grid grid-cols-3 gap-3">
                   {DEMO.map((d) => (
                     <button key={d.key} type="button" disabled={busy} onClick={() => handleAuthSubmit(null, "Login", d)} className="name-tag">
@@ -193,7 +193,7 @@ const Login = () => {
                   </span>
                 </label>
                 <button type="submit" disabled={busy} className="btn btn-clay w-full text-base">
-                  {busy ? t("login.creating") : t("login.create")}
+                  <Busy on={busy} busy={t("login.creating")} idle={t("login.create")} />
                 </button>
               </form>
             )}

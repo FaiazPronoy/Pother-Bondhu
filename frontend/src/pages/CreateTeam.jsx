@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { AppContext } from "../context/AppContext";
-import { AREAS, PageHeader, SignInPrompt } from "../components/bits";
+import { AREAS, PageHeader, SignInPrompt, Busy } from "../components/bits";
 import { useLang } from "../context/LangContext";
 
 const CreateTeamPage = () => {
@@ -77,7 +77,7 @@ const CreateTeamPage = () => {
             placeholder={t("create.aboutHint")} />
         </div>
 
-        <button type="submit" disabled={saving} className="btn btn-clay">{saving ? t("create.creating") : t("create.submit")}</button>
+        <button type="submit" disabled={saving} className="btn btn-clay"><Busy on={saving} busy={t("create.creating")} idle={t("create.submit")} /></button>
       </form>
     </>
   );

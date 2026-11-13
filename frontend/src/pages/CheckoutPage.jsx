@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { Heart, Wallet } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { DONATIONS } from '../config';
-import { Empty, PageHeader, Points } from '../components/bits';
+import { Empty, PageHeader, Points, Busy } from '../components/bits';
 import { useLang } from '../context/LangContext';
 
 const CheckoutPage = () => {
@@ -193,7 +193,7 @@ const CheckoutPage = () => {
               : <span>{t('checkout.paidFrom', { points: num(userData.points) })}</span>}
           </p>
           <button type="submit" form="checkout" disabled={placingOrder || short > 0} className="btn btn-clay w-full mt-4 text-base">
-            {placingOrder ? t('checkout.placing') : t('checkout.place')}
+            <Busy on={placingOrder} busy={t('checkout.placing')} idle={t('checkout.place')} />
           </button>
         </aside>
       </div>

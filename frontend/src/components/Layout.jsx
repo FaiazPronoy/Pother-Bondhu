@@ -272,7 +272,7 @@ function Footer({ compact }) {
         </nav>
         <div className="text-sm text-ink-2 space-y-1 md:max-w-xs [&_p]:!text-left">
           <p>
-            © {new Date().getFullYear()} {t("common.brand")} · {t("footer.photos")}{" "}
+            © {new Date().getFullYear()} {t("common.brand")}. {t("footer.photos")}{" "}
             <a href="https://unsplash.com" className="underline underline-offset-2 hover:text-ink" rel="noreferrer" target="_blank">Unsplash</a>
           </p>
           <p>{t("footer.madeBy")}</p>

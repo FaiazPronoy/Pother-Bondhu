@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { MapPin, Plus, UserPlus, Search } from "lucide-react";
 import { AppContext } from "../context/AppContext";
-import { Avatar, Empty, Loading, PageHeader, SignInPrompt } from "../components/bits";
+import { Avatar, Empty, Loading, PageHeader, SignInPrompt, Busy } from "../components/bits";
 import { useLang } from "../context/LangContext";
 
 const MyTeam = () => {
@@ -133,7 +133,7 @@ const MyTeam = () => {
                     </fieldset>
                   )}
                   <button type="submit" disabled={!selectedTeam || selectedVolunteers.length === 0 || sending} className="btn btn-moss w-full">
-                    {sending ? t("myTeam.sending") : selectedVolunteers.length ? t("myTeam.send", { n: selectedVolunteers.length }) : t("myTeam.sendNone")}
+                    <Busy on={sending} busy={t("myTeam.sending")} idle={selectedVolunteers.length ? t("myTeam.send", { n: selectedVolunteers.length }) : t("myTeam.sendNone")} />
                   </button>
                 </>
               )}
