@@ -62,7 +62,7 @@ function Hero() {
           ))}
         </h1>
 
-        <p className="mt-6 text-lg sm:text-xl text-ink-2 max-w-[34rem]">{t("landing.lead")}</p>
+        <p className="mt-6 text-lg sm:text-xl text-ink-2 max-w-[34rem] justify">{t("landing.lead")}</p>
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
           <Link to="/rescues#post" className="btn btn-clay btn-pill min-h-14 px-7 text-[1.06rem]">

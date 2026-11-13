@@ -54,7 +54,7 @@ export function PageHeader({ eyebrow, title, children, action }) {
     <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="max-w-2xl">
         <h1 className="text-[1.9rem] sm:text-[2.4rem] font-semibold">{title}</h1>
-        {children && <p className="mt-2 text-ink-2 text-lg">{children}</p>}
+        {children && <p className="mt-2 text-ink-2 text-lg justify">{children}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </header>
@@ -125,6 +125,19 @@ export function Points({ value, className = "" }) {
       <span className="text-[.8em] font-medium opacity-80">{t("common.points")}</span>
     </span>
   );
+}
+
+// a small turning ring for buttons that are waiting on the server
+export function Spinner({ size = 18 }) {
+  return (
+    <span aria-hidden="true" className="inline-block shrink-0 rounded-full border-[2.5px] border-current border-r-transparent animate-spin"
+      style={{ width: size, height: size }} />
+  );
+}
+
+// button text that swaps to a spinner and a busy label while the action runs
+export function Busy({ on, busy, idle }) {
+  return on ? <><Spinner /> {busy}</> : idle;
 }
 
 export function SignInPrompt({ children }) {

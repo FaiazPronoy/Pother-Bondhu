@@ -131,15 +131,10 @@
     text-wrap: balance;
   }
 
-  /* running text: never a single word alone on the last line.
-     Justified from 640 px up; on a phone the column is too narrow and justifying opens wide gaps between words. */
+  /* running text: never a single word alone on the last line */
   p, li, dd, figcaption, blockquote {
-    text-align: start;
     hyphens: auto;
     text-wrap: pretty;
-  }
-  @media (min-width: 640px) {
-    p, li, dd, figcaption, blockquote { text-align: justify; }
   }
   html[lang="bn"] p, html[lang="bn"] li { hyphens: manual; }
 
@@ -162,6 +157,12 @@
 
 @layer components {
   .bn { font-family: var(--font-bangla); letter-spacing: 0; }
+
+  /* justified text for long lines only (page intros, bios, descriptions).
+     Narrow columns such as cards and phones stay left aligned, since justifying them opens wide gaps between words. */
+  @media (min-width: 640px) {
+    .justify { text-align: justify; }
+  }
 
   /* kept for a few small labels; sentence case, no wide tracking */
   .eyebrow {
