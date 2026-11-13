@@ -53,7 +53,8 @@ with PetPoints and a small supplies shop.
 
 **Rescue desk**
 - After signing in, the home page becomes your dashboard
-- Quick actions, the latest posts, your teams and waiting invitations
+- Animals that need help near you come first, then your own reports and their status, invitations and teams
+- A Report an animal button is always one tap away, at the top of the menu or at the bottom of a phone screen
 
 **Wallet and shop**
 - Top up PetPoints (an in-app credit)

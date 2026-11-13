@@ -1,6 +1,6 @@
 # Pother Bondhu redesign plan
 
-Status: waiting for your choice of direction (A, B or C). No app code has changed yet.
+Status: built on the redesign branch. Chosen direction: the landing from C and the rescue desk from A, with the warm mixed wash kept and justified text on long lines. After screenshots are in docs/redesign/after/.
 
 Samples: serve the repo root (`python -m http.server 5199`) and open `http://127.0.0.1:5199/docs/redesign/samples/`. Screenshots of every sample at 360 px and 1280 px, light and dark, are in `docs/redesign/samples/shots/`. Before screenshots are in `docs/redesign/before/`.
 
