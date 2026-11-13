@@ -46,25 +46,27 @@ function Hero() {
   const lines = [...t("landing.title1").split("|"), t("landing.title2a"), t("landing.title2b")];
   return (
     <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-14 lg:pt-16 lg:pb-24 grid gap-12 lg:grid-cols-[1.1fr_.9fr] items-center">
-      <div>
+      {/* centred on phones and tablets, left aligned beside the photos on desktop */}
+      <div className="text-center lg:text-left">
         <figure className="m-0">
-          <blockquote lang="bn" className="bn !text-left text-[clamp(1.3rem,6.2vw,2rem)] leading-snug text-clay">
+          <blockquote lang="bn" className="bn !text-center lg:!text-left text-[clamp(1.3rem,6.2vw,2rem)] leading-snug text-clay">
             ওরা কথা বলতে পারে না, আমরা পারি।
           </blockquote>
           {lang === "en" && (
-            <figcaption className="mt-1 text-ink-2 !text-left">{t("landing.mottoGloss")}</figcaption>
+            <figcaption className="mt-1 text-ink-2 !text-center lg:!text-left">{t("landing.mottoGloss")}</figcaption>
           )}
         </figure>
 
+        {/* the staircase: on a phone the lines step left and right around the centre, on desktop they step in from the left */}
         <h1 className={`mt-6 font-semibold tracking-[-0.02em] ${size}`}>
           {lines.map((line, i) => (
-            <span key={line} className={`block ${i % 2 ? "sm:pl-[1.6em]" : ""} ${i > 1 ? "font-normal" : "font-bold"}`}>{line}</span>
+            <span key={line} className={`block ${i % 2 ? "pl-[1.3em] lg:pl-[1.6em]" : "pr-[1.3em] lg:pr-0"} ${i > 1 ? "font-normal" : "font-bold"}`}>{line}</span>
           ))}
         </h1>
 
-        <p className="mt-6 text-lg sm:text-xl text-ink-2 max-w-[34rem] justify">{t("landing.lead")}</p>
+        <p className="mt-6 mx-auto lg:mx-0 text-lg sm:text-xl text-ink-2 max-w-[34rem] !text-center lg:!text-justify">{t("landing.lead")}</p>
 
-        <div className="mt-8 flex flex-col sm:flex-row gap-3">
+        <div className="mt-8 flex flex-col sm:flex-row sm:justify-center lg:justify-start gap-3">
           <Link to="/rescues#post" className="btn btn-clay btn-pill min-h-14 px-7 text-[1.06rem]">
             <Camera size={21} aria-hidden="true" /> {t("landing.report")}
           </Link>
