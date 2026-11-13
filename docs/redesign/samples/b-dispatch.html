@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sample B: Dispatch board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Tiro+Bangla&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* B: cooler, plainer neutrals; Figtree carries the interface, Fraunces only for the motto and the title */
+  :root { --page: #F8F7F5; --surface: #FFFFFF; --sunken: #EFEDEA; --line: #E3E0DC; --line-2: #CBC6C0; --ink: #1D1A18; --ink-2: #5B5550; }
+  :root[data-theme="dark"] { --page: #141312; --surface: #1D1B1A; --sunken: #262321; --line: #34302D; --line-2: #4D4743; --ink: #F0ECE8; --ink-2: #B9B1AA; }
+  h2, h3 { font-family: var(--font-sans); font-weight: 700; letter-spacing: -0.01em; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+  @media (min-width: 640px) { .wrap { padding: 0 24px; } }
+
+  .bar { position: sticky; top: 0; z-index: 20; background: var(--surface); border-bottom: 1px solid var(--line); }
+  .bar .wrap { display: flex; align-items: center; gap: 6px; height: 60px; }
+  .mark { font: 600 1.2rem/1 var(--font-display); text-decoration: none; margin-right: auto; display: inline-flex; gap: 8px; align-items: center; }
+  .mark i { width: 10px; height: 10px; border-radius: 3px; background: var(--clay); display: inline-block; }
+  .tabs { display: none; gap: 2px; height: 100%; }
+  .tabs a { display: flex; align-items: center; padding: 0 12px; text-decoration: none; color: var(--ink-2); font-weight: 600; border-bottom: 2px solid transparent; }
+  .tabs a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--clay); }
+  .tabs a:hover { color: var(--ink); }
+  .more { color: var(--ink-2); font-weight: 500 !important; }
+  .icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 10px; color: var(--ink-2); background: none; border: 0; cursor: pointer; text-decoration: none; }
+  .icon-btn:hover { background: var(--sunken); color: var(--ink); }
+  .bar .report { display: none; min-height: 42px; }
+  @media (min-width: 1000px) { .tabs { display: flex; } .bar .report { display: inline-flex; } .bar .menu { display: none; } }
+
+  /* landing: the photo leads, full width, then the words */
+  .photo-band { margin: 0; position: relative; }
+  .photo-band img { width: 100%; height: clamp(240px, 52vw, 520px); object-fit: cover; object-position: 50% 40%; }
+  .photo-band figcaption { position: absolute; left: 16px; bottom: 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .chip-on-photo { background: rgb(20 19 18 / .78); color: #F7F3EE; padding: 4px 10px; border-radius: 6px; font-size: .85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+  .chip-on-photo svg { width: 15px; height: 15px; }
+  .intro { padding: 32px 0 48px; display: grid; gap: 24px; }
+  @media (min-width: 900px) { .intro { max-width: 860px; margin-left: max(24px, calc((100vw - 1180px) / 2 + 24px)); gap: 28px; padding-block: 56px 72px; } }
+  .motto { font-size: clamp(1.5rem, 6.6vw, 2.3rem); line-height: 1.3; color: var(--clay); }
+  .gloss { margin-top: 4px; font-family: var(--font-display); font-style: italic; color: var(--ink-2); }
+  .title { font-family: var(--font-display); font-size: clamp(2rem, 8vw, 3.1rem); line-height: 1.08; letter-spacing: -0.025em; }
+  .title span { display: block; }
+  .lead { margin-top: 16px; color: var(--ink-2); font-size: 1.1rem; max-width: 32rem; }
+  .actions { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+  .actions .btn { min-height: 56px; }
+  @media (min-width: 640px) { .actions { flex-direction: row; } }
+
+  .sec { border-top: 1px solid var(--line); padding: 44px 0; }
+  .sec h2 { font-size: 1.5rem; }
+  .timeline { list-style: none; padding: 0; margin: 24px 0 0; display: grid; gap: 0; counter-reset: s; }
+  .timeline li { counter-increment: s; display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding-bottom: 24px; position: relative; }
+  .timeline li::before { content: counter(s); width: 32px; height: 32px; border-radius: 50%; background: var(--ink); color: var(--page); display: grid; place-items: center; font-weight: 700; z-index: 1; }
+  .timeline li:not(:last-child)::after { content: ""; position: absolute; left: 15px; top: 34px; bottom: 2px; width: 2px; background: var(--line-2); }
+  .timeline h3 { font-size: 1.1rem; margin-top: 4px; }
+  .timeline p { color: var(--ink-2); margin-top: 2px; }
+  @media (min-width: 900px) {
+    .timeline { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .timeline li { grid-template-columns: 1fr; gap: 10px; padding: 0; }
+    .timeline li:not(:last-child)::after { left: 36px; right: -12px; top: 15px; bottom: auto; width: auto; height: 2px; }
+  }
+
+  /* rows: compact, scannable list of cases */
+  .rows { list-style: none; padding: 0; margin: 16px 0 0; border-top: 1px solid var(--line); }
+  .rows li { border-bottom: 1px solid var(--line); }
+  .row { display: grid; grid-template-columns: 84px 1fr; gap: 12px; padding: 12px 0; text-decoration: none; align-items: start; }
+  @media (min-width: 640px) { .row { grid-template-columns: 120px 1fr auto; gap: 16px; } }
+  .row img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; }
+  @media (min-width: 640px) { .row img { width: 120px; height: 90px; } }
+  .row .top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+  .row .where { font-weight: 700; }
+  .row .when { color: var(--ink-2); font-size: .88rem; }
+  .row .note { margin-top: 4px; color: var(--ink-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: .95rem; }
+  .row .side-act { display: none; }
+  @media (min-width: 640px) { .row .side-act { display: flex; align-items: center; } }
+  .ghost { min-height: 40px; padding: 0 14px; border-radius: 8px; border: 1.5px solid var(--line-2); background: none; color: var(--ink); font: 600 .9rem/1 var(--font-sans); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+  .ghost.safe { border-color: var(--moss); color: var(--moss); }
+  :root[data-theme="dark"] .ghost.safe { color: #A6D2B1; border-color: #8DBF9A; }
+
+  footer { border-top: 1px solid var(--line); padding: 28px 0 100px; color: var(--ink-2); font-size: .92rem; }
+
+  /* desk: status lanes */
+  main.desk { padding: 20px 0 120px; }
+  .desk-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+  .desk-head h1 { font-family: var(--font-sans); font-weight: 700; font-size: 1.6rem; letter-spacing: -0.01em; }
+  .desk-head .area { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--surface); font-weight: 600; }
+  .desk-head .area svg { width: 16px; height: 16px; }
+  .mine-strip { margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); display: flex; gap: 12px; align-items: center; }
+  .mine-strip img { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; }
+  .mine-strip .t { font-weight: 600; }
+  .mine-strip .s { font-size: .88rem; color: var(--ink-2); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 2px; }
+  .lane-tabs { display: flex; gap: 6px; margin-top: 18px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .lane-tabs button { flex: none; min-height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); font: 600 .9rem/1 var(--font-sans); display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+  .lane-tabs button[aria-pressed="true"] { background: var(--ink); color: var(--page); border-color: var(--ink); }
+  .lane-tabs svg { width: 16px; height: 16px; }
+  .lane-tabs .n { font-variant-numeric: tabular-nums; opacity: .8; }
+  .lanes { margin-top: 12px; }
+  .lane h2 { display: none; }
+  .lane + .lane { display: none; }
+  @media (min-width: 1000px) {
+    .lane-tabs { display: none; }
+    .lanes { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 24px; margin-top: 24px; }
+    .lane + .lane { display: block; }
+    .lane h2 { display: flex; align-items: center; gap: 8px; font-size: 1rem; padding-bottom: 10px; }
+    .lane h2 .n { color: var(--ink-2); font-weight: 600; }
+    .lane .row { grid-template-columns: 96px 1fr; }
+    .lane .row img { width: 96px; height: 80px; }
+    .lane .row .side-act { display: none; }
+  }
+  .lane .act { margin-top: 8px; display: flex; gap: 8px; }
+  .aside-row { margin-top: 32px; display: grid; gap: 16px; }
+  @media (min-width: 800px) { .aside-row { grid-template-columns: repeat(3, 1fr); } }
+  .box { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: var(--surface); }
+  .box h2 { font-size: 1rem; }
+  .box p, .box li { color: var(--ink-2); font-size: .95rem; }
+  .box ul { list-style: none; padding: 0; margin: 8px 0 0; }
+  .box li { display: flex; justify-content: space-between; padding: 6px 0; }
+  .box .row2 { display: flex; gap: 8px; margin-top: 10px; }
+  .box .row2 .btn { min-height: 42px; flex: 1; font-size: .92rem; }
+  .btn-moss { background: var(--moss); color: #FFF8F0; }
+  :root[data-theme="dark"] .btn-moss { color: #141312; }
+  .box a { color: var(--ink); font-weight: 600; text-underline-offset: 3px; }
+
+  .fab { position: fixed; z-index: 30; left: 12px; right: 12px; bottom: 12px; min-height: 58px; font-size: 1.08rem; border-radius: 14px; }
+  @media (min-width: 1000px) { .fab { display: none; } }
+  .switcher { bottom: 82px; }
+  @media (min-width: 1000px) { .switcher { bottom: 12px; } }
+
+  /* report: one screen, three fields */
+  main.report { max-width: 980px; margin: 0 auto; padding: 20px 16px 120px; }
+  @media (min-width: 900px) { .rep-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; } }
+  .report h1 { font-family: var(--font-sans); font-weight: 700; font-size: 1.6rem; letter-spacing: -0.01em; }
+  .picker { margin-top: 16px; display: grid; place-items: center; gap: 6px; aspect-ratio: 1; max-height: 420px; width: 100%; border-radius: 14px; background: var(--ink); color: var(--page); cursor: pointer; text-align: center; padding: 20px; }
+  .picker svg { width: 44px; height: 44px; }
+  .picker strong { font-size: 1.15rem; }
+  .picker span { opacity: .8; font-size: .9rem; }
+  .fields { margin-top: 16px; display: grid; gap: 16px; }
+  .label { display: block; font-weight: 600; margin-bottom: 6px; }
+  .areas { display: flex; flex-wrap: wrap; gap: 6px; }
+  .areas button { min-height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--surface); color: var(--ink); font: 500 .92rem/1 var(--font-sans); cursor: pointer; }
+  .areas button[aria-pressed="true"] { background: var(--ink); color: var(--page); border-color: var(--ink); font-weight: 700; }
+  .field { width: 100%; min-height: 50px; padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--line-2); background: var(--surface); color: var(--ink); font: 1rem/1.4 var(--font-sans); }
+  .field:focus { outline: none; border-color: var(--clay); box-shadow: 0 0 0 3px var(--clay-lo); }
+  textarea.field { min-height: 100px; resize: vertical; }
+  .quick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .quick button { min-height: 36px; padding: 0 10px; border-radius: 8px; border: 1px dashed var(--line-2); background: none; color: var(--ink-2); font: 500 .88rem/1 var(--font-sans); cursor: pointer; }
+  .hint { margin-top: 6px; color: var(--ink-2); font-size: .88rem; }
+  .send { width: 100%; min-height: 58px; font-size: 1.08rem; }
+  details summary { cursor: pointer; font-weight: 600; min-height: 44px; display: flex; align-items: center; }
+  .spinner { width: 18px; height: 18px; border-radius: 50%; border: 2.5px solid currentColor; border-right-color: transparent; animation: spin .7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ============ LANDING ============ -->
+<section class="view" id="landing" aria-label="Landing page">
+  <header class="bar"><div class="wrap">
+    <a class="mark" href="#landing"><i></i>Pother Bondhu</a>
+    <nav class="tabs" aria-label="Main"><a href="#">Rescues</a><a href="#">Adopt</a><a href="#">Vets</a><a href="#">Teams</a><a href="#">Volunteers</a></nav>
+    <button class="icon-btn" type="button" aria-label="বাংলায় দেখুন"><span class="bn" style="font-weight:600">বাংলা</span></button>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch to dark mode"><svg class="i"><use href="icons.svg#moon"/></svg></button>
+    <a class="btn btn-line" href="#" style="min-height:42px">Sign in</a>
+  </div></header>
+
+  <main id="main">
+    <figure class="photo-band">
+      <img src="../../../frontend/public/img/hero-hand.jpg" alt="A hand reaching out to a street dog that lifts its head to sniff it">
+    </figure>
+    <div class="wrap intro">
+      <div>
+        <p class="bn motto" lang="bn">ওরা কথা বলতে পারে না, আমরা পারি।</p>
+        <p class="gloss">They have no voice, so we lend them ours.</p>
+      </div>
+      <div>
+        <h1 class="title"><span>A little care,</span><span>a little light,</span><span>can make their</span><span>world feel right.</span></h1>
+        <p class="lead">See a street animal that needs help? Post a photo with the area. Volunteers in that area see it and go to help.</p>
+        <div class="actions">
+          <a class="btn btn-clay" href="#report"><svg class="i"><use href="icons.svg#camera"/></svg>Report an animal</a>
+          <a class="btn btn-line" href="#">Join as a volunteer</a>
+        </div>
+      </div>
+    </div>
+
+    <section class="sec"><div class="wrap">
+      <h2>How it works</h2>
+      <ol class="timeline">
+        <li><div><h3>Post a photo</h3><p>Add a photo of the animal, the area and a short note.</p></div></li>
+        <li><div><h3>A team goes to help</h3><p>Volunteer teams in that area see the post. They go to the animal and post an update.</p></div></li>
+        <li><div><h3>Support the work</h3><p>Top up PetPoints, send some to a volunteer, or buy food and supplies in the shop.</p></div></li>
+      </ol>
+    </div></section>
+
+    <section class="sec"><div class="wrap">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><h2>Needs help now</h2><a href="#" style="font-weight:600;color:var(--clay);min-height:44px;display:inline-flex;align-items:center">All rescues</a></div>
+      <ul class="rows">
+        <li><a class="row" href="#"><img src="../../../backend/seed-photos/injured-eye.jpg" alt=""><div><div class="top"><span class="status st-urgent"><svg class="i"><use href="icons.svg#alert"/></svg>Urgent</span><span class="where">Dhanmondi</span><span class="when">5 hours ago</span></div><p class="note">Eye looks swollen and cloudy. Found him near Road 27. Friendly, let me sit next to him. Needs a clinic trip.</p></div></a></li>
+        <li><a class="row" href="#"><img src="../../../backend/seed-photos/road-dog.jpg" alt=""><div><div class="top"><span class="status st-urgent"><svg class="i"><use href="icons.svg#alert"/></svg>Urgent</span><span class="where">Badda</span><span class="when">34 hours ago</span></div><p class="note bn" lang="bn">লিংক রোডের গলির মাঝখানে শুয়ে আছে, এই গরমে প্রায় নড়ছেই না। পানি দিয়েছি। আজ রাতে কেউ একবার দেখে আসতে পারবেন?</p></div></a></li>
+        <li><a class="row" href="#"><img src="../../../backend/seed-photos/ledge-cat.jpg" alt=""><div><div class="top"><span class="status st-vet"><svg class="i"><use href="icons.svg#steth"/></svg>Needs vet</span><span class="where">Gulshan</span><span class="when">2 days ago</span></div><p class="note">On the wall behind Gulshan 2 market. Eating fine but her ear is torn. Flagging it for the cat team.</p></div></a></li>
+      </ul>
+    </div></section>
+  </main>
+  <footer><div class="wrap"><p class="bn" lang="bn" style="color:var(--clay);font-size:1.1rem">ওরা কথা বলতে পারে না, আমরা পারি।</p><p style="margin-top:6px">Made in Dhaka by Faiaz Abrar Zaman Pronoy and Sinthia Khandoker. Photos from Unsplash.</p></div></footer>
+</section>
+
+<!-- ============ DESK ============ -->
+<section class="view" id="desk" aria-label="Rescue desk">
+  <header class="bar"><div class="wrap">
+    <button class="icon-btn menu" type="button" aria-label="Open menu"><svg class="i"><use href="icons.svg#menu"/></svg></button>
+    <a class="mark" href="#landing"><i></i>Pother Bondhu</a>
+    <nav class="tabs" aria-label="Main"><a href="#desk" aria-current="page">Desk</a><a href="#">Board</a><a href="#">Adopt</a><a href="#">Vets</a><a href="#">Teams</a><a href="#">Volunteers</a><a href="#" class="more">Shop</a></nav>
+    <button class="icon-btn" type="button" aria-label="বাংলায় দেখুন"><span class="bn" style="font-weight:600">বাংলা</span></button>
+    <a class="btn btn-clay report" href="#report"><svg class="i"><use href="icons.svg#camera"/></svg>Report</a>
+  </div></header>
+
+  <main class="desk"><div class="wrap">
+    <div class="desk-head">
+      <h1>Cases near you</h1>
+      <button class="area" type="button"><svg class="i"><use href="icons.svg#pin"/></svg>Dhanmondi and nearby<svg class="i"><use href="icons.svg#down"/></svg></button>
+    </div>
+
+    <div class="mine-strip">
+      <img src="../../../backend/seed-photos/injured-eye.jpg" alt="">
+      <div style="min-width:0"><p class="t">Your report, Dhanmondi</p><p class="s"><span class="status st-urgent"><svg class="i"><use href="icons.svg#alert"/></svg>Urgent</span>Posted 5 hours ago</p></div>
+    </div>
+
+    <div class="lane-tabs" role="group" aria-label="Status">
+      <button type="button" aria-pressed="true"><svg class="i"><use href="icons.svg#alert"/></svg>Needs help <span class="n">4</span></button>
+      <button type="button" aria-pressed="false"><svg class="i"><use href="icons.svg#walk"/></svg>Being helped <span class="n">3</span></button>
+      <button type="button" aria-pressed="false"><svg class="i"><use href="icons.svg#check"/></svg>Resolved <span class="n">2</span></button>
+    </div>
+
+    <div class="lanes">
+      <section class="lane" aria-label="Needs help">
+        <h2><svg class="i"><use href="icons.svg#alert"/></svg>Needs help <span class="n">4</span></h2>
+        <ul class="rows">
+          <li data-case><div class="row"><img src="../../../backend/seed-photos/injured-eye.jpg" alt=""><div><div class="top"><span class="status st-urgent"><svg class="i"><use href="icons.svg#alert"/></svg>Urgent</span><span class="where">Dhanmondi</span><span class="when">5 h</span></div><p class="note">Eye looks swollen and cloudy. Found him near Road 27. Needs a clinic trip.</p><div class="act"><button class="ghost" type="button"><svg class="i"><use href="icons.svg#walk"/></svg>I am going</button></div></div></div></li>
+          <li data-case><div class="row"><img src="../../../backend/seed-photos/cat-colony.jpg" alt=""><div><div class="top"><span class="status st-urgent"><svg class="i"><use href="icons.svg#alert"/></svg>Urgent</span><span class="where">Moghbazar</span><span class="when">28 h</span></div><p class="note">The cat colony behind the Moghbazar flyover is up to five now.</p></div></div></li>
+          <li data-case><div class="row"><img src="../../../backend/seed-photos/street-dinner.jpg" alt=""><div><div class="top"><span class="status st-vet"><svg class="i"><use href="icons.svg#steth"/></svg>Needs vet</span><span class="where">Mirpur</span><span class="when">9 h</span></div><p class="note">Night round done. 14 dogs fed between Mirpur 10 and 11.</p></div></div></li>
+          <li data-case><div class="row"><img src="../../../backend/seed-photos/ledge-cat.jpg" alt=""><div><div class="top"><span class="status st-vet"><svg class="i"><use href="icons.svg#steth"/></svg>Needs vet</span><span class="where">Gulshan</span><span class="when">2 d</span></div><p class="note">On the wall behind Gulshan 2 market. Her ear is torn.</p></div></div></li>
+        </ul>
+      </section>
+      <section class="lane" aria-label="Being helped">
+        <h2><svg class="i"><use href="icons.svg#walk"/></svg>Being helped <span class="n">3</span></h2>
+        <ul class="rows">
+          <li data-case><div class="row"><img src="../../../backend/seed-photos/mohammadpur-dog.jpg" alt=""><div><div class="top"><span class="status st-helping"><svg class="i"><use href="icons.svg#walk"/></svg>Being helped</span></div><p class="note"><b>Mohammadpur</b>, 3 days ago</p><div class="act"><button class="ghost safe" type="button" data-mark-safe><svg class="i"><use href="icons.svg#check"/></svg>Mark as safe</button></div></div></div></li>
+          <li data-case><div class="row"><img src="../../../backend/seed-photos/white-kitten.jpg" alt=""><div><div class="top"><span class="status st-helping"><svg class="i"><use href="icons.svg#walk"/></svg>Being helped</span></div><p class="note"><b>Uttara</b>, 20 hours ago</p></div></div></li>
+          <li data-case><div class="row"><img src="../../../backend/seed-photos/pack.jpg" alt=""><div><div class="top"><span class="status st-helping"><svg class="i"><use href="icons.svg#walk"/></svg>Being helped</span></div><p class="note"><b>Uttara</b>, 4 days ago</p></div></div></li>
+        </ul>
+      </section>
+      <section class="lane" aria-label="Resolved">
+        <h2><svg class="i"><use href="icons.svg#check"/></svg>Resolved <span class="n">2</span></h2>
+        <ul class="rows">
+          <li><div class="row"><img src="../../../backend/seed-photos/calico.jpg" alt=""><div><div class="top"><span class="status st-resolved"><svg class="i"><use href="icons.svg#check"/></svg>Resolved</span></div><p class="note"><b>Mirpur</b>, 5 days ago</p></div></div></li>
+          <li><div class="row"><img src="../../../backend/seed-photos/bowl-dog.jpg" alt=""><div><div class="top"><span class="status st-resolved"><svg class="i"><use href="icons.svg#check"/></svg>Resolved</span></div><p class="note"><b>Banani</b>, 2 days ago</p></div></div></li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="aside-row">
+      <section class="box"><h2>Team invitation</h2><p style="margin-top:6px"><b style="color:var(--ink)">Gulshan Cat Watch</b>, from Rafiq Ahmed</p><div class="row2"><button class="btn btn-moss" type="button">Join</button><button class="btn btn-line" type="button">Decline</button></div></section>
+      <section class="box"><h2>Your teams</h2><ul><li><span>Dhanmondi Street Feeders</span><span>3 members</span></li></ul><p style="margin-top:6px"><a href="#">Manage teams</a></p></section>
+      <section class="box"><h2>Support</h2><p style="margin-top:6px">4,200 PetPoints. <a href="#">Send to a volunteer</a> or <a href="#">buy supplies</a>.</p><p class="bn" lang="bn" style="margin-top:10px;color:var(--clay)">ওরা কথা বলতে পারে না, আমরা পারি।</p></section>
+    </div>
+  </div></main>
+  <a class="btn btn-clay fab" href="#report"><svg class="i"><use href="icons.svg#camera"/></svg>Report an animal</a>
+</section>
+
+<!-- ============ REPORT ============ -->
+<section class="view" id="report" aria-label="Report an animal">
+  <header class="bar"><div class="wrap">
+    <a class="icon-btn" href="#desk" aria-label="Back"><svg class="i" style="transform:rotate(90deg)"><use href="icons.svg#down"/></svg></a>
+    <a class="mark" href="#landing"><i></i>Pother Bondhu</a>
+  </div></header>
+  <main class="report">
+    <h1>Report an animal</h1>
+    <form class="rep-grid" onsubmit="event.preventDefault(); const b=this.querySelector('.send'); b.disabled=true; b.innerHTML='<span class=&quot;spinner&quot;></span>Sending';">
+      <label class="picker"><svg class="i"><use href="icons.svg#camera"/></svg><strong>Take a photo</strong><span>or pick one from your phone. JPG, PNG or WebP, up to 3 MB</span><input type="file" accept="image/*" capture="environment" class="sr-only"></label>
+      <div class="fields">
+        <div><span class="label" id="wl">Where?</span>
+          <div class="areas" role="group" aria-labelledby="wl">
+            <button type="button" aria-pressed="true">Dhanmondi</button><button type="button">Mohammadpur</button><button type="button">Mirpur</button><button type="button">Gulshan</button><button type="button">Banani</button><button type="button">Badda</button><button type="button">Uttara</button><button type="button">Moghbazar</button><button type="button">Bashundhara</button><button type="button">Puran Dhaka</button>
+          </div></div>
+        <div><label class="label" for="what">What is wrong?</label>
+          <textarea class="field" id="what" maxlength="500" placeholder="Bangla or English"></textarea>
+          <p class="hint">0/500</p></div>
+        <details><summary>More details (optional)</summary>
+          <label class="label" for="urg" style="margin-top:8px">Status</label><select class="field" id="urg"><option>Urgent</option><option>Needs vet</option><option>Being helped</option></select></details>
+        <button class="btn btn-clay send" type="submit"><svg class="i"><use href="icons.svg#send"/></svg>Send report</button>
+      </div>
+    </form>
+  </main>
+</section>
+
+<nav class="switcher" aria-label="Sample views"><a href="#landing">Landing</a><a href="#desk">Desk</a><a href="#report">Report</a><button type="button" data-theme-toggle>Theme</button></nav>
+<script src="shared.js"></script>
+</body>
+</html>

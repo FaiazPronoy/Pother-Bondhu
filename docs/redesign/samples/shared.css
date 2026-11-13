@@ -1,0 +1,118 @@
+/* Shared base for the three redesign samples. Brand clay stays #B4441F (light) and #E0754F (dark). */
+:root {
+  --clay: #B4441F;
+  --clay-hi: #8F3416;
+  --clay-lo: #F7DCCD;
+  --on-clay: #FFF8F0;
+  --moss: #3F6B4E;
+  --moss-lo: #DCE8DD;
+  --sun: #E9A23B;
+  --sun-lo: #FBE9C8;
+  --danger: #A52A2A;
+
+  /* neutrals moved off the default cream to a quieter warm grey */
+  --page: #F6F3EF;
+  --surface: #FFFFFF;
+  --sunken: #ECE7E1;
+  --line: #E1DAD2;
+  --line-2: #C9BFB4;
+  --ink: #221B16;
+  --ink-2: #5C5149;
+
+  --font-sans: "Figtree", "Noto Sans Bengali", system-ui, sans-serif;
+  --font-display: "Fraunces", "Tiro Bangla", Georgia, serif;
+  --font-bangla: "Tiro Bangla", "Noto Serif Bengali", serif;
+
+  --r-control: 10px;
+  --r-card: 14px;
+  --r-photo: 10px;
+  --shadow-lift: 0 1px 2px rgb(34 27 22 / .06), 0 8px 20px -12px rgb(34 27 22 / .22);
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+}
+
+:root[data-theme="dark"] {
+  --clay: #E0754F;
+  --clay-hi: #EE8C69;
+  --clay-lo: #4A2618;
+  --on-clay: #1A1411;
+  --moss: #8DBF9A;
+  --moss-lo: #22362A;
+  --sun-lo: #3D2E14;
+  --danger: #F08A80;
+  --page: #161311;
+  --surface: #201B18;
+  --sunken: #2A2420;
+  --line: #3A322C;
+  --line-2: #54493F;
+  --ink: #F1EAE2;
+  --ink-2: #BFB2A5;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 16px/1.6 var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; margin: 0; text-wrap: balance; }
+p { margin: 0; }
+a { color: inherit; }
+img { display: block; max-width: 100%; }
+::selection { background: var(--clay-lo); color: var(--ink); }
+:focus-visible { outline: 3px solid var(--sun); outline-offset: 2px; border-radius: 6px; }
+.bn { font-family: var(--font-bangla); letter-spacing: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+svg.i { width: 20px; height: 20px; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 20px; border-radius: var(--r-control);
+  font: 600 1rem/1.2 var(--font-sans); text-decoration: none; cursor: pointer; border: 0;
+  transition: background-color .15s, border-color .15s, transform .15s var(--ease-out);
+}
+.btn:active { transform: scale(.98); }
+.btn-clay { background: var(--clay); color: var(--on-clay); }
+.btn-clay:hover { background: var(--clay-hi); }
+.btn-line { background: transparent; color: var(--ink); border: 1.5px solid var(--line-2); }
+.btn-line:hover { border-color: var(--ink); }
+
+/* status: an icon, a word and a colour, never the colour alone */
+.status {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px 3px 8px; border-radius: 6px;
+  font: 700 .8rem/1.4 var(--font-sans);
+}
+.status svg.i { width: 15px; height: 15px; stroke-width: 2.4; }
+.st-urgent { background: #A52A2A; color: #FFF8F0; }
+.st-vet { background: var(--sun-lo); color: #5A3A06; }
+.st-helping { background: var(--moss-lo); color: #22432F; }
+.st-resolved { background: var(--sunken); color: var(--ink-2); }
+:root[data-theme="dark"] .st-vet { color: #F6D79E; }
+:root[data-theme="dark"] .st-helping { color: #BFE0C8; }
+
+.switcher {
+  position: fixed; z-index: 90; right: 12px; bottom: 12px;
+  display: flex; gap: 4px; padding: 4px; border-radius: 12px;
+  background: #221B16; color: #F1EAE2; font: 600 .8rem/1 var(--font-sans);
+  box-shadow: 0 8px 24px -8px rgb(0 0 0 / .5);
+}
+.switcher a, .switcher button { color: inherit; text-decoration: none; padding: 8px 10px; border-radius: 8px; background: none; border: 0; font: inherit; cursor: pointer; }
+.switcher a[aria-current="page"] { background: #F1EAE2; color: #221B16; }
+
+.view { display: none; }
+.view.on { display: block; }
+
+/* signature moment: the badge settles into "Resolved" with a short, warm confirmation */
+.status.is-safe { animation: settle .24s var(--ease-out) both; }
+.safe-note { font-weight: 600; color: var(--moss); animation: fade .2s .1s ease-out both; }
+:root[data-theme="dark"] .safe-note { color: #A6D2B1; }
+@keyframes settle { from { opacity: .3; transform: scale(.88); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .2s; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redesign samples</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700&family=Fraunces:opsz,wght@9..144,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared.css">
+<style>
+  main { max-width: 1180px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 2rem; }
+  .intro { margin-top: 8px; color: var(--ink-2); max-width: 46rem; }
+  .grid { margin-top: 28px; display: grid; gap: 28px; }
+  @media (min-width: 960px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  article { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  h2 { font-size: 1.35rem; }
+  .shots { display: grid; grid-template-columns: 2.4fr 1fr; gap: 8px; align-items: start; }
+  .shots img { border-radius: 8px; border: 1px solid var(--line); width: 100%; height: 220px; object-fit: cover; object-position: top; }
+  ul { margin: 0; padding-left: 18px; color: var(--ink-2); }
+  li + li { margin-top: 4px; }
+  .open { margin-top: auto; }
+  .open a { margin-right: 8px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Pother Bondhu: three directions</h1>
+  <p class="intro">Each sample has a landing page, the signed-in rescue desk and the report form. Use the switcher at the bottom right to change view and theme. On the desk, press "Mark as safe" to see the signature moment. All three keep the clay colour, the mottos word for word, Fraunces and Figtree.</p>
+  <div class="grid">
+    <article>
+      <h2>A. Noticeboard</h2>
+      <div class="shots"><img src="shots/a-noticeboard_desk_desktop_light.jpg" alt="Sample A desk on desktop"><img src="shots/a-noticeboard_desk_phone_light.jpg" alt="Sample A desk on a phone"></div>
+      <ul><li>Feed of photo-led case cards, two across</li><li>Sidebar with Report on top, Shop and PetPoints moved to a small Support group</li><li>Landing: motto, title, one real case photo, two actions</li><li>Closest to what the prompt asks for</li></ul>
+      <p class="open"><a class="btn btn-clay" href="a-noticeboard.html#desk">Open A</a></p>
+    </article>
+    <article>
+      <h2>B. Dispatch board</h2>
+      <div class="shots"><img src="shots/b-dispatch_desk_desktop_light.jpg" alt="Sample B desk on desktop"><img src="shots/b-dispatch_desk_phone_light.jpg" alt="Sample B desk on a phone"></div>
+      <ul><li>Cases sorted into lanes: needs help, being helped, resolved</li><li>Compact rows, more cases per screen, an "I am going" button</li><li>Top tab bar instead of a sidebar, plainer and cooler</li><li>Landing: one full-width photo, then the words</li></ul>
+      <p class="open"><a class="btn btn-clay" href="b-dispatch.html#desk">Open B</a></p>
+    </article>
+    <article>
+      <h2>C. Scrapbook, tidied</h2>
+      <div class="shots"><img src="shots/c-scrapbook_landing_desktop_light.jpg" alt="Sample C landing on desktop"><img src="shots/c-scrapbook_desk_phone_light.jpg" alt="Sample C desk on a phone"></div>
+      <ul><li>Keeps your stair title, the two photo prints and the three photo steps</li><li>No glow, no paw texture, no tape, small tilt only on the hero</li><li>Desk uses the same "near you" plan as A, with print-style cards</li><li>Least change from today</li></ul>
+      <p class="open"><a class="btn btn-clay" href="c-scrapbook.html#landing">Open C</a></p>
+    </article>
+  </div>
+</main>
+</body>
+</html>
